@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>3. Cross-linked polyimide: introduce multifunctional branching &#8212; ChemFAST · Documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=b95a8313" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../_static/chemfast.css?v=6c49ce7e" />
+    <script src="../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../_static/favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="4. POSS-PMMA: map reactions onto a structured component" href="poss.html" />
+    <link rel="prev" title="2. Radical PMMA: move an active state during chain growth" href="radical-pmma.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/left_small_logo.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<nav class="chemfast-nav" aria-label="Documentation navigation">
+  <h3 class="chemfast-nav-title">Navigation</h3>
+  <a class="chemfast-nav-link" href="../index.html">Introduction</a>
+  <div class="chemfast-nav-label">Get ChemFAST</div>
+  <div class="chemfast-nav-children">
+    <a class="chemfast-nav-link" href="../online-tools.html">Online Tools</a>
+    <a class="chemfast-nav-link" href="../installation.html">Installation</a>
+  </div>
+  <a class="chemfast-nav-link" href="../quick-start.html">Quick Start</a>
+  <a class="chemfast-nav-link" href="../workflow.html">Workflow</a>
+  <a class="chemfast-nav-link" href="../reaction-dsl.html">Reaction DSL</a>
+  <details class="chemfast-nav-group" open>
+    <summary>Tutorials</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="index.html">Overview</a>
+      <a class="chemfast-nav-link" href="first-system.html">Linear Polyimide</a>
+      <a class="chemfast-nav-link" href="radical-pmma.html">Radical PMMA</a>
+      <a class="chemfast-nav-link is-current" href="#" aria-current="page">Crosslinked Network</a>
+      <a class="chemfast-nav-link" href="poss.html">POSS–PMMA</a>
+      <a class="chemfast-nav-link" href="spe.html">SPE</a>
+      <a class="chemfast-nav-link" href="block-ps-peo.html">PS-b-PEO</a>
+      <a class="chemfast-nav-link" href="aa-relaxation.html">AA Relaxation</a>
+    </div>
+  </details>
+  <details class="chemfast-nav-group">
+    <summary>Reference</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="../usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link" href="../inputs.html">Input Reference</a>
+      <a class="chemfast-nav-link" href="../api/index.html">Core API</a>
+    </div>
+  </details>
+  <a class="chemfast-nav-link" href="../testing.html">Testing</a>
+  <a class="chemfast-nav-link" href="../troubleshooting.html">Troubleshooting</a>
+</nav>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="cross-linked-polyimide-introduce-multifunctional-branching">
+<h1>3. Cross-linked polyimide: introduce multifunctional branching<a class="headerlink" href="#cross-linked-polyimide-introduce-multifunctional-branching" title="Link to this heading">¶</a></h1>
+<p>This example extends the linear polyimide chemistry with a trifunctional amine.
+The reconstruction procedure is unchanged; branching emerges from the permitted
+CG connections.</p>
+<section id="define-the-network-forming-reactants">
+<h2>1. Define the network-forming reactants<a class="headerlink" href="#define-the-network-forming-reactants" title="Link to this heading">¶</a></h2>
+<p>The four molecular reactants and their CG colours are shown below.</p>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="../_images/reactants2.svg"><img alt="Molecular structures of A, B1, B2, and C mapped to coral, blue, lavender, and yellow CG beads." src="../_images/reactants2.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Network-forming reactants and their one-bead CG representations.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;cg_topology_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reaction_final.xml&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;reaction_path_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reaction_path.txt&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;domd_react_dsl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v1&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;smiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;O1C(=O)c2ccc(Oc3cc4C(=O)OC(=O)c4cc3)cc2C1=O&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;N&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_valence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;B1&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;smiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Nc1ccc(Oc2ccc(N)cc2)cc1&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;N&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_valence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;B2&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;smiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Nc1ccc(N)cc1&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;N&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_valence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;C&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;smiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Nc1cc(N)cc(N)c1&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;N&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_valence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;reactions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A-B1&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;general&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;B1&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;smarts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[O:1]=[C:2][O:3][C:4]=[O:5].[NH2:6]&gt;&gt;[O:1]=[C:2][N:6][C:4]=[O:5].[O:3]&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;prod_idx&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="mi">0</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;intrinsic_probability&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;B1-A&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;general&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;B1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;smarts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[NH2:6].[O:1]=[C:2][O:3][C:4]=[O:5]&gt;&gt;[O:1]=[C:2][N:6][C:4]=[O:5].[O:3]&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;prod_idx&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="mi">0</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;intrinsic_probability&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A-B2&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;general&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;B2&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;smarts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[O:1]=[C:2][O:3][C:4]=[O:5].[NH2:6]&gt;&gt;[O:1]=[C:2][N:6][C:4]=[O:5].[O:3]&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;prod_idx&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="mi">0</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;intrinsic_probability&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;B2-A&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;general&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;B2&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;smarts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[NH2:6].[O:1]=[C:2][O:3][C:4]=[O:5]&gt;&gt;[O:1]=[C:2][N:6][C:4]=[O:5].[O:3]&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;prod_idx&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="mi">0</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;intrinsic_probability&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A-C&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;general&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;C&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;smarts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[O:1]=[C:2][O:3][C:4]=[O:5].[NH2:6]&gt;&gt;[O:1]=[C:2][N:6][C:4]=[O:5].[O:3]&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;prod_idx&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="mi">0</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;intrinsic_probability&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;C-A&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;general&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;C&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;smarts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[NH2:6].[O:1]=[C:2][O:3][C:4]=[O:5]&gt;&gt;[O:1]=[C:2][N:6][C:4]=[O:5].[O:3]&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;prod_idx&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="mi">0</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;intrinsic_probability&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Type</p></th>
+<th class="head text-right"><p>Count</p></th>
+<th class="head text-right"><p><code class="docutils literal notranslate"><span class="pre">max_valence</span></code></p></th>
+<th class="head"><p>Role</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">A</span></code></p></td>
+<td class="text-right"><p>200</p></td>
+<td class="text-right"><p>2</p></td>
+<td><p>bifunctional dianhydride</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">B1</span></code></p></td>
+<td class="text-right"><p>100</p></td>
+<td class="text-right"><p>2</p></td>
+<td><p>bifunctional diamine</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">B2</span></code></p></td>
+<td class="text-right"><p>100</p></td>
+<td class="text-right"><p>2</p></td>
+<td><p>second bifunctional diamine</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">C</span></code></p></td>
+<td class="text-right"><p>4</p></td>
+<td class="text-right"><p>3</p></td>
+<td><p>trifunctional branch point</p></td>
+</tr>
+</tbody>
+</table>
+<p>The six ordered rules cover <code class="docutils literal notranslate"><span class="pre">A-B1</span></code>, <code class="docutils literal notranslate"><span class="pre">A-B2</span></code>, and <code class="docutils literal notranslate"><span class="pre">A-C</span></code> in both participant
+orders. They share the same local imidization SMARTS. Composition and
+<code class="docutils literal notranslate"><span class="pre">max_valence</span></code> determine the possible network topology; the SMARTS determines
+the atomistic transformation.</p>
+</section>
+<section id="construct-and-relax-the-cg-network">
+<h2>2. Construct and relax the CG network<a class="headerlink" href="#construct-and-relax-the-cg-network" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>prepare_cg.py<span class="w"> </span>04_network_pi
+<span class="nb">cd</span><span class="w"> </span>04_network_pi/cg
+python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
+<span class="nb">cd</span><span class="w"> </span>../..
+</pre></div>
+</div>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Initial CG mixture</p></th>
+<th class="head"><p>Polymerized and pre-equilibrated CG network</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><img alt="Initial mixture of four CG reactant types." src="../_images/cg_ini2.png" /></p></td>
+<td><p><img alt="Final branched CG polyimide configuration." src="../_images/cg_final2.png" /></p></td>
+</tr>
+</tbody>
+</table>
+<p>The yellow C beads can accept three reaction-generated connections, creating
+branch points among the bifunctional components. Trifunctionality permits a
+network but does not guarantee that every finite trajectory percolates.</p>
+</section>
+<section id="reconstruct-the-atomistic-network">
+<h2>3. Reconstruct the atomistic network<a class="headerlink" href="#reconstruct-the-atomistic-network" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>reconstruct_aa.py<span class="w"> </span>04_network_pi
+</pre></div>
+</div>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Final CG network</p></th>
+<th class="head"><p>Energy-minimized AA reconstruction</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><img alt="Final CG network used for reconstruction." src="../_images/cg_final2.png" /></p></td>
+<td><p><img alt="Atomistic cross-linked polyimide after energy minimization." src="../_images/aa_em2.png" /></p></td>
+</tr>
+</tbody>
+</table>
+<p>ReactionPath replay assigns the correct diamine or trifunctional amine to every
+accepted CG event. The final CG geometry guides the placement of the resulting
+atomistic network.</p>
+</section>
+<section id="briefly-equilibrate-the-aa-model">
+<h2>4. Briefly equilibrate the AA model<a class="headerlink" href="#briefly-equilibrate-the-aa-model" title="Link to this heading">¶</a></h2>
+<p>See <a class="reference internal" href="aa-relaxation.html"><span class="std std-doc">AA relaxation</span></a> for the external GROMACS steps used to
+produce EM/EQ coordinates from the reconstructed <code class="docutils literal notranslate"><span class="pre">system.gro</span></code>.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Energy-minimized AA model</p></th>
+<th class="head"><p>AA model after the supplied short equilibration</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><img alt="Energy-minimized atomistic network." src="../_images/aa_em2.png" /></p></td>
+<td><p><img alt="Atomistic network after short equilibration." src="../_images/aa_final2.png" /></p></td>
+</tr>
+</tbody>
+</table>
+<p>This short run provides an initial coordinate relaxation only. Network
+properties require an independently validated production protocol.</p>
+</section>
+<section id="what-to-inspect">
+<h2>What to inspect<a class="headerlink" href="#what-to-inspect" title="Link to this heading">¶</a></h2>
+<ul class="simple">
+<li><p>C beads never exceed three reaction-generated connections;</p></li>
+<li><p>A, B1, and B2 beads never exceed two;</p></li>
+<li><p>ReactionPath rules agree with the participating bead types;</p></li>
+<li><p>the atomistic network and force-field export contain the expected branch
+points and all required bonded terms.</p></li>
+</ul>
+<p>Next: <a class="reference internal" href="poss.html"><span class="std std-doc">POSS-PMMA</span></a>.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

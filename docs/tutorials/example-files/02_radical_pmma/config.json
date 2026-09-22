@@ -1,0 +1,31 @@
+{
+  "cg_topology_file": "reaction_final.xml",
+  "reaction_path_file": "reaction_path.txt",
+  "box_tensor": [10,10,10],
+  "domd_react_dsl": "v1",
+  "reactants": [
+    {
+      "name": "P",
+      "smiles": "C=C(C(=O)OC)C",
+      "N": 600,
+      "activate": 1,
+      "max_valence": 2
+    }
+  ],
+  "reactions": [
+    {
+      "name": "P-P",
+      "kind": "radical",
+      "reactants": ["P", "P"],
+      "smarts": "[C:1]=[C;H0:2].[CH2;$([CH2]=[C;H0]):3]>>[C:1][C:2][CH1:3]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0,
+      "activation": {
+        "from": 0,
+        "to": 1
+      }
+    }
+  ]
+}

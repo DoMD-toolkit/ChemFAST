@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Force-field and file-output API details &#8212; ChemFAST · Documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=b95a8313" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../_static/chemfast.css?v=6c49ce7e" />
+    <script src="../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../_static/favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/left_small_logo.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<nav class="chemfast-nav" aria-label="Documentation navigation">
+  <h3 class="chemfast-nav-title">Navigation</h3>
+  <a class="chemfast-nav-link" href="../index.html">Introduction</a>
+  <div class="chemfast-nav-label">Get ChemFAST</div>
+  <div class="chemfast-nav-children">
+    <a class="chemfast-nav-link" href="../online-tools.html">Online Tools</a>
+    <a class="chemfast-nav-link" href="../installation.html">Installation</a>
+  </div>
+  <a class="chemfast-nav-link" href="../quick-start.html">Quick Start</a>
+  <a class="chemfast-nav-link" href="../workflow.html">Workflow</a>
+  <a class="chemfast-nav-link" href="../reaction-dsl.html">Reaction DSL</a>
+  <details class="chemfast-nav-group">
+    <summary>Tutorials</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="../tutorials/index.html">Overview</a>
+      <a class="chemfast-nav-link" href="../tutorials/first-system.html">Linear Polyimide</a>
+      <a class="chemfast-nav-link" href="../tutorials/radical-pmma.html">Radical PMMA</a>
+      <a class="chemfast-nav-link" href="../tutorials/network.html">Crosslinked Network</a>
+      <a class="chemfast-nav-link" href="../tutorials/poss.html">POSS–PMMA</a>
+      <a class="chemfast-nav-link" href="../tutorials/spe.html">SPE</a>
+      <a class="chemfast-nav-link" href="../tutorials/block-ps-peo.html">PS-b-PEO</a>
+      <a class="chemfast-nav-link" href="../tutorials/aa-relaxation.html">AA Relaxation</a>
+    </div>
+  </details>
+  <details class="chemfast-nav-group" open>
+    <summary>Reference</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="../usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link" href="../inputs.html">Input Reference</a>
+      <a class="chemfast-nav-link is-current" href="index.html">Core API</a>
+    </div>
+  </details>
+  <a class="chemfast-nav-link" href="../testing.html">Testing</a>
+  <a class="chemfast-nav-link" href="../troubleshooting.html">Troubleshooting</a>
+</nav>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="force-field-and-file-output-api-details">
+<h1>Force-field and file-output API details<a class="headerlink" href="#force-field-and-file-output-api-details" title="Link to this heading">¶</a></h1>
+<p>The core force-field interface is <code class="docutils literal notranslate"><span class="pre">FF</span></code> + <code class="docutils literal notranslate"><span class="pre">FF.setup()</span></code>. The pipeline functions below are convenience layers for exporting assigned systems; they are not replacements for the core object.</p>
+<section id="force-field-object">
+<h2>Force-field object<a class="headerlink" href="#force-field-object" title="Link to this heading">¶</a></h2>
+<p>.. py:class:: FF(name)
+:module: chemfast.ff.ForceField</p>
+<p>Supported names are <code class="docutils literal notranslate"><span class="pre">&quot;opls&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;amber&quot;</span></code>, and <code class="docutils literal notranslate"><span class="pre">&quot;cg&quot;</span></code>. For AA assignment, construct the object with the desired family and pass the RDKit molecule to <code class="docutils literal notranslate"><span class="pre">setup()</span></code>; CG setup instead requires <code class="docutils literal notranslate"><span class="pre">cg_graph</span></code> and <code class="docutils literal notranslate"><span class="pre">config</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.ff.ForceField</span><span class="w"> </span><span class="kn">import</span> <span class="n">FF</span>
+
+<span class="n">ff</span> <span class="o">=</span> <span class="n">FF</span><span class="p">(</span><span class="s2">&quot;opls&quot;</span><span class="p">)</span>
+<span class="n">ff</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">use_gmx</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_boss</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">use_ml</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After setup, assigned interactions are available through <code class="docutils literal notranslate"><span class="pre">ff.params</span></code>; OPLS charge processing is available through <code class="docutils literal notranslate"><span class="pre">ff.charges</span></code>, and <code class="docutils literal notranslate"><span class="pre">ff.success</span></code> records assignment status.</p>
+</section>
+<section id="coordinate-writers">
+<h2>Coordinate writers<a class="headerlink" href="#coordinate-writers" title="Link to this heading">¶</a></h2>
+<p>.. py:function:: write_mols_to_sdf(mols, output_path, force_v3000=True)
+:module: chemfast.conf.misc.io.sdf</p>
+<p>.. py:function:: write_mols_to_xml(mols, box, filename=’chemfast.xml’, graphs=None, program=’galamost’, version=’1.3’)
+:module: chemfast.conf.misc.io.xml</p>
+<p>.. py:function:: write_mols_to_gro(mols, box_tensor, output_path)
+:module: chemfast.conf.misc.io.gro</p>
+</section>
+<section id="force-field-export-pipelines">
+<h2>Force-field/export pipelines<a class="headerlink" href="#force-field-export-pipelines" title="Link to this heading">¶</a></h2>
+<p>.. py:function:: run_top_mode(rdmol, output_dir=’.’, base_name=’system’, obmol=None, **args)
+:module: chemfast.ff.pipeline</p>
+<p>.. py:function:: run_itp_mode(mols, output_dir=’.’, obmols=None, molecule_name=None, **args)
+:module: chemfast.ff.pipeline</p>
+<p>.. py:function:: run_adv_top_mode(rd_mols, output_dir, base_name=’system’, size_threshold=300, useML=True, useBOSS=True, useGMX=True, overwrite=False, **args)
+:module: chemfast.ff.pipeline</p>
+<p><code class="docutils literal notranslate"><span class="pre">run_adv_top_mode</span></code> performs prototype deduplication, assignment and GROMACS TOP/ITP/GRO export. Use the generated GRO, TOP and included ITP files as one matched set.</p>
+<p>Return to the <a class="reference internal" href="index.html#force-field-assignment"><span class="std std-ref">Core API</span></a> for the recommended workflow.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

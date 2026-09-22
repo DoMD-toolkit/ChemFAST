@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=80", "wheel"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "chemfast"
+version = "1.0.0"
+description = "ChemFAST molecular modeling toolkit"
+requires-python = ">=3.12"
+
+dependencies = [
+    # --- Molecular & Data Science Stack ---
+    "rdkit>=2025.09.5",
+    "gsd",
+    "scipy",
+    "pandas",
+    "networkx",
+    "numpy",
+    "sqlalchemy",
+    "pdbreader",
+    "tqdm",
+
+    # --- Machine Learning & Compute Acceleration ---
+    "numba",
+    "torch",
+    "torch-geometric",
+
+    # --- GPU Acceleration (PyOpenCL Ecosystem) ---
+    "pyopencl",
+    "mako",                 # Template engine dependency for PyOpenCL runtime C code generation
+    "pytools",              # PyOpenCL low-level object management
+    "appdirs",              # PyOpenCL cross-platform kernel compilation cache management
+
+    # --- Platform-Specific Dependencies (Environment Markers) ---
+
+    # nomkl installed only on Windows (avoids conflicts on Mac Apple Silicon)
+    "nomkl; sys_platform == 'win32'",
+
+    # MLX installed explicitly and ONLY on native Apple Silicon (macOS arm64)
+    "mlx; sys_platform == 'darwin' and platform_machine == 'arm64'",
+]
+
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+# Only explicitly declared ChemFAST package resources are included.
+include-package-data = false
+
+
+[tool.setuptools.packages.find]
+where      = ["src"]
+include    = ["chemfast", "chemfast.*"]
+namespaces = false
+
+
+[tool.setuptools.package-data]
+
+# Required model weights and force-field resources for installed ChemFAST packages.
+"chemfast.cg.cg_ff" = [
+    "models/**/*",
+]
+
+"chemfast.ff.opls" = [
+    "resources/**/*",
+]
+
+"chemfast.ff.opls.opls_db" = [
+    "resources/**/*",
+]
+
+"chemfast.ff.opls.opls_ml" = [
+    "models/**/*",
+]

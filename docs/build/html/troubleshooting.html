@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Troubleshooting &#8212; ChemFAST · Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=b95a8313" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="_static/chemfast.css?v=6c49ce7e" />
+    <script src="_static/documentation_options.js?v=a12e3537"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.svg"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Software testing" href="testing.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/left_small_logo.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<nav class="chemfast-nav" aria-label="Documentation navigation">
+  <h3 class="chemfast-nav-title">Navigation</h3>
+  <a class="chemfast-nav-link" href="index.html">Introduction</a>
+  <div class="chemfast-nav-label">Get ChemFAST</div>
+  <div class="chemfast-nav-children">
+    <a class="chemfast-nav-link" href="online-tools.html">Online Tools</a>
+    <a class="chemfast-nav-link" href="installation.html">Installation</a>
+  </div>
+  <a class="chemfast-nav-link" href="quick-start.html">Quick Start</a>
+  <a class="chemfast-nav-link" href="workflow.html">Workflow</a>
+  <a class="chemfast-nav-link" href="reaction-dsl.html">Reaction DSL</a>
+  <details class="chemfast-nav-group">
+    <summary>Tutorials</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="tutorials/index.html">Overview</a>
+      <a class="chemfast-nav-link" href="tutorials/first-system.html">Linear Polyimide</a>
+      <a class="chemfast-nav-link" href="tutorials/radical-pmma.html">Radical PMMA</a>
+      <a class="chemfast-nav-link" href="tutorials/network.html">Crosslinked Network</a>
+      <a class="chemfast-nav-link" href="tutorials/poss.html">POSS–PMMA</a>
+      <a class="chemfast-nav-link" href="tutorials/spe.html">SPE</a>
+      <a class="chemfast-nav-link" href="tutorials/block-ps-peo.html">PS-b-PEO</a>
+      <a class="chemfast-nav-link" href="tutorials/aa-relaxation.html">AA Relaxation</a>
+    </div>
+  </details>
+  <details class="chemfast-nav-group">
+    <summary>Reference</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link" href="inputs.html">Input Reference</a>
+      <a class="chemfast-nav-link" href="api/index.html">Core API</a>
+    </div>
+  </details>
+  <a class="chemfast-nav-link" href="testing.html">Testing</a>
+  <a class="chemfast-nav-link is-current" href="#" aria-current="page">Troubleshooting</a>
+</nav>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="troubleshooting">
+<h1>Troubleshooting<a class="headerlink" href="#troubleshooting" title="Link to this heading">¶</a></h1>
+<p>Most problems can be localized by first determining whether they occur in the
+unit, integration, or reproducibility layer.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Symptom</p></th>
+<th class="head"><p>Check / action</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">No</span> <span class="pre">module</span> <span class="pre">named</span> <span class="pre">chemfast</span></code></p></td>
+<td><p>Activate the intended environment and install ChemFAST from the project root with <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pip</span> <span class="pre">install</span> <span class="pre">-e</span> <span class="pre">.</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">DSLValidationError</span></code></p></td>
+<td><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests/unit/test_reaction_dsl_work.py</span> <span class="pre">-q</span></code>; check SMARTS syntax, atom mapping, participant order, probabilities, <code class="docutils literal notranslate"><span class="pre">max_valence</span></code>, and reaction type</p></td>
+</tr>
+<tr class="row-even"><td><p>Reaction result or active state is incorrect</p></td>
+<td><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests/unit/test_reaction_engine_work.py</span> <span class="pre">-q</span></code>; inspect mapped bond edits, reaction capacity, and <code class="docutils literal notranslate"><span class="pre">general</span></code>/<code class="docutils literal notranslate"><span class="pre">radical</span></code> behavior</p></td>
+</tr>
+<tr class="row-odd"><td><p>Fast sanitization fails</p></td>
+<td><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests/unit/test_fast_sanitize_work.py</span> <span class="pre">-q</span></code>; compare the failing molecule with normal RDKit sanitization</p></td>
+</tr>
+<tr class="row-even"><td><p>Structured/PDB reactant mapping fails</p></td>
+<td><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests/integration/test_filler_mapping_work.py</span> <span class="pre">-q</span></code>; check reference atom order, explicit hydrogens, fragment SMARTS, and zero-based mapped indices</p></td>
+</tr>
+<tr class="row-odd"><td><p>AA topology reconstruction fails</p></td>
+<td><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests/integration/test_public_api_work.py</span> <span class="pre">-q</span></code>; verify that the CG XML and ReactionPath come from the same construction and preserve the original node IDs</p></td>
+</tr>
+<tr class="row-even"><td><p>PyGAMD runner cannot start</p></td>
+<td><p>Confirm that PyGAMD and its CUDA backend are installed separately, then check the selected GPU and CUDA compatibility</p></td>
+</tr>
+<tr class="row-odd"><td><p>No reactions occur during the CG run</p></td>
+<td><p>Check the Reaction-DSL, reaction capacities, active sites, and CG encounter conditions. A valid DSL defines permitted reactions but does not guarantee that reactive particles meet</p></td>
+</tr>
+<tr class="row-even"><td><p>Reconstructed coordinates differ by approximately one box length</p></td>
+<td><p>This usually indicates a periodic-image difference. GRO and SDF reproducibility comparisons use periodic boundary handling for the cubic simulation box</p></td>
+</tr>
+<tr class="row-odd"><td><p>SDF/GRO coordinate reproducibility test fails beyond tolerance</p></td>
+<td><p>Inspect the reported residue/bead and worst atom first; distinguish periodic wrapping, numerical variation, and a genuine reconstruction change before modifying any tolerance</p></td>
+</tr>
+<tr class="row-even"><td><p>TOP/ITP reproducibility test fails</p></td>
+<td><p>Inspect topology membership and force-field parameters. The comparator ignores harmless formatting differences and compares the parsed GROMACS content semantically</p></td>
+</tr>
+<tr class="row-odd"><td><p>CG XML reproducibility test fails</p></td>
+<td><p>Check particle arrays, connectivity, box information, and coordinates against the corresponding approved reference</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">useGMX</span></code> rejected by <code class="docutils literal notranslate"><span class="pre">FF.setup()</span></code></p></td>
+<td><p>Use <code class="docutils literal notranslate"><span class="pre">use_gmx</span></code> with <code class="docutils literal notranslate"><span class="pre">FF.setup()</span></code>. Camel-case options such as <code class="docutils literal notranslate"><span class="pre">useGMX</span></code> belong to the higher-level force-field pipeline wrappers</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ff.success</span></code> is <code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
+<td><p>Inspect missing force-field terms and confirm that the requested database or ML resources are available before exporting</p></td>
+</tr>
+<tr class="row-even"><td><p>Full OPLS database test cannot run</p></td>
+<td><p>Download <a class="reference external" href="https://github.com/DoMD-toolkit/ChemFAST/releases/download/ChemFAST-v1.0.0/opls.db">opls.db from ChemFAST v1.0.0</a> and place it at <code class="docutils literal notranslate"><span class="pre">src/chemfast/ff/opls/opls_db/resources/opls.db</span></code> in the project root. An absent or incomplete database causes tests marked <code class="docutils literal notranslate"><span class="pre">requires_database</span></code> to be skipped; a skip is <strong>not</strong> a passed reproducibility check.</p></td>
+</tr>
+<tr class="row-odd"><td><p>ML force-field test cannot run</p></td>
+<td><p>Tests marked <code class="docutils literal notranslate"><span class="pre">requires_ml</span></code> require the packaged production model checkpoints; the reproducibility test itself runs the ML route on CPU</p></td>
+</tr>
+<tr class="row-even"><td><p>Database manifest warning appears</p></td>
+<td><p>The installed full database differs from the approved release reference. Database-dependent numerical results may therefore differ</p></td>
+</tr>
+<tr class="row-odd"><td><p>Model manifest check fails</p></td>
+<td><p>Restore the production ML artifacts from the matching ChemFAST release; the packaged model manifest is expected to match the approved reference</p></td>
+</tr>
+<tr class="row-even"><td><p>A reproducibility test fails but unit/integration tests pass</p></td>
+<td><p>Run the failing case alone, for example <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests/reproducibility/test_spe_network_repro.py</span> <span class="pre">-q</span> <span class="pre">-s</span></code>, and inspect the first reported output difference</p></td>
+</tr>
+<tr class="row-odd"><td><p>Unsure whether the comparator itself is responsible</p></td>
+<td><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests/unit/test_golden_compare.py</span> <span class="pre">-q</span></code> before investigating the scientific workflow</p></td>
+</tr>
+</tbody>
+</table>
+<p>A summary such as <code class="docutils literal notranslate"><span class="pre">34</span> <span class="pre">passed,</span> <span class="pre">4</span> <span class="pre">skipped</span></code> means the 34 executed tests passed;
+the four skipped database-dependent reproducibility checks <strong>have not been
+verified</strong>. After installing the complete release <code class="docutils literal notranslate"><span class="pre">opls.db</span></code> at the location
+above, rerun <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">-q</span></code> and check that the database-dependent
+reproducibility tests actually execute. The complete release archive already
+includes this database; a source checkout does not.</p>
+<p>For a quick localization, run the test layers separately:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/unit<span class="w"> </span>-q
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/integration<span class="w"> </span>-q
+python<span class="w"> </span>-m<span class="w"> </span>pytest<span class="w"> </span>tests/reproducibility<span class="w"> </span>-q<span class="w"> </span>-s
+</pre></div>
+</div>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

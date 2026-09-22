@@ -1,0 +1,147 @@
+{
+  "reference_environment": {
+    "python": "3.12.13",
+    "platform": "Windows-11-10.0.22000-SP0",
+    "packages": {
+      "chemfast": "0.4.0",
+      "rdkit": "2026.3.1",
+      "numpy": "2.4.6",
+      "scipy": "1.18.0",
+      "networkx": "3.6.1",
+      "torch": "2.5.1+cpu",
+      "torch-geometric": "2.8.0",
+      "sqlalchemy": "2.0.51",
+      "gsd": "5.0.1",
+      "numba": "0.65.1",
+      "pytest": "9.1.1"
+    }
+  },
+  "release_artifacts": {
+    "database": {
+      "path": "src/chemfast/ff/opls/opls_db/resources/opls.db",
+      "size_bytes": 1560780800,
+      "counts": {
+        "atom": 2525590,
+        "bond": 2179549,
+        "angle": 5413058,
+        "dihedral": 7383679,
+        "improper": 766786
+      },
+      "sha256": "41a14447cdfa60e57bcb60211f77810055ca9820257064566db1d553aeafb006"
+    },
+    "models": {
+      "files": [
+        {
+          "path": "src/chemfast/cg/cg_ff/models/dDPredictor.pt",
+          "size_bytes": 16873869,
+          "sha256": "5d856653813b038c4ff0972696be6a545d8c1864f6bf17708c47854b71644f70"
+        },
+        {
+          "path": "src/chemfast/cg/cg_ff/models/dHPredictor.pt",
+          "size_bytes": 279885,
+          "sha256": "fd51d127a41c8f6a3468d6db6291288d765cf6aae9a26ab68abffd445a7df21f"
+        },
+        {
+          "path": "src/chemfast/cg/cg_ff/models/dPPredictor.pt",
+          "size_bytes": 279885,
+          "sha256": "5ff43d2cfcb167c328e1b0b1e491cb439ef40c1c1be816ab0f025431862d43fc"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/angle_idx.pkl",
+          "size_bytes": 13304,
+          "sha256": "854e245d735288d25159ef96fd68412b04c56529778f20ff63f3e31bd37bb571"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/bond_idx.pkl",
+          "size_bytes": 6191,
+          "sha256": "c6a68f2e208e90fb986990f9c4ff0aea733eb3e7f3b0c44fc67840c811c8a6a1"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/charge6.pt",
+          "size_bytes": 3717691,
+          "sha256": "b6a3f12a97796476de94817d89e23466ace0138c70d7eff3ddaa7557b7f8b856"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/di_idx.pkl",
+          "size_bytes": 19481,
+          "sha256": "03f4470e169a0b66bc4c06e735bf33595b4f60c0a329416ed4c1b0eb1dd1be9a"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/idx_angle.pkl",
+          "size_bytes": 13304,
+          "sha256": "8f039b0c1177cab5b3478bd63b51157373a3767c1100a6e8d8a77f0df439f8eb"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/idx_bond.pkl",
+          "size_bytes": 6191,
+          "sha256": "f2dce15bcd685c9880363cee34fdd56fd847b3176a7e1d92e6a53a4f0421ffd2"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/idx_di.pkl",
+          "size_bytes": 19481,
+          "sha256": "7e6245b9cd9556b3003d189b3f52deb5a54532b0db12d67781eab6d7f2e57bee"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/idx_imps.pkl",
+          "size_bytes": 109,
+          "sha256": "781eb65774181c25bc2299d32f4ac9ef744d6594a9edc01d27236825aa9c1be9"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/idx_nonbond.pkl",
+          "size_bytes": 1087,
+          "sha256": "b078f1cf80865fe882f9dc5b596b9ee0d9bcefeae63b462cc69f20ba3b1a0f67"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/imps_idx.pkl",
+          "size_bytes": 109,
+          "sha256": "0bfbf7926cbc07444146e3268d1370c1e43282808b5e4fadc456e5278cc963ff"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/minAngle.pt",
+          "size_bytes": 606364,
+          "sha256": "e2371eb7325be9bd440616e02bdab018be03a7265ef6cd4ada59fd4c6cbc0c1e"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/minBond.pt",
+          "size_bytes": 1432663,
+          "sha256": "9b3285b79eb5b2b74461b9fcf9319832dd84cc4fc9cd25cc95c267caa03f6b8d"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/minDi.pt",
+          "size_bytes": 808233,
+          "sha256": "f33c68e7ad4df85c894b3c1afb3b13d880a65397fb7561770754e5d2c09efd2e"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/minDi_add.pt",
+          "size_bytes": 808626,
+          "sha256": "d8748637081ba5f384ca80d409890c22c7c6b97ba63179be2bfab53bd713233e"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/minImp.pt",
+          "size_bytes": 490547,
+          "sha256": "6386798225d4a6a7b4cb8a8d66198b0c60263be7f01df47a419797e4bf111ece"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/minNonbond.pt",
+          "size_bytes": 439330,
+          "sha256": "248880b43dd4ca9ded1475b39d7aa7b6f7329470b12451a638068f64dd1e4a92"
+        },
+        {
+          "path": "src/chemfast/ff/opls/opls_ml/models/nbtype_an_hash.pkl",
+          "size_bytes": 1464,
+          "sha256": "b400da7807fe2553acdf87d6776afe342cbf5b2ba7b3c7dc34b4dd19dbe00463"
+        }
+      ],
+      "combined_sha256": "4ffc03e265f253c61ca187bddadccb2f787608d94c1bb2516e1b7fa04e1adb08"
+    }
+  },
+  "cases": [
+    "minimal_pi",
+    "au_peo",
+    "spe_network",
+    "cg",
+    "db_forcefield",
+    "ml_forcefield"
+  ],
+  "note": "Real output files under each case/outputs are the scientific goldens. This manifest only records provenance."
+}

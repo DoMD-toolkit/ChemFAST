@@ -1,0 +1,12 @@
+; ================================================================
+; Generated with DoMD-FF
+; ================================================================
+
+[ moleculetype ]
+; Name            nrexcl
+MOL_S_2          3
+
+[ atoms ]
+;   nr       type  resnr residue  atom   cgnr     charge       mass
+     1   domd_023    209      L     Li      1     1.000000     6.9410
+

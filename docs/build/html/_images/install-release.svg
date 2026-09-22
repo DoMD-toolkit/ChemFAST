@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="180" viewBox="0 0 880 180" role="img" aria-labelledby="title">
+  <title id="title">ChemFAST installation from a release package</title>
+  <rect width="100%" height="100%" rx="12" fill="#f1f7f8"/>
+  <g font-family="Arial,sans-serif" fill="#183443">
+    <rect x="20" y="24" width="250" height="132" rx="9" fill="white" stroke="#dbe7eb"/>
+    <text x="38" y="53" font-size="13" fill="#087f8c">01</text>
+    <text x="38" y="88" font-size="17">ChemFAST Release</text>
+    <text x="38" y="119" font-size="12">Accessible on GitHub</text>
+    <text x="282" y="99" font-size="24">›</text>
+
+    <rect x="315" y="24" width="250" height="132" rx="9" fill="white" stroke="#dbe7eb"/>
+    <text x="333" y="53" font-size="13" fill="#087f8c">02</text>
+    <text x="333" y="88" font-size="17">Create Environment</text>
+    <text x="333" y="119" font-size="12">Conda dependencies</text>
+    <text x="577" y="99" font-size="24">›</text>
+
+    <rect x="610" y="24" width="250" height="132" rx="9" fill="white" stroke="#dbe7eb"/>
+    <text x="628" y="53" font-size="13" fill="#087f8c">03</text>
+    <text x="628" y="88" font-size="17">Install ChemFAST</text>
+  </g>
+</svg>

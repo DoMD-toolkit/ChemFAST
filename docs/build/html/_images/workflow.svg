@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="220" viewBox="0 0 880 220">
+  <rect width="100%" height="100%" rx="12" fill="#f1f7f8"/>
+  <g font-family="Arial,sans-serif" fill="#183443">
+    <rect x="20" y="24" width="195" height="164" rx="9" fill="white" stroke="#dbe7eb"/>
+    <text x="36" y="52" font-size="13" fill="#087f8c">01</text>
+    <text x="36" y="86" font-size="16">Chemical Input</text>
+    <text x="36" y="119" font-size="12">SMILES · SMARTS</text>
+    <text x="36" y="145" font-size="12">Reaction-DSL</text>
+    <text x="220" y="110" font-size="22">›</text>
+
+    <rect x="235" y="24" width="195" height="164" rx="9" fill="white" stroke="#dbe7eb"/>
+    <text x="251" y="52" font-size="13" fill="#087f8c">02</text>
+    <text x="251" y="86" font-size="16">CG Construction</text>
+    <text x="251" y="119" font-size="11.5">HSP-based Parameterization</text>
+    <text x="251" y="145" font-size="11.5">Polymerization &amp; Pre-equilibration</text>
+    <text x="435" y="110" font-size="22">›</text>
+
+    <rect x="450" y="24" width="195" height="164" rx="9" fill="white" stroke="#dbe7eb"/>
+    <text x="466" y="52" font-size="13" fill="#087f8c">03</text>
+    <text x="466" y="86" font-size="16">AA Reconstruction</text>
+    <text x="466" y="119" font-size="11.5">ReactionPath replay</text>
+    <text x="466" y="145" font-size="11.5">Topology &amp; Coordinate</text>
+    <text x="650" y="110" font-size="22">›</text>
+
+    <rect x="665" y="24" width="195" height="164" rx="9" fill="white" stroke="#dbe7eb"/>
+    <text x="681" y="52" font-size="13" fill="#087f8c">04</text>
+    <text x="681" y="86" font-size="15">Force Field Assignment</text>
+    <text x="681" y="119" font-size="12">Database + ML</text>
+    <text x="681" y="145" font-size="12">GRO · TOP · ITP</text>
+  </g>
+</svg>

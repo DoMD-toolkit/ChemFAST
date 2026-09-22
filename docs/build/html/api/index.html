@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="../">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Core API &#8212; ChemFAST · Documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=b95a8313" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../_static/chemfast.css?v=6c49ce7e" />
+    <script src="../_static/documentation_options.js?v=a12e3537"></script>
+    <script src="../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="../_static/favicon.svg"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Software testing" href="../testing.html" />
+    <link rel="prev" title="Input reference" href="../inputs.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/left_small_logo.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<nav class="chemfast-nav" aria-label="Documentation navigation">
+  <h3 class="chemfast-nav-title">Navigation</h3>
+  <a class="chemfast-nav-link" href="../index.html">Introduction</a>
+  <div class="chemfast-nav-label">Get ChemFAST</div>
+  <div class="chemfast-nav-children">
+    <a class="chemfast-nav-link" href="../online-tools.html">Online Tools</a>
+    <a class="chemfast-nav-link" href="../installation.html">Installation</a>
+  </div>
+  <a class="chemfast-nav-link" href="../quick-start.html">Quick Start</a>
+  <a class="chemfast-nav-link" href="../workflow.html">Workflow</a>
+  <a class="chemfast-nav-link" href="../reaction-dsl.html">Reaction DSL</a>
+  <details class="chemfast-nav-group">
+    <summary>Tutorials</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="../tutorials/index.html">Overview</a>
+      <a class="chemfast-nav-link" href="../tutorials/first-system.html">Linear Polyimide</a>
+      <a class="chemfast-nav-link" href="../tutorials/radical-pmma.html">Radical PMMA</a>
+      <a class="chemfast-nav-link" href="../tutorials/network.html">Crosslinked Network</a>
+      <a class="chemfast-nav-link" href="../tutorials/poss.html">POSS–PMMA</a>
+      <a class="chemfast-nav-link" href="../tutorials/spe.html">SPE</a>
+      <a class="chemfast-nav-link" href="../tutorials/block-ps-peo.html">PS-b-PEO</a>
+      <a class="chemfast-nav-link" href="../tutorials/aa-relaxation.html">AA Relaxation</a>
+    </div>
+  </details>
+  <details class="chemfast-nav-group" open>
+    <summary>Reference</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="../usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link" href="../inputs.html">Input Reference</a>
+      <a class="chemfast-nav-link is-current" href="#" aria-current="page">Core API</a>
+    </div>
+  </details>
+  <a class="chemfast-nav-link" href="../testing.html">Testing</a>
+  <a class="chemfast-nav-link" href="../troubleshooting.html">Troubleshooting</a>
+</nav>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="core-api">
+<h1>Core API<a class="headerlink" href="#core-api" title="Link to this heading">¶</a></h1>
+<p>This page is a compact reference to the ChemFAST APIs used throughout the tutorials. It is <strong>not</strong> a required linear workflow: the APIs are modular, and you only call the stages needed for your input and target output.</p>
+<section id="core-api-reference">
+<h2>1. Core API reference<a class="headerlink" href="#core-api-reference" title="Link to this heading">¶</a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Category</p></th>
+<th class="head"><p>Main APIs</p></th>
+<th class="head"><p>Typical input</p></th>
+<th class="head"><p>Typical output</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Reaction-DSL compilation</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">compile_file</span></code>, <code class="docutils literal notranslate"><span class="pre">compile_dict</span></code></p></td>
+<td><p>Reaction-DSL file or Python dictionary</p></td>
+<td><p>compiled reaction model</p></td>
+<td><p>validates and normalizes the permitted chemistry</p></td>
+</tr>
+<tr class="row-odd"><td><p>Main functionality</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">build_pygamd_protocol</span></code>, <code class="docutils literal notranslate"><span class="pre">get_cgff_parameters</span></code>, <code class="docutils literal notranslate"><span class="pre">parse_config</span></code>, <code class="docutils literal notranslate"><span class="pre">topology_builder</span></code>, <code class="docutils literal notranslate"><span class="pre">embed_molecules</span></code>, <code class="docutils literal notranslate"><span class="pre">FF</span></code> / <code class="docutils literal notranslate"><span class="pre">FF.setup</span></code></p></td>
+<td><p>DSL, completed CG data, CG graph/history, or AA molecule</p></td>
+<td><p>CG protocol, CG parameters, parsed reconstruction config, AA topology/coordinates, FF parameters</p></td>
+<td><p>performs the main CG preparation, AA reconstruction, and force-field assignment</p></td>
+</tr>
+<tr class="row-even"><td><p>Output and export</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">write_mols_to_sdf</span></code>, <code class="docutils literal notranslate"><span class="pre">write_mols_to_xml</span></code>, <code class="docutils literal notranslate"><span class="pre">write_mols_to_gro</span></code>, <code class="docutils literal notranslate"><span class="pre">run_itp_mode</span></code>, <code class="docutils literal notranslate"><span class="pre">run_top_mode</span></code>, <code class="docutils literal notranslate"><span class="pre">run_adv_top_mode</span></code></p></td>
+<td><p>reconstructed molecules and assigned parameters</p></td>
+<td><p>SDF/XML/GRO and GROMACS ITP/TOP/GRO files</p></td>
+<td><p>writes coordinate checkpoints and simulation-ready output files</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="what-the-core-apis-do">
+<h2>2. What the core APIs do<a class="headerlink" href="#what-the-core-apis-do" title="Link to this heading">¶</a></h2>
+<section id="reaction-dsl-compilation">
+<span id="id1"></span><h3>Reaction-DSL compilation<a class="headerlink" href="#reaction-dsl-compilation" title="Link to this heading">¶</a></h3>
+<p>Compile the DSL first when you want to validate the chemistry independently:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.cg.reaction_dsl</span><span class="w"> </span><span class="kn">import</span> <span class="n">compile_file</span><span class="p">,</span> <span class="n">compile_dict</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">compile_file</span><span class="p">(</span><span class="s2">&quot;config.json&quot;</span><span class="p">)</span>
+<span class="c1"># or:</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">compile_dict</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Compilation checks the reaction model and defines which chemistry is permitted. It does not run dynamics or decide which particles react in space. See the <a class="reference internal" href="../reaction-dsl.html"><span class="std std-doc">Reaction-DSL guide</span></a> for writing the chemistry model and the <a class="reference internal" href="../inputs.html"><span class="std std-doc">input reference</span></a> for field definitions.</p>
+<p>.. py:function:: compile_file(path)
+:module: chemfast.cg.reaction_dsl</p>
+<p>.. py:function:: compile_dict(raw)
+:module: chemfast.cg.reaction_dsl</p>
+</section>
+<section id="main-functionality">
+<h3>Main functionality<a class="headerlink" href="#main-functionality" title="Link to this heading">¶</a></h3>
+<section id="cg-preparation">
+<span id="id2"></span><h4>CG preparation<a class="headerlink" href="#cg-preparation" title="Link to this heading">¶</a></h4>
+<p>The two main CG preparation calls are:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.cg.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_pygamd_protocol</span><span class="p">,</span> <span class="n">get_cgff_parameters</span>
+
+<span class="n">build_pygamd_protocol</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;cg&quot;</span><span class="p">,</span> <span class="n">use_builtin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">mass_density</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">get_cgff_parameters</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">&quot;cg/cg_parameters.json&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">output_dir=&quot;cg&quot;</span></code> means that the generated CG files are written into the <code class="docutils literal notranslate"><span class="pre">cg/</span></code> directory relative to the current working directory. The typical result is:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>cg/
+├── initial.xml
+├── cg_parameters.json
+└── run_pygamd_polymerization.py
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">build_pygamd_protocol</span></code> creates the initial CG system and the PyGAMD runner script; <code class="docutils literal notranslate"><span class="pre">get_cgff_parameters</span></code> creates the CG interaction parameters consumed by that runner.</p>
+<p>The generated protocol is executed separately. Change into the output directory before running it:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>cg
+python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
+<span class="nb">cd</span><span class="w"> </span>..
+</pre></div>
+</div>
+<p>For reactive construction, the two important products must come from the same run:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>reaction_final.xml   final CG coordinates and connectivity
+reaction_path.txt    ordered reaction events that created that connectivity
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">reaction_final.xml</span></code> describes the completed CG structure, while <code class="docutils literal notranslate"><span class="pre">reaction_path.txt</span></code> records the accepted reaction history required for atomistic reconstruction.</p>
+<p>.. py:function:: build_pygamd_protocol(config, output_dir=’pygamd_protocol’, *, xml_name=’initial.xml’, runner_name=’run_pygamd_polymerization.py’, use_builtin=False, with_cg_ff=False, mass_density=0.9, default_bond_length=1.0, minimum_distance=None, n_conformers=10, random_seed=2026, include_dihedrals=False)
+:module: chemfast.cg.pipeline</p>
+<p>.. py:function:: get_cgff_parameters(config, output=’cg_parameters.json’, **kwargs)
+:module: chemfast.cg.pipeline</p>
+</section>
+<section id="parse-the-completed-cg-system">
+<h4>Parse the completed CG system<a class="headerlink" href="#parse-the-completed-cg-system" title="Link to this heading">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">parse_config</span></code> converts the input dictionary into the ChemFAST reconstruction configuration object:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.misc.parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_config</span>
+
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">work_dir</span><span class="o">=</span><span class="n">root</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">config</span></code> already specifies the completed CG files through:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;cg_topology_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cg/reaction_final.xml&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;reaction_path_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cg/reaction_path.txt&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">parse_config</span></code> resolves those files automatically. For each CG molecule, the resulting configuration contains the corresponding CG graph in <code class="docutils literal notranslate"><span class="pre">cfg.cg_graphs</span></code>, including its connectivity and coordinates, together with the corresponding constructed ReactionPath in <code class="docutils literal notranslate"><span class="pre">cfg.reaction_list</span></code>.</p>
+<p>.. py:function:: parse_config(user_config, work_dir=WindowsPath(‘.’))
+:module: chemfast.conf.misc.parser</p>
+</section>
+<section id="rebuild-atomistic-topology">
+<span id="id3"></span><h4>Rebuild atomistic topology<a class="headerlink" href="#rebuild-atomistic-topology" title="Link to this heading">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">topology_builder</span></code> operates on one CG graph and its corresponding ReactionPath:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.topology_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">topology_builder</span>
+
+<span class="n">mol</span><span class="p">,</span> <span class="n">graph</span> <span class="o">=</span> <span class="n">topology_builder</span><span class="p">(</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">reactant_config</span><span class="p">,</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">reaction_template</span><span class="p">,</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">filler_config</span><span class="p">,</span>
+    <span class="n">cg_graph</span><span class="p">,</span>
+    <span class="n">reaction_path</span><span class="p">,</span>
+    <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>It uses the reactant, reaction, and filler definitions together with the CG graph, then replays the recorded ReactionPath to reconstruct the all-atom molecular topology. The returned <code class="docutils literal notranslate"><span class="pre">mol</span></code> is the reconstructed RDKit molecule and <code class="docutils literal notranslate"><span class="pre">graph</span></code> stores the corresponding atomistic graph information.</p>
+<p>.. py:function:: topology_builder(reactant_config, reaction_template, filler_config, cg_graph, reaction_list, fast_sanitize_p=False)
+:module: chemfast.conf</p>
+</section>
+<section id="rebuild-atomistic-coordinates">
+<h4>Rebuild atomistic coordinates<a class="headerlink" href="#rebuild-atomistic-coordinates" title="Link to this heading">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">embed_molecules</span></code> accepts the reconstructed molecules and their corresponding CG-guided graph information:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.embed_molecule</span><span class="w"> </span><span class="kn">import</span> <span class="n">embed_molecules</span>
+
+<span class="n">mols</span> <span class="o">=</span> <span class="n">embed_molecules</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="n">graphs</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">chunk_per_d</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>It reconstructs atomistic coordinates for the list of molecules using the completed CG structures as the spatial guide.</p>
+<p>.. py:function:: embed_molecules(rdmols, aa_graphs, config, chunk_per_d=1)
+:module: chemfast.conf</p>
+</section>
+<section id="force-field-assignment">
+<span id="id4"></span><h4>Force-field assignment<a class="headerlink" href="#force-field-assignment" title="Link to this heading">¶</a></h4>
+<p><code class="docutils literal notranslate"><span class="pre">FF</span></code> is the core force-field object and <code class="docutils literal notranslate"><span class="pre">FF.setup()</span></code> performs parameter assignment:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.ff.ForceField</span><span class="w"> </span><span class="kn">import</span> <span class="n">FF</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><code class="docutils literal notranslate"><span class="pre">FF</span></code> name</p></th>
+<th class="head"><p>Intended input</p></th>
+<th class="head"><p>Purpose</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;opls&quot;</span></code></p></td>
+<td><p>atomistic RDKit molecule</p></td>
+<td><p>OPLS-family AA assignment</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;amber&quot;</span></code></p></td>
+<td><p>atomistic RDKit molecule</p></td>
+<td><p>AMBER-family AA assignment</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">&quot;cg&quot;</span></code></p></td>
+<td><p>CG graph + configuration</p></td>
+<td><p>CG interaction assignment</p></td>
+</tr>
+</tbody>
+</table>
+<p>For OPLS assignment:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ff</span> <span class="o">=</span> <span class="n">FF</span><span class="p">(</span><span class="s2">&quot;opls&quot;</span><span class="p">)</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">ff</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span>
+    <span class="n">rdmol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span>
+    <span class="n">use_gmx</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">use_boss</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">use_ml</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>CG assignment uses the same object interface with CG-specific inputs:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">cg_ff</span> <span class="o">=</span> <span class="n">FF</span><span class="p">(</span><span class="s2">&quot;cg&quot;</span><span class="p">)</span>
+<span class="n">cg_params</span> <span class="o">=</span> <span class="n">cg_ff</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">cg_graph</span><span class="o">=</span><span class="n">cg_graph</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The AMBER interface is also exposed, with the current implementation primarily targeting GAFF2-style small-molecule parameter assignment:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">amber_ff</span> <span class="o">=</span> <span class="n">FF</span><span class="p">(</span><span class="s2">&quot;amber&quot;</span><span class="p">)</span>
+<span class="n">amber_params</span> <span class="o">=</span> <span class="n">amber_ff</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="n">rdmol</span><span class="o">=</span><span class="n">mol</span><span class="p">,</span> <span class="n">use_db</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The current AMBER/GAFF2 backend is intended mainly for further development and user extension. The bundled database currently contains only 10 molecules, so it should be treated as a limited reference dataset rather than broad GAFF2 coverage.</p>
+<p><code class="docutils literal notranslate"><span class="pre">FF.setup()</span></code> assigns parameters; file writers and pipeline wrappers handle export.</p>
+<p>.. py:class:: FF(name)
+:module: chemfast.ff.ForceField</p>
+</section>
+</section>
+<section id="output-and-export">
+<h3>Output and export<a class="headerlink" href="#output-and-export" title="Link to this heading">¶</a></h3>
+<p>Reconstructed molecules can be written directly to common coordinate formats:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.misc.io.sdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_mols_to_sdf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.misc.io.xml</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_mols_to_xml</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.misc.io.gro</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_mols_to_gro</span>
+
+<span class="n">write_mols_to_sdf</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="s2">&quot;atomistic.sdf&quot;</span><span class="p">)</span>
+<span class="n">write_mols_to_xml</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">box_tensor</span><span class="p">,</span> <span class="s2">&quot;atomistic.xml&quot;</span><span class="p">)</span>
+<span class="n">write_mols_to_gro</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">box_tensor</span><span class="p">,</span> <span class="s2">&quot;atomistic.gro&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>.. py:function:: write_mols_to_sdf(mols, output_path, force_v3000=True)
+:module: chemfast.conf.misc.io.sdf</p>
+<p>.. py:function:: write_mols_to_xml(mols, box, filename=’chemfast.xml’, graphs=None, program=’galamost’, version=’1.3’)
+:module: chemfast.conf.misc.io.xml</p>
+<p>.. py:function:: write_mols_to_gro(mols, box_tensor, output_path)
+:module: chemfast.conf.misc.io.gro</p>
+<p>For force-field export, the pipeline wrappers provide different output levels:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>API</p></th>
+<th class="head"><p>Main use</p></th>
+<th class="head"><p>Output</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">run_itp_mode</span></code></p></td>
+<td><p>molecule-level force-field export</p></td>
+<td><p>per-molecule ITP/GRO files</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">run_top_mode</span></code></p></td>
+<td><p>integrated AA system export</p></td>
+<td><p>TOP/GRO files</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">run_adv_top_mode</span></code></p></td>
+<td><p>multicomponent, deduplicated system export</p></td>
+<td><p>matched GRO/TOP/ITP set</p></td>
+</tr>
+</tbody>
+</table>
+<p>For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.ff.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_adv_top_mode</span>
+
+<span class="n">run_adv_top_mode</span><span class="p">(</span>
+    <span class="n">mols</span><span class="p">,</span> <span class="s2">&quot;aa&quot;</span><span class="p">,</span> <span class="n">base_name</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
+    <span class="n">useGMX</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">useBOSS</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">useML</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">run_adv_top_mode</span></code> is a convenient <strong>force-field assignment/export pipeline</strong> built around the lower-level FF functionality; it is not the core force-field API itself.</p>
+<p>.. py:function:: run_adv_top_mode(rd_mols, output_dir, base_name=’system’, size_threshold=300, useML=True, useBOSS=True, useGMX=True, overwrite=False, **args)
+:module: chemfast.ff.pipeline</p>
+<p>For lower-level output details, see <a class="reference internal" href="ff.html"><span class="std std-doc">Force-field and file-output API details</span></a>.</p>
+</section>
+</section>
+<section id="combine-the-apis-in-a-reusable-script">
+<h2>3. Combine the APIs in a reusable script<a class="headerlink" href="#combine-the-apis-in-a-reusable-script" title="Link to this heading">¶</a></h2>
+<p>A practical ChemFAST script typically combines only the APIs required for a given stage. In the tutorials, this pattern is organized into two reusable functions: one prepares the CG input files and simulation protocol, while the other reconstructs the atomistic system and exports the resulting force-field files.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.cg.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_pygamd_protocol</span><span class="p">,</span> <span class="n">get_cgff_parameters</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.misc.parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_config</span><span class="p">,</span> <span class="n">post_process_aa_mol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.topology_builder</span><span class="w"> </span><span class="kn">import</span> <span class="n">topology_builder</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.embed_molecule</span><span class="w"> </span><span class="kn">import</span> <span class="n">embed_molecules</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.misc.io.sdf</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_mols_to_sdf</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.ff.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_adv_top_mode</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">prepare_cg</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;config.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+    <span class="n">build_pygamd_protocol</span><span class="p">(</span>
+        <span class="n">config</span><span class="p">,</span>
+        <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;cg&quot;</span><span class="p">,</span>
+        <span class="n">use_builtin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">mass_density</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+        <span class="n">random_seed</span><span class="o">=</span><span class="mi">2026</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">get_cgff_parameters</span><span class="p">(</span>
+        <span class="n">config</span><span class="p">,</span>
+        <span class="n">output</span><span class="o">=</span><span class="s2">&quot;cg/cg_parameters.json&quot;</span><span class="p">,</span>
+        <span class="n">random_seed</span><span class="o">=</span><span class="mi">2026</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">reconstruct_aa</span><span class="p">(</span><span class="n">root</span><span class="p">):</span>
+    <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">root</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
+    <span class="n">cg_dir</span><span class="p">,</span> <span class="n">aa_dir</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;cg&quot;</span><span class="p">,</span> <span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;aa&quot;</span>
+
+    <span class="n">config</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">root</span> <span class="o">/</span> <span class="s2">&quot;config.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;cg_topology_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cg_dir</span> <span class="o">/</span> <span class="s2">&quot;reaction_final.xml&quot;</span><span class="p">)</span>
+    <span class="n">config</span><span class="p">[</span><span class="s2">&quot;reaction_path_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cg_dir</span> <span class="o">/</span> <span class="s2">&quot;reaction_path.txt&quot;</span><span class="p">)</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">work_dir</span><span class="o">=</span><span class="n">root</span><span class="p">)</span>
+
+    <span class="n">mols</span><span class="p">,</span> <span class="n">graphs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">cg_graph</span><span class="p">,</span> <span class="n">reaction_path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">cg_graphs</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">reaction_list</span><span class="p">):</span>
+        <span class="n">mol</span><span class="p">,</span> <span class="n">graph</span> <span class="o">=</span> <span class="n">topology_builder</span><span class="p">(</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">reactant_config</span><span class="p">,</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">reaction_template</span><span class="p">,</span>
+            <span class="n">cfg</span><span class="o">.</span><span class="n">filler_config</span><span class="p">,</span>
+            <span class="n">cg_graph</span><span class="p">,</span>
+            <span class="n">reaction_path</span><span class="p">,</span>
+            <span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">mols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+        <span class="n">graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+
+    <span class="n">mols</span> <span class="o">=</span> <span class="n">embed_molecules</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="n">graphs</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">chunk_per_d</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">mol</span><span class="p">,</span> <span class="n">graph</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="n">graphs</span><span class="p">):</span>
+        <span class="n">post_process_aa_mol</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">box_tensor</span><span class="p">)</span>
+
+    <span class="n">aa_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">write_mols_to_sdf</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">aa_dir</span> <span class="o">/</span> <span class="s2">&quot;atomistic.sdf&quot;</span><span class="p">))</span>
+
+    <span class="n">run_adv_top_mode</span><span class="p">(</span>
+        <span class="n">mols</span><span class="p">,</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">aa_dir</span><span class="p">),</span>
+        <span class="n">base_name</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
+        <span class="n">useGMX</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">useBOSS</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">useML</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+</div>
+<p>For each tutorial case, the execution sequence is the same:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Prepare the CG input and runner.</span>
+python<span class="w"> </span>prepare_cg.py<span class="w"> </span>CASE
+
+<span class="c1"># 2. Enter the generated CG directory and run the protocol.</span>
+<span class="nb">cd</span><span class="w"> </span>CASE/cg
+python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
+<span class="nb">cd</span><span class="w"> </span>../..
+
+<span class="c1"># 3. Reconstruct AA and export the force field.</span>
+python<span class="w"> </span>reconstruct_aa.py<span class="w"> </span>CASE
+</pre></div>
+</div>
+<p>Here, <code class="docutils literal notranslate"><span class="pre">CASE</span></code> only selects the working directory containing the corresponding config.json and generated files. The ChemFAST API calls and execution pattern remain unchanged across the tutorials; what differs between examples is the Reaction-DSL that defines the chemistry. Continue with the <a class="reference internal" href="../tutorials/index.html"><span class="std std-doc">tutorial sequence</span></a> to see how different systems are expressed through the DSL while using the same workflow.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "aa_bead_rmse_angstrom": 5,
+  "gro_bead_rmse_angstrom": 5,
+  "cg_coordinate_rmse_nm": 0.5,
+  "box_abs": 1e-6,
+  "ff_float_abs": 1e-5,
+  "cg_ff_float_abs": 1e-5,
+  "generic_float_abs": 1e-8
+}

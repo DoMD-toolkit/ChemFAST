@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DoMD AutoFF Pipeline v1.0</title>
+    <link href="./static/images/favicon.ico" rel="icon" type="image/x-icon">
+    <link href="./static/images/favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="./static/css/style.css" rel="stylesheet">
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="top-bar">
+        <span>DoMD AutoFF Pipeline Interface [v1.0]</span>
+        <span>SYS_READY OPLS</span>
+    </div>
+
+    <div class="window">
+        <h2>Input Parameters</h2>
+        <div id="dropzone">Click to Browse or Drag & Drop (.pdb, .sdf)</div>
+        <input accept=".pdb,.sdf" id="fileInput" multiple type="file">
+
+        <div class="form-group file-status">
+            <div>Mol File: <span id="molDisplay" style="color:#2563eb;">[None]</span></div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #a1a1aa; border-bottom: 1px solid #ffffff; margin: 8px 0;">
+
+        <div class="form-group" style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <span><input checked id="useGMX" type="checkbox"> <label for="useGMX">GMX Template</label></span>
+            <span><input checked id="useBOSS" type="checkbox"> <label for="useBOSS">OPLS Database</label></span>
+            <span><input checked id="useML" type="checkbox"> <label for="useML">ML Inference</label></span>
+            <span><input id="overwrite" type="checkbox"> <label for="overwrite">Overwrite Existing</label></span>
+        </div>
+
+        <div class="form-group"
+             style="display: flex; gap: 15px; margin-top: 12px; align-items: center; flex-wrap: wrap;">
+
+            <span style="font-weight: bold; color: #1e3a8a;">Run Mode</span>
+            <div style="width: 1px; height: 16px; background-color: #a1a1aa; box-shadow: 1px 0 0 #fff;"></div>
+
+            <span style="display: flex; align-items: center; gap: 4px;">
+                <input checked id="modeTop" name="run_mode" style="margin:0;" type="radio" value="top_mode">
+                <label for="modeTop">TOP Mode</label>
+            </span>
+            <span style="display: flex; align-items: center; gap: 4px;">
+                <input id="modeItp" name="run_mode" style="margin:0;" type="radio" value="itp_mode">
+                <label for="modeItp">ITP Mode</label>
+            </span>
+
+            <div style="width: 1px; height: 16px; background-color: #a1a1aa; box-shadow: 1px 0 0 #fff;"></div>
+
+            <span style="display: flex; align-items: center; gap: 5px;">
+                <label for="chargeFactor" style="font-weight: bold; color: #1e3a8a;">Charge Factor:</label>
+                <input class="retro-input" id="chargeFactor" inputmode="decimal" type="text" value="1.0">
+            </span>
+        </div>
+
+        <div class="action-row">
+            <button id="submitBtn" type="button">EXECUTE_PIPELINE()</button>
+            <button id="helpBtn" type="button">HELP</button>
+        </div>
+
+        <div id="result-area">
+            <div class="result-row" id="resultMsg">[SYSTEM STANDBY] Output slot empty.</div>
+            <div class="result-row">
+                <a href="#" id="downloadLink" target="_blank">>> Download Results Archive (.zip) <<</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="terminal-window">
+        <h3>Console Output</h3>
+        <div id="terminal-container">
+            <pre id="terminal"><span class="blink" id="cmdCursor">_</span></pre>
+        </div>
+    </div>
+
+    <div class="footer">
+        Copyright &copy; 2000-2026 DoMD-toolkit Team. All Rights Reserved.<br>
+    </div>
+</div>
+
+<div id="modalOverlay">
+    <div class="retro-modal">
+        <div class="modal-title">
+            <span id="modalTitleText">System Alert</span>
+            <button onclick="closeModal()"
+                    style="padding: 0 5px; font-size: 10px; margin-left: 10px; cursor: pointer; background: transparent; border: 1px solid rgba(255,255,255,0.5); color: white;">
+                X
+            </button>
+        </div>
+        <div class="modal-body">
+            <p id="modalMsg" style="margin-top:0; font-weight: bold;"></p>
+            <button onclick="closeModal()" style="margin-top: 15px;">Acknowledge (OK)</button>
+        </div>
+    </div>
+</div>
+
+<template class="terminal-help-template" data-role="help" data-topic="main">
+    <span></span>
+    <span style="color:#39ff14;">
+ ================================================================
+                 DOMD AUTOFF QUICK HELP
+ ================================================================
+
+  INPUT
+    Provide one molecular structure file in .pdb or .sdf format.
+
+  RUN MODE
+    TOP Mode : build a complete GROMACS topology for one molecular system.
+    ITP Mode : parameterize molecular fragments and package ITP outputs.
+
+  OPTIONS
+    GMX Template        Use available GROMACS-style template information.
+    OPLS Database       Search the local OPLS parameter database.
+    ML Inference        Enable ML-based parameter inference when available.
+    Overwrite Existing  Allow regeneration of existing intermediate files.
+
+  CHARGE FACTOR
+    Scaling factor applied during charge assignment. The default value is 1.0.
+
+  OUTPUT
+    The result archive contains generated topology files and debug logs.
+    If the job fails, download the archive and inspect debug_error.log.
+
+  RECOVERY
+    The browser saves the active task id and log cursor locally.
+    If the page is refreshed or the connection drops, live logs resume from
+    the last received log sequence when the task is still retained.
+
+ ================================================================
+</span>
+    <span style="color:#FFBF00;">For more information, please goto </span><a href="//github.com/DoMD-toolkit/DoMD-FF"
+                                                                             style="text-decoration: none;"
+                                                                             target="_blank"><span
+        style="color:#39ff14;">https://github.com/DoMD-toolkit/DoMD-FF</span></a>
+    <span></span>
+</template>
+
+<template class="banner-template" data-group="default" data-role="banner">
+<span style="color: #39ff14;">!      _____        __  __ _____         ______ ______
+!     |  __ \      |  \/  |  __ \       |  ____|  ____|
+!     | |  | | ___ | \  / | |  | |______| |__  | |__
+!     | |  | |/ _ \| |\/| | |  | |______|  __| |  __|
+!     | |__| | (_) | |  | | |__| |      | |    | |
+!     |_____/ \___/|_|  |_|_____/       |_|    |_|
+!</span>
+</template>
+
+<template class="banner-template" data-group="default" data-role="banner">
+<span style="color: rgba(57, 255, 20, 0.5);"><span style="color: rgba(57, 255, 20, 1.0);">!</span>     ██████╗  ██████╗ ███╗   ███╗██████╗       ███████╗███████╗
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>     ██╔══██╗██╔═══██╗████╗ ████║██╔══██╗      ██╔════╝██╔════╝
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>     ██║  ██║██║   ██║██╔████╔██║██║  ██║█████╗█████╗  █████╗
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>     ██║  ██║██║   ██║██║╚██╔╝██║██║  ██║╚════╝██╔══╝  ██╔══╝
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>     ██████╔╝╚██████╔╝██║ ╚═╝ ██║██████╔╝      ██║     ██║
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>     ╚═════╝  ╚═════╝ ╚═╝     ╚═╝╚═════╝       ╚═╝     ╚═╝</span>
+</template>
+
+<template class="banner-template" data-group="default" data-role="banner">
+    <span style="color: #39ff14;">!    O~~~~~              O~~       O~~O~~~~~          O~~~~~~~~O~~~~~~~~
+!    O~~   O~~           O~ O~~   O~~~O~~   O~~       O~~      O~~
+!    O~~    O~~   O~~    O~~ O~~ O O~~O~~    O~~      O~~      O~~
+!    O~~    O~~ O~~  O~~ O~~  O~~  O~~O~~    O~~O~~~~~O~~~~~~  O~~~~~~
+!    O~~    O~~O~~    O~~O~~   O~  O~~O~~    O~~      O~~      O~~
+!    O~~   O~~  O~~  O~~ O~~       O~~O~~   O~~       O~~      O~~
+!    O~~~~~       O~~    O~~       O~~O~~~~~          O~~      O~~</span>
+</template>
+
+<template class="banner-template" data-group="default" data-role="banner">
+    <span style="color: #39ff14;">!    DDD      M   M DDD      FFFF FFFF
+!    D  D     MM MM D  D     F    F
+!    D  D ooo M M M D  D --- FFF  FFF
+!    D  D o o M   M D  D     F    F
+!    DDD  ooo M   M DDD      F    F    </span>
+</template>
+
+<template class="banner-template" data-group="default" data-role="banner">
+    <span style="color: #39ff14;">!     /$$$$$$$            /$$      /$$ /$$$$$$$          /$$$$$$$$ /$$$$$$$$
+!    | $$__  $$          | $$$    /$$$| $$__  $$        | $$_____/| $$_____/
+!    | $$  \ $$  /$$$$$$ | $$$$  /$$$$| $$  \ $$        | $$      | $$
+!    | $$  | $$ /$$__  $$| $$ $$/$$ $$| $$  | $$ /$$$$$$| $$$$$   | $$$$$
+!    | $$  | $$| $$  \ $$| $$  $$$| $$| $$  | $$|______/| $$__/   | $$__/
+!    | $$  | $$| $$  | $$| $$\  $ | $$| $$  | $$        | $$      | $$
+!    | $$$$$$$/|  $$$$$$/| $$ \/  | $$| $$$$$$$/        | $$      | $$
+!    |_______/  \______/ |__/     |__/|_______/         |__/      |__/
+!</span>
+</template>
+
+<template class="banner-template" data-group="halloween" data-role="banner">
+    <span style="color: rgba(57, 255, 20, 0.5);"><span style="color: rgba(57, 255, 20, 1.0);">!</span>     ▓█████▄  ▒█████   ███▄ ▄███▓▓█████▄   █████▒  █████▒
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>     ▒██▀ ██▌▒██▒  ██▒▓██▒▀█▀ ██▒▒██▀ ██▌▓██   ▒ ▓██   ▒
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>     ░██   █▌▒██░  ██▒▓██    ▓██░░██   █▌▒████ ░ ▒████ ░
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>     ░▓█▄   ▌▒██   ██░▒██    ▒██ ░▓█▄   ▌░▓█▒  ░ ░▓█▒  ░
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>     ░▒████▓ ░ ████▓▒░▒██▒   ░██▒░▒████▓ ░▒█░    ░▒█░
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>      ▒▒▓  ▒ ░ ▒░▒░▒░ ░ ▒░   ░  ░ ▒▒▓  ▒  ▒ ░     ▒ ░
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>      ░ ▒  ▒   ░ ▒ ▒░ ░  ░      ░ ░ ▒  ▒  ░       ░
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>      ░ ░  ░ ░ ░ ░ ▒  ░      ░    ░ ░  ░  ░ ░     ░ ░
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>        ░        ░ ░         ░      ░
+<span style="color: rgba(57, 255, 20, 1.0);">!</span>      ░                           ░                      </span>
+</template>
+
+<template class="banner-template" data-group="halloween" data-role="banner">
+    <span style="color: rgba(57, 255, 20, 1);">!     _ .-') _               _   .-')    _ .-') _
+!    ( (  OO) )             ( '.( OO )_ ( (  OO) )
+!     \     .'_  .-'),-----. ,--.   ,--.)\     .'_             ,------.   ,------.
+!     ,`'--..._)( OO'  .-.  '|   `.'   | ,`'--..._)   .-')  ('-| _.---'('-| _.---'
+!     |  |  \  '/   |  | |  ||         | |  |  \  ' _(  OO) (OO|(_\    (OO|(_\
+!     |  |   ' |\_) |  |\|  ||  |'.'|  | |  |   ' |(,------./  |  '--. /  |  '--.
+!     |  |   / :  \ |  | |  ||  |   |  | |  |   / : '------'\_)|  .--' \_)|  .--'
+!     |  '--'  /   `'  '-'  '|  |   |  | |  '--'  /           \|  |_)    \|  |_)
+!     `-------'      `-----' `--'   `--' `-------'             `--'       `--'     </span>
+</template>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const allBanners = Array.from(document.querySelectorAll('template[data-role="banner"]'));
+        if (allBanners.length === 0) return;
+
+        const now = new Date();
+        // const now = new Date("2026-10-31");
+        const month = now.getMonth() + 1;
+        const day = now.getDate();
+
+        let activeGroup = 'default';
+
+        if (month === 10 && day >= 25 && day <= 31) {
+            activeGroup = 'halloween';
+        } else if (month === 12 && day >= 20 && day <= 26) {
+            activeGroup = 'christmas';
+        } else if (month === 1 && day >= 1 && day <= 3) {
+            activeGroup = 'newyear';
+        }
+
+        let pool = allBanners.filter(b => b.getAttribute('data-group') === activeGroup);
+
+        if (pool.length === 0) {
+            pool = allBanners.filter(b => {
+                const g = b.getAttribute('data-group');
+                return g === 'default' || !g; // 没写属性的也算 default
+            });
+            if (pool.length === 0) pool = allBanners;
+        }
+
+        const randomIndex = Math.floor(Math.random() * pool.length);
+        const randomBannerHTML = pool[randomIndex].innerHTML.trim();
+
+        const terminal = document.getElementById('terminal');
+        const cursor = document.getElementById('cmdCursor');
+
+        const tempContainer = document.createElement('div');
+        tempContainer.innerHTML = randomBannerHTML;
+
+        while (tempContainer.firstChild) {
+            terminal.insertBefore(tempContainer.firstChild, cursor);
+        }
+
+        terminal.insertBefore(document.createTextNode('\n'), cursor);
+    });
+</script>
+<script src="./static/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+{
+  "cg_topology_file": "reaction_final.xml",
+  "reaction_path_file": "reaction_path.txt",
+  "domd_react_dsl": "v1",
+  "reactants": [
+    {
+      "name": "S",
+      "smiles": "C=Cc1ccccc1",
+      "N": 20,
+      "max_valence": 2
+    },
+    {
+      "name": "O",
+      "smiles": "CCO",
+      "N": 20,
+      "max_valence": 2
+    }
+  ],
+  "reactions": [
+    {
+      "name": "S-S",
+      "kind": "radical",
+      "reactants": ["S", "S"],
+      "smarts": "[C:1]=[C;H1:2].[CH2;$([CH2]=[C;H1]):3]>>[C:1][C:2][CH1:3]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0,
+      "activation": {
+        "from": 0,
+        "to": 1
+      }
+    },
+    {
+      "name": "S-O",
+      "kind": "radical",
+      "reactants": ["S", "O"],
+      "smarts": "[C:1]=[C;H1:2].[CH3:3]>>[C:1][C:2][C:3]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0,
+      "activation": {
+        "from": 0,
+        "to": 1
+      }
+    },
+    {
+      "name": "O-O",
+      "kind": "radical",
+      "reactants": ["O", "O"],
+      "smarts": "[O:1].[CH3:2]>>[O:1][C:2]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0,
+      "activation": {
+        "from": 0,
+        "to": 1
+      }
+    }
+  ]
+}

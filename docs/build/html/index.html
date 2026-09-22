@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>ChemFAST &#8212; ChemFAST · Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=b95a8313" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="_static/chemfast.css?v=6c49ce7e" />
+    <script src="_static/documentation_options.js?v=a12e3537"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.svg"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Online Tools" href="online-tools.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="#">
+    <img class="logo" src="_static/left_small_logo.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<nav class="chemfast-nav" aria-label="Documentation navigation">
+  <h3 class="chemfast-nav-title">Navigation</h3>
+  <a class="chemfast-nav-link is-current" href="#" aria-current="page">Introduction</a>
+  <div class="chemfast-nav-label">Get ChemFAST</div>
+  <div class="chemfast-nav-children">
+    <a class="chemfast-nav-link" href="online-tools.html">Online Tools</a>
+    <a class="chemfast-nav-link" href="installation.html">Installation</a>
+  </div>
+  <a class="chemfast-nav-link" href="quick-start.html">Quick Start</a>
+  <a class="chemfast-nav-link" href="workflow.html">Workflow</a>
+  <a class="chemfast-nav-link" href="reaction-dsl.html">Reaction DSL</a>
+  <details class="chemfast-nav-group">
+    <summary>Tutorials</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="tutorials/index.html">Overview</a>
+      <a class="chemfast-nav-link" href="tutorials/first-system.html">Linear Polyimide</a>
+      <a class="chemfast-nav-link" href="tutorials/radical-pmma.html">Radical PMMA</a>
+      <a class="chemfast-nav-link" href="tutorials/network.html">Crosslinked Network</a>
+      <a class="chemfast-nav-link" href="tutorials/poss.html">POSS–PMMA</a>
+      <a class="chemfast-nav-link" href="tutorials/spe.html">SPE</a>
+      <a class="chemfast-nav-link" href="tutorials/block-ps-peo.html">PS-b-PEO</a>
+      <a class="chemfast-nav-link" href="tutorials/aa-relaxation.html">AA Relaxation</a>
+    </div>
+  </details>
+  <details class="chemfast-nav-group">
+    <summary>Reference</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link" href="inputs.html">Input Reference</a>
+      <a class="chemfast-nav-link" href="api/index.html">Core API</a>
+    </div>
+  </details>
+  <a class="chemfast-nav-link" href="testing.html">Testing</a>
+  <a class="chemfast-nav-link" href="troubleshooting.html">Troubleshooting</a>
+</nav>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="chemfast">
+<h1>ChemFAST<a class="headerlink" href="#chemfast" title="Link to this heading">¶</a></h1>
+<div class="chemfast-hero docutils container">
+<div class="chemfast-hero-copy docutils container">
+<p><strong>Build atomistic polymer models from chemical definitions.</strong></p>
+<p>ChemFAST connects reactants and reaction rules to coarse-grained (CG) construction,
+all-atom (AA) reconstruction, and force-field assignment. Start with the browser-based
+DoMD tools or reproduce a complete local workflow. You do not need to learn the
+Python API before running the first example.</p>
+</div>
+<div class="chemfast-hero-visual docutils container">
+<img alt="ChemFAST connects chemical definitions, coarse-grained construction, and atomistic reconstruction." src="_images/chemfast_logo.png" />
+</div>
+</div>
+<section id="what-does-chemfast-do">
+<h2>1. What does ChemFAST do?<a class="headerlink" href="#what-does-chemfast-do" title="Link to this heading">¶</a></h2>
+<figure class="align-default">
+<img alt="Chemical definitions pass through CG construction, atomistic reconstruction, and force-field assignment." class="chemfast-workflow" src="_images/workflow.svg" />
+</figure>
+<p>Define molecular building blocks and their allowed reactions, construct or supply a CG
+configuration, and reconstruct atomistic connectivity and coordinates. ChemFAST also
+exports force-field and simulation inputs; external MD engines carry out relaxation.
+See <a class="reference internal" href="workflow.html"><span class="std std-doc">Workflow</span></a> for the methods and limitations behind these stages.</p>
+</section>
+<section id="how-would-you-like-to-start">
+<h2>2. How would you like to start?<a class="headerlink" href="#how-would-you-like-to-start" title="Link to this heading">¶</a></h2>
+<div class="chemfast-start-grid docutils container">
+<div class="chemfast-start-card docutils container">
+<p class="rubric" id="use-domd-online"><a class="reference internal" href="online-tools.html"><span class="std std-doc">Use DoMD online</span></a></p>
+<p>Explore <strong>OPLS AutoFF</strong>, <strong>DoMD Topology</strong>, or experimental <strong>DoMD AL</strong> in your browser;
+no local command-line installation is needed to try the available web tools.</p>
+</div>
+<div class="chemfast-start-card docutils container">
+<p class="rubric" id="install-chemfast"><a class="reference internal" href="installation.html"><span class="std std-doc">Install ChemFAST</span></a></p>
+<p>Set up the local Python environment for tutorial reproduction, custom workflows, and
+simulation-engine integration.</p>
+</div>
+<div class="chemfast-start-card docutils container">
+<p class="rubric" id="run-the-first-system"><a class="reference internal" href="quick-start.html"><span class="std std-doc">Run the first system</span></a></p>
+<p>Follow five checkpoints from a simple Reaction-DSL input to an AA output and an optional MD relaxation.</p>
+</div>
+<div class="chemfast-start-card docutils container">
+<p class="rubric" id="modify-your-chemistry"><a class="reference internal" href="reaction-dsl.html"><span class="std std-doc">Modify your chemistry</span></a></p>
+<p>After the first run, learn how the Reaction-DSL changes molecular building blocks and reactions.</p>
+</div>
+</div>
+</section>
+<section id="suggested-learning-path">
+<h2>Suggested learning path<a class="headerlink" href="#suggested-learning-path" title="Link to this heading">¶</a></h2>
+<p><strong>Introduction → Online tools or Installation → Quick Start → Workflow → Reaction DSL →
+Tutorials → Reference → Testing.</strong> Follow the first three sections to produce a
+result; read the deeper explanations when you need to change chemistry or troubleshoot.</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

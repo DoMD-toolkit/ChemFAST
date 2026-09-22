@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Reaction-DSL &#8212; ChemFAST · Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=b95a8313" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="_static/chemfast.css?v=6c49ce7e" />
+    <script src="_static/documentation_options.js?v=a12e3537"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.svg"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Tutorials: build different polymer systems" href="tutorials/index.html" />
+    <link rel="prev" title="Workflow" href="workflow.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/left_small_logo.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<nav class="chemfast-nav" aria-label="Documentation navigation">
+  <h3 class="chemfast-nav-title">Navigation</h3>
+  <a class="chemfast-nav-link" href="index.html">Introduction</a>
+  <div class="chemfast-nav-label">Get ChemFAST</div>
+  <div class="chemfast-nav-children">
+    <a class="chemfast-nav-link" href="online-tools.html">Online Tools</a>
+    <a class="chemfast-nav-link" href="installation.html">Installation</a>
+  </div>
+  <a class="chemfast-nav-link" href="quick-start.html">Quick Start</a>
+  <a class="chemfast-nav-link" href="workflow.html">Workflow</a>
+  <a class="chemfast-nav-link is-current" href="#" aria-current="page">Reaction DSL</a>
+  <details class="chemfast-nav-group">
+    <summary>Tutorials</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="tutorials/index.html">Overview</a>
+      <a class="chemfast-nav-link" href="tutorials/first-system.html">Linear Polyimide</a>
+      <a class="chemfast-nav-link" href="tutorials/radical-pmma.html">Radical PMMA</a>
+      <a class="chemfast-nav-link" href="tutorials/network.html">Crosslinked Network</a>
+      <a class="chemfast-nav-link" href="tutorials/poss.html">POSS–PMMA</a>
+      <a class="chemfast-nav-link" href="tutorials/spe.html">SPE</a>
+      <a class="chemfast-nav-link" href="tutorials/block-ps-peo.html">PS-b-PEO</a>
+      <a class="chemfast-nav-link" href="tutorials/aa-relaxation.html">AA Relaxation</a>
+    </div>
+  </details>
+  <details class="chemfast-nav-group">
+    <summary>Reference</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link" href="inputs.html">Input Reference</a>
+      <a class="chemfast-nav-link" href="api/index.html">Core API</a>
+    </div>
+  </details>
+  <a class="chemfast-nav-link" href="testing.html">Testing</a>
+  <a class="chemfast-nav-link" href="troubleshooting.html">Troubleshooting</a>
+</nav>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="reaction-dsl">
+<h1>Reaction-DSL<a class="headerlink" href="#reaction-dsl" title="Link to this heading">¶</a></h1>
+<p>Reaction-DSL is a domain-specific language for describing how molecular building
+blocks connect and how their reactive states change. Define the reactants and
+functional-group transformations first; a simulation engine then applies these
+definitions to build a polymer. The language separates chemical construction
+instructions from the engine’s integration, encounter detection and sampling.</p>
+<section id="learn-the-language-with-the-first-example">
+<h2>Learn the language with the first example<a class="headerlink" href="#learn-the-language-with-the-first-example" title="Link to this heading">¶</a></h2>
+<p>The <a class="reference internal" href="quick-start.html"><span class="std std-doc">Quick start</span></a> runs an existing linear polyimide example.
+To turn it into your own system, edit <code class="docutils literal notranslate"><span class="pre">01_linear_pi/config.json</span></code> in this order:</p>
+<ol class="arabic simple">
+<li><p>Change <code class="docutils literal notranslate"><span class="pre">reactants</span></code> to declare the complete molecules and their starting counts.
+<code class="docutils literal notranslate"><span class="pre">max_valence</span></code> limits <strong>CG connections</strong>, not the valence of an individual atom.</p></li>
+<li><p>Change each reaction’s ordered <code class="docutils literal notranslate"><span class="pre">reactants</span></code> pair and mapped <code class="docutils literal notranslate"><span class="pre">smarts</span></code> so its
+participants and atom-level transformation match the intended chemistry.</p></li>
+<li><p>Choose <code class="docutils literal notranslate"><span class="pre">kind:</span> <span class="pre">&quot;general&quot;</span></code> for reactions without an active-state requirement,
+or <code class="docutils literal notranslate"><span class="pre">kind:</span> <span class="pre">&quot;radical&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">activation</span></code> for active-site propagation.</p></li>
+<li><p>Set any structured <code class="docutils literal notranslate"><span class="pre">fillers</span></code> only if a full reference structure and mapped
+reactive atom indices are available; a fragment SMARTS is not a full molecule.</p></li>
+<li><p>Re-run CG preparation and check the generated reaction records, then reconstruct
+the AA system from the <strong>matching</strong> CG XML and ordered ReactionPath.</p></li>
+</ol>
+<p>The sections below explain each field in this example. For types, defaults and
+file formats use <a class="reference internal" href="inputs.html"><span class="std std-doc">Input reference</span></a>; for a worked change in chemistry,
+continue to <a class="reference internal" href="tutorials/index.html"><span class="std std-doc">Tutorials</span></a>. A syntactically valid DSL does not
+by itself establish a chemically valid reaction or equilibrated structure.</p>
+</section>
+<section id="building-blocks-and-their-representation">
+<h2>Building blocks and their representation<a class="headerlink" href="#building-blocks-and-their-representation" title="Link to this heading">¶</a></h2>
+<p>Start with three objects: the building blocks available, the transformations they
+can undergo, and any structured components whose geometry must be preserved.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Object</p></th>
+<th class="head"><p>Chemical meaning</p></th>
+<th class="head"><p>Representation</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><strong>Reactant</strong></p></td>
+<td><p>A molecular building block, such as a monomer, or a reactive group on a filler</p></td>
+<td><p>A named type defined by molecular SMILES or fragment SMARTS</p></td>
+</tr>
+<tr class="row-odd"><td><p><strong>Reaction</strong></p></td>
+<td><p>A specified transformation between the reactants’ functional groups</p></td>
+<td><p>Atom-mapped reaction SMARTS, together with participating types, reaction probability and state changes</p></td>
+</tr>
+<tr class="row-even"><td><p><strong>Filler</strong></p></td>
+<td><p>A structured component, such as a nanoparticle or biomolecule, with a supplied atomistic geometry</p></td>
+<td><p>An all-atom PDB reference and mappings identifying its reactive groups</p></td>
+</tr>
+</tbody>
+</table>
+<p>A flexible molecular reactant is represented by a CG bead during construction.
+A filler needs several CG sites to preserve its shape and the spatial arrangement
+of its reactive groups. From the supplied PDB and mappings, ChemFAST automatically
+builds a rigid <strong>point cloud</strong>. Reactive <strong>arms</strong> are placed at the centres of their
+mapped atom groups; all other CG beads are non-reactive <strong>centers</strong> representing
+the filler body. A center is therefore a type of body bead, not a single extra hub.</p>
+<p><strong>All arms and centers together form one rigid body.</strong> Their relative positions
+remain fixed during CG simulation. In the supplied POSS example, the four mapped
+NH₂ groups define four <code class="docutils literal notranslate"><span class="pre">CN</span></code> arms, while the remaining CG beads belong to the <code class="docutils literal notranslate"><span class="pre">SiO</span></code>
+center type. During AA reconstruction, the PDB supplies the reference geometry
+and the arm mappings identify the atoms that participate in reactions.</p>
+<figure class="align-default" id="id1">
+<a class="reference internal image-reference" href="_images/filler-representation.svg"><img alt="The supplied POSS structure has four mapped NH2 reactive groups. Its CG representation contains blue CN arms and grey SiO centers, all belonging to one rigid body, without an additional central hub." src="_images/filler-representation.svg" style="width: 100%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">POSS filler representation. The atomistic panel uses the supplied PDB coordinates
+and bonds. Each mapped NH₂ group becomes a reactive <code class="docutils literal notranslate"><span class="pre">CN</span></code> arm; every other CG bead
+is a non-reactive <code class="docutils literal notranslate"><span class="pre">SiO</span></code> center. The CG discretization is schematic, with arm
+positions calculated from the supplied mappings. Labels 1–4 identify corresponding
+groups, not <code class="docutils literal notranslate"><span class="pre">cg_id</span></code> values.</span><a class="headerlink" href="#id1" title="Link to this image">¶</a></p>
+</figcaption>
+</figure>
+<p>Thus, a filler-bound group is declared as a reactant type but is instantiated
+through a filler mapping, rather than generated as an independent molecule.</p>
+</section>
+<section id="document-structure">
+<h2>Document structure<a class="headerlink" href="#document-structure" title="Link to this heading">¶</a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">&quot;domd_react_dsl&quot;:</span> <span class="pre">&quot;v1&quot;</span></code> as the language-version key in ChemFAST v1.0.0.
+All downloadable tutorial configurations use this same spelling.
+The following complete configuration defines a dianhydride and a diamine, their
+reaction rules, and filenames for subsequent reconstruction:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;cg_topology_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reaction_final.xml&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;reaction_path_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reaction_path.txt&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;smiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;O1C(=O)c2ccc(Oc3cc4C(=O)OC(=O)c4cc3)cc2C1=O&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;N&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_valence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;B1&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;smiles&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Nc1ccc(Oc2ccc(N)cc2)cc1&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;N&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;max_valence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;reactions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A-B1&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;general&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;B1&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;smarts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[O:1]=[C:2][O:3][C:4]=[O:5].[NH2:6]&gt;&gt;[O:1]=[C:2][N:6][C:4]=[O:5].[O:3]&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;prod_idx&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="mi">0</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;intrinsic_probability&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;B1-A&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;kind&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;general&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;B1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;smarts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[NH2:6].[O:1]=[C:2][O:3][C:4]=[O:5]&gt;&gt;[O:1]=[C:2][N:6][C:4]=[O:5].[O:3]&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;prod_idx&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="mi">0</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">&quot;intrinsic_probability&quot;</span><span class="p">:</span><span class="w"> </span><span class="mf">1.0</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;domd_react_dsl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v1&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Download the <a class="reference download internal" download="" href="_downloads/0b7417314e9bf0aba5577bbd3e64526e/linear-pi.json"><code class="xref download docutils literal notranslate"><span class="pre">complete</span> <span class="pre">configuration</span></code></a>.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Required / default</p></th>
+<th class="head"><p>Contents</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">domd_react_dsl</span></code></p></td>
+<td><p>Required: <code class="docutils literal notranslate"><span class="pre">&quot;v1&quot;</span></code></p></td>
+<td><p>Language version</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">reactants</span></code></p></td>
+<td><p>Required</p></td>
+<td><p>Named types: complete molecules defined by SMILES, or reactive fragments of fillers defined by SMARTS</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">reactions</span></code></p></td>
+<td><p>Required</p></td>
+<td><p>Named transformations using atom-mapped reaction SMARTS, with reaction type, probability and optional state changes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">fillers</span></code></p></td>
+<td><p>Optional: <code class="docutils literal notranslate"><span class="pre">[]</span></code></p></td>
+<td><p>Structured components with PDB references and reactive-site mappings</p></td>
+</tr>
+</tbody>
+</table>
+<p>ChemFAST also accepts file and box options in this document. Their formats,
+defaults and path resolution are described under
+<a class="reference internal" href="inputs.html#configuration"><span class="std std-ref">Configuration</span></a>; they are not reaction-language semantics.</p>
+</section>
+<section id="reactants">
+<h2>Reactants<a class="headerlink" href="#reactants" title="Link to this heading">¶</a></h2>
+<p>Each entry in <code class="docutils literal notranslate"><span class="pre">reactants</span></code> declares a type that can be named in a reaction.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Required / default</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>Required</p></td>
+<td><p>Unique, non-empty type name</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">smiles</span></code></p></td>
+<td><p>Exactly one of <code class="docutils literal notranslate"><span class="pre">smiles</span></code> or <code class="docutils literal notranslate"><span class="pre">smarts</span></code></p></td>
+<td><p>SMILES for a complete molecular building block</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">smarts</span></code></p></td>
+<td><p>Exactly one of <code class="docutils literal notranslate"><span class="pre">smiles</span></code> or <code class="docutils literal notranslate"><span class="pre">smarts</span></code></p></td>
+<td><p>SMARTS for a reactive fragment within a structured filler</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">N</span></code></p></td>
+<td><p>Optional: <code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p>Non-negative integer number of independent molecules; omit for SMARTS-only types</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">max_valence</span></code></p></td>
+<td><p>Required; integer ≥ 1</p></td>
+<td><p>Maximum reaction-generated CG connections: how many chemical connections this bead can form with other beads, not an atom’s elemental valence</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">activate</span></code></p></td>
+<td><p>Optional: <code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p>Initial number of active sites for <code class="docutils literal notranslate"><span class="pre">radical</span></code> reactions; <code class="docutils literal notranslate"><span class="pre">n</span></code> sites are randomly selected without replacement from all sites of this type</p></td>
+</tr>
+</tbody>
+</table>
+<p>A CG connection can represent more than one atomistic bond formed by the same
+transformation. Set <code class="docutils literal notranslate"><span class="pre">max_valence</span></code> from the intended CG reaction connectivity.
+Membership of the filler rigid body does not consume this reaction capacity.</p>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;activate&quot;:</span> <span class="pre">n</span></code> selects <code class="docutils literal notranslate"><span class="pre">n</span></code> sites from the entire population of that type. For a
+SMARTS-defined filler-arm type, selection is across all matching arms on all
+filler copies, not <code class="docutils literal notranslate"><span class="pre">n</span></code> arms per filler. If independent molecules and filler arms
+share the type, they form one combined pool. The count cannot exceed that pool.
+<code class="docutils literal notranslate"><span class="pre">activate</span></code> does not select the reaction type: <code class="docutils literal notranslate"><span class="pre">kind</span></code> does that.</p>
+</section>
+<section id="reactions">
+<h2>Reactions<a class="headerlink" href="#reactions" title="Link to this heading">¶</a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Required / default</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>Required</p></td>
+<td><p>Unique reaction name used in ReactionPath</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">reactants</span></code></p></td>
+<td><p>Required</p></td>
+<td><p>One ordered list of type names per rule, e.g. <code class="docutils literal notranslate"><span class="pre">[&quot;A&quot;,</span> <span class="pre">&quot;B1&quot;]</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">smarts</span></code></p></td>
+<td><p>Required</p></td>
+<td><p>Atom-mapped reaction SMARTS specifying participating atoms and their connectivity changes</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">prod_idx</span></code></p></td>
+<td><p>Optional ChemFAST reconstruction option</p></td>
+<td><p>Zero-based indices of the products to retain during AA reconstruction; unselected products are removed</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">kind</span></code></p></td>
+<td><p>Optional: <code class="docutils literal notranslate"><span class="pre">&quot;general&quot;</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">&quot;general&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;radical&quot;</span></code>; see below</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">intrinsic_probability</span></code></p></td>
+<td><p>Required; number in <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code></p></td>
+<td><p>Probability factor for attempting an otherwise eligible reaction during simulation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">activation</span></code></p></td>
+<td><p>Required for <code class="docutils literal notranslate"><span class="pre">radical</span></code></p></td>
+<td><p>Active-state source and destination, using <code class="docutils literal notranslate"><span class="pre">from</span></code> and <code class="docutils literal notranslate"><span class="pre">to</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">type_changes</span></code></p></td>
+<td><p>Optional: <code class="docutils literal notranslate"><span class="pre">[]</span></code>; <code class="docutils literal notranslate"><span class="pre">general</span></code> only</p></td>
+<td><p>Type updates applied after an accepted reaction</p></td>
+</tr>
+</tbody>
+</table>
+<section id="reactant-order-and-atom-maps">
+<h3>Reactant order and atom maps<a class="headerlink" href="#reactant-order-and-atom-maps" title="Link to this heading">¶</a></h3>
+<p>Each reaction rule specifies <strong>one ordered list</strong> of participating CG types:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;B1&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>If a transformation applies to B1 and B2, write two separately named reaction
+rules, one with <code class="docutils literal notranslate"><span class="pre">[&quot;A&quot;,</span> <span class="pre">&quot;B1&quot;]</span></code> and one with <code class="docutils literal notranslate"><span class="pre">[&quot;A&quot;,</span> <span class="pre">&quot;B2&quot;]</span></code>. The rules may use
+the same atom-mapped SMARTS when it matches both molecule types. Each type must
+match the SMARTS template in its position; nested lists are not accepted.
+The exact rule <code class="docutils literal notranslate"><span class="pre">name</span></code> is used for its CG bond and ReactionPath events. No
+combination suffix is added automatically.</p>
+<p>For <code class="docutils literal notranslate"><span class="pre">[&quot;A&quot;,</span> <span class="pre">&quot;B1&quot;]</span></code>, <strong>slot 0</strong> is A and <strong>slot 1</strong> is B1. Slot order must agree with:</p>
+<ul class="simple">
+<li><p>The dot-separated reactant templates on the left of <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code> in SMARTS.</p></li>
+<li><p>The node order in a recorded ReactionPath event.</p></li>
+<li><p>The indices in <code class="docutils literal notranslate"><span class="pre">activation.from</span></code>, <code class="docutils literal notranslate"><span class="pre">activation.to</span></code> and <code class="docutils literal notranslate"><span class="pre">type_changes[].node</span></code>.</p></li>
+</ul>
+<p>Swapping the type names alone changes this correspondence. Atom-map labels such
+as <code class="docutils literal notranslate"><span class="pre">:2</span></code> and <code class="docutils literal notranslate"><span class="pre">:6</span></code> identify atoms across the two sides of SMARTS; they are neither
+slot indices nor particle IDs. In the complete example, the mapped nitrogen <code class="docutils literal notranslate"><span class="pre">:6</span></code>
+replaces the anhydride oxygen <code class="docutils literal notranslate"><span class="pre">:3</span></code> in the connected product.</p>
+<p>For AA reconstruction, use <code class="docutils literal notranslate"><span class="pre">prod_idx</span></code> to choose which products to retain. Products
+are numbered from <code class="docutils literal notranslate"><span class="pre">0</span></code> in their order on the right of <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code>; <code class="docutils literal notranslate"><span class="pre">&quot;prod_idx&quot;:</span> <span class="pre">[0]</span></code>
+retains the first, <code class="docutils literal notranslate"><span class="pre">[1]</span></code> retains the second, and <code class="docutils literal notranslate"><span class="pre">[0,</span> <span class="pre">1]</span></code> retains both. Unselected
+products are removed. In the example, <code class="docutils literal notranslate"><span class="pre">[0]</span></code> retains the polymer product and removes
+the water by-product. If the product order is reversed, use <code class="docutils literal notranslate"><span class="pre">[1]</span></code> to retain the
+same polymer product. When <code class="docutils literal notranslate"><span class="pre">prod_idx</span></code> is omitted, this product-index filtering is
+not applied.</p>
+</section>
+<section id="general-and-radical-reactions">
+<h3>General and radical reactions<a class="headerlink" href="#general-and-radical-reactions" title="Link to this heading">¶</a></h3>
+<p><strong><code class="docutils literal notranslate"><span class="pre">general</span></code></strong> reactions select participating types with available reaction
+capacity, without requiring an active site. This describes construction such as
+coupling between complementary functional groups in step-growth polymerization.</p>
+<p><strong><code class="docutils literal notranslate"><span class="pre">radical</span></code></strong> reactions additionally require and update an active state. If
+<code class="docutils literal notranslate"><span class="pre">activation.from</span></code> is a slot, that participant must be active and the others
+inactive; if it is <code class="docutils literal notranslate"><span class="pre">null</span></code>, all participants must initially be inactive. After
+acceptance, the active state is assigned according to <code class="docutils literal notranslate"><span class="pre">activation.to</span></code>:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p><code class="docutils literal notranslate"><span class="pre">from</span></code></p></th>
+<th class="head"><p><code class="docutils literal notranslate"><span class="pre">to</span></code></p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">null</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p>Initiate activity at slot 0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1</span></code></p></td>
+<td><p>Transfer activity from slot 0 to slot 1, as in chain propagation</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p>Retain activity at slot 0</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">0</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">null</span></code></p></td>
+<td><p>Quench activity at slot 0</p></td>
+</tr>
+</tbody>
+</table>
+<p>For example, <code class="docutils literal notranslate"><span class="pre">&quot;activation&quot;:</span> <span class="pre">{&quot;from&quot;:</span> <span class="pre">0,</span> <span class="pre">&quot;to&quot;:</span> <span class="pre">1}</span></code> transfers the active site from
+the first reactant to the second. Indices must exist in the ordered reactant list;
+<code class="docutils literal notranslate"><span class="pre">from</span></code> and <code class="docutils literal notranslate"><span class="pre">to</span></code> cannot both be <code class="docutils literal notranslate"><span class="pre">null</span></code>. These state operations describe the
+specified construction mechanism, not every possible radical termination route.</p>
+</section>
+<section id="intrinsic-probability">
+<h3>Intrinsic probability<a class="headerlink" href="#intrinsic-probability" title="Link to this heading">¶</a></h3>
+<p>Polymerization during MD is implemented by probabilistically accepting eligible
+reaction encounters. <code class="docutils literal notranslate"><span class="pre">intrinsic_probability</span></code> supplies a user-prescribed factor:
+<code class="docutils literal notranslate"><span class="pre">0</span></code> disables acceptance and <code class="docutils literal notranslate"><span class="pre">1</span></code> removes this particular probabilistic rejection.
+Encounter conditions and any additional sampling factors still depend on the
+execution protocol. This construction approach is described by
+<a class="reference external" href="https://doi.org/10.1002/jcc.24495">Liu et al., <em>A kinetic chain growth algorithm in coarse-grained simulations</em>,
+J. Comput. Chem. <strong>37</strong>, 2634–2646 (2016)</a>.</p>
+<p>The factor is not a predicted rate constant or equilibrium conversion. Assigning
+it does not calibrate simulation time to experimental polymerization kinetics.</p>
+</section>
+<section id="type-changes">
+<h3>Type changes<a class="headerlink" href="#type-changes" title="Link to this heading">¶</a></h3>
+<p>Use <code class="docutils literal notranslate"><span class="pre">type_changes</span></code> when an accepted <strong>general</strong> reaction changes which subsequent
+rules a CG site can participate in. Add this field to the reaction definition:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="nt">&quot;type_changes&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">&quot;node&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;to&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;B_after&quot;</span><span class="p">}]</span>
+</pre></div>
+</div>
+<p>Here slot 1 changes to the declared type <code class="docutils literal notranslate"><span class="pre">B_after</span></code>. Declare that type in
+<code class="docutils literal notranslate"><span class="pre">reactants</span></code> even if its initial <code class="docutils literal notranslate"><span class="pre">N</span></code> is <code class="docutils literal notranslate"><span class="pre">0</span></code>; its <code class="docutils literal notranslate"><span class="pre">max_valence</span></code> becomes the site’s
+new reaction capacity. Subsequent reaction rules must name <code class="docutils literal notranslate"><span class="pre">B_after</span></code>
+where that state is required.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">node</span></code></p></td>
+<td><p>Zero-based reactant slot to update, not a global CG particle ID</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">to</span></code></p></td>
+<td><p>Target type name already declared in <code class="docutils literal notranslate"><span class="pre">reactants</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>Updates occur in list order after the primary event is accepted, without another
+probability draw. Each slot may appear only once, and the resulting connectivity
+must fit the target type’s capacity. A type update changes CG state and future
+eligibility; it does not replace the atomistic transformation encoded by SMARTS.
+<code class="docutils literal notranslate"><span class="pre">radical</span></code> reactions use <code class="docutils literal notranslate"><span class="pre">activation</span></code> and cannot also request <code class="docutils literal notranslate"><span class="pre">type_changes</span></code>.</p>
+</section>
+</section>
+<section id="structured-components">
+<h2>Structured components<a class="headerlink" href="#structured-components" title="Link to this heading">¶</a></h2>
+<p>A filler is a complete reference structure, while its reactive groups are local
+parts of that structure. Define each reactive fragment by SMARTS in <code class="docutils literal notranslate"><span class="pre">reactants</span></code>,
+then map its atoms onto a PDB reference inside <code class="docutils literal notranslate"><span class="pre">fillers</span></code>.</p>
+<p>The following entries illustrate the mapping syntax; substitute your PDB and
+its actual atom indices before use:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ARM&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;smarts&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;[N]-[C]-[C]&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;max_valence&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">&quot;fillers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Core&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;N&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;references/core.pdb&quot;</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">&quot;mappings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span><span class="nt">&quot;cg_id&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ARM&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;atom_idx&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">12</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">]}</span>
+<span class="w">      </span><span class="p">]</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">name</span></code></p></td>
+<td><p>Filler identifier</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">N</span></code></p></td>
+<td><p>Number of copies to construct</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">file</span></code></p></td>
+<td><p>PDB reference containing atomistic coordinates; verify the connectivity read from it</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mappings</span></code></p></td>
+<td><p>List of reactive-site mappings</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mappings[].cg_id</span></code></p></td>
+<td><p>Local CG site index within the mapped rigid component; unique within its mappings and consistent with its CG site numbering</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mappings[].type</span></code></p></td>
+<td><p>Declared reactant type for the site, supplying its fragment SMARTS and reaction capacity</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">mappings[].atom_idx</span></code></p></td>
+<td><p>Ordered, zero-based RDKit atom indices in the loaded PDB, one per fragment SMARTS atom</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">filler_idx</span></code></p></td>
+<td><p>For FG: actual rigid-body IDs in the final XML that use this reference</p></td>
+</tr>
+</tbody>
+</table>
+<p>Each filler requires <code class="docutils literal notranslate"><span class="pre">name</span></code>, <code class="docutils literal notranslate"><span class="pre">N</span></code>, <code class="docutils literal notranslate"><span class="pre">file</span></code> and a non-empty <code class="docutils literal notranslate"><span class="pre">mappings</span></code> list. Each
+mapping requires <code class="docutils literal notranslate"><span class="pre">cg_id</span></code>, <code class="docutils literal notranslate"><span class="pre">type</span></code> and <code class="docutils literal notranslate"><span class="pre">atom_idx</span></code>; counts and indices are
+non-negative integers, and an <code class="docutils literal notranslate"><span class="pre">atom_idx</span></code> list must not repeat an index.</p>
+<p><strong>Mapping order is positional.</strong> In the example, SMARTS atom 0 (N) maps to reference
+atom 12, atom 1 (C) to reference atom 8, and atom 2 (C) to reference atom 9.
+The array is deliberately not sorted. Its length and order must match the SMARTS
+atoms, and the selected reference fragment must match the pattern. These indices
+are not PDB serial numbers, atom-map labels or global CG particle IDs. Preserve
+the reference atom order and hydrogen representation after preparing mappings.</p>
+<p>For reconstruction, supply <code class="docutils literal notranslate"><span class="pre">filler_idx</span></code> from the actual final XML <code class="docutils literal notranslate"><span class="pre">body</span></code> values.
+For example, <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">9]</span></code> would associate two rigid bodies with this reference only if
+those are their recorded IDs. <code class="docutils literal notranslate"><span class="pre">N:</span> <span class="pre">2</span></code> alone does not identify them. Reference-path
+resolution is described in <a class="reference internal" href="inputs.html#configuration"><span class="std std-ref">Configuration</span></a>.</p>
+</section>
+<section id="scope-and-validation">
+<h2>Scope and validation<a class="headerlink" href="#scope-and-validation" title="Link to this heading">¶</a></h2>
+<p>The language specifies allowed connectivity and state changes. The execution
+engine supplies coordinates, encounter criteria, time integration and sampling;
+force-field assignment is another stage. ChemFAST’s generated PyGAMD runner
+supports binary rules that add one CG connection, using either general coupling
+or radical activity transfer. It rejects <code class="docutils literal notranslate"><span class="pre">type_changes</span></code>, activation creation or
+quenching, unary/multibody rules, and mixed general/radical protocols. These are
+language features beyond that runner; see <a class="reference internal" href="api/advanced.html"><span class="std std-doc">Advanced control</span></a>.</p>
+<p>Product selection with <code class="docutils literal notranslate"><span class="pre">prod_idx</span></code> applies to AA reconstruction. The current CG
+compiler independently derives connectivity from the first SMARTS product;
+changing <code class="docutils literal notranslate"><span class="pre">prod_idx</span></code> does not change that CG compilation step.</p>
+<p>Specify <code class="docutils literal notranslate"><span class="pre">activate</span></code> explicitly for a controlled initial radical population.
+In the PyGAMD adapter, if all counts are zero, all source-type sites are activated
+by default; a type appearing as both source and target instead requires an
+explicit count. This is an adapter initialization policy, not a DSL default.</p>
+<p>Check a document before constructing a system:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.cg.reaction_dsl</span><span class="w"> </span><span class="kn">import</span> <span class="n">compile_file</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">compile_file</span><span class="p">(</span><span class="s2">&quot;system.json&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Compilation checks required fields, declared types, counts, probability bounds,
+reaction templates, slot indices and reaction-capacity compatibility. It does
+not run MD or prove the chemical feasibility of a proposed transformation.
+Also inspect PDB mappings, final XML/ReactionPath correspondence and the
+engine’s supported reaction operations before reconstruction.</p>
+<p>DSL input is declarative JSON, not a place for executable Python. Treat external
+runner scripts separately as code. Successful parsing is structural validation;
+it is not validation of a material’s chemistry, kinetics or physical properties.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

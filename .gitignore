@@ -1,0 +1,16 @@
+﻿__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.idea/
+.vscode/
+docs/build/*
+!docs/build/html/
+docs/.doctrees/
+.DS_Store
+Thumbs.db
+
+tests/.pytest_tmp/
+tests/reproducibility_report.xml
+
+docs/build/html/.doctrees/

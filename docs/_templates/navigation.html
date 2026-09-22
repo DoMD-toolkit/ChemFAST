@@ -1,0 +1,36 @@
+{# Compact, curated Alabaster sidebar navigation. #}
+<nav class="chemfast-nav" aria-label="Documentation navigation">
+  <h3 class="chemfast-nav-title">Navigation</h3>
+  <a class="chemfast-nav-link{% if pagename == 'index' %} is-current{% endif %}" href="{{ pathto('index') }}"{% if pagename == 'index' %} aria-current="page"{% endif %}>Introduction</a>
+  <div class="chemfast-nav-label">Get ChemFAST</div>
+  <div class="chemfast-nav-children">
+    <a class="chemfast-nav-link{% if pagename == 'online-tools' %} is-current{% endif %}" href="{{ pathto('online-tools') }}"{% if pagename == 'online-tools' %} aria-current="page"{% endif %}>Online Tools</a>
+    <a class="chemfast-nav-link{% if pagename == 'installation' %} is-current{% endif %}" href="{{ pathto('installation') }}"{% if pagename == 'installation' %} aria-current="page"{% endif %}>Installation</a>
+  </div>
+  <a class="chemfast-nav-link{% if pagename == 'quick-start' %} is-current{% endif %}" href="{{ pathto('quick-start') }}"{% if pagename == 'quick-start' %} aria-current="page"{% endif %}>Quick Start</a>
+  <a class="chemfast-nav-link{% if pagename == 'workflow' %} is-current{% endif %}" href="{{ pathto('workflow') }}"{% if pagename == 'workflow' %} aria-current="page"{% endif %}>Workflow</a>
+  <a class="chemfast-nav-link{% if pagename == 'reaction-dsl' %} is-current{% endif %}" href="{{ pathto('reaction-dsl') }}"{% if pagename == 'reaction-dsl' %} aria-current="page"{% endif %}>Reaction DSL</a>
+  <details class="chemfast-nav-group"{% if pagename.startswith('tutorials/') %} open{% endif %}>
+    <summary>Tutorials</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link{% if pagename == 'tutorials/index' %} is-current{% endif %}" href="{{ pathto('tutorials/index') }}"{% if pagename == 'tutorials/index' %} aria-current="page"{% endif %}>Overview</a>
+      <a class="chemfast-nav-link{% if pagename == 'tutorials/first-system' %} is-current{% endif %}" href="{{ pathto('tutorials/first-system') }}"{% if pagename == 'tutorials/first-system' %} aria-current="page"{% endif %}>Linear Polyimide</a>
+      <a class="chemfast-nav-link{% if pagename == 'tutorials/radical-pmma' %} is-current{% endif %}" href="{{ pathto('tutorials/radical-pmma') }}"{% if pagename == 'tutorials/radical-pmma' %} aria-current="page"{% endif %}>Radical PMMA</a>
+      <a class="chemfast-nav-link{% if pagename == 'tutorials/network' %} is-current{% endif %}" href="{{ pathto('tutorials/network') }}"{% if pagename == 'tutorials/network' %} aria-current="page"{% endif %}>Crosslinked Network</a>
+      <a class="chemfast-nav-link{% if pagename == 'tutorials/poss' %} is-current{% endif %}" href="{{ pathto('tutorials/poss') }}"{% if pagename == 'tutorials/poss' %} aria-current="page"{% endif %}>POSS–PMMA</a>
+      <a class="chemfast-nav-link{% if pagename == 'tutorials/spe' %} is-current{% endif %}" href="{{ pathto('tutorials/spe') }}"{% if pagename == 'tutorials/spe' %} aria-current="page"{% endif %}>SPE</a>
+      <a class="chemfast-nav-link{% if pagename == 'tutorials/block-ps-peo' %} is-current{% endif %}" href="{{ pathto('tutorials/block-ps-peo') }}"{% if pagename == 'tutorials/block-ps-peo' %} aria-current="page"{% endif %}>PS-b-PEO</a>
+      <a class="chemfast-nav-link{% if pagename == 'tutorials/aa-relaxation' %} is-current{% endif %}" href="{{ pathto('tutorials/aa-relaxation') }}"{% if pagename == 'tutorials/aa-relaxation' %} aria-current="page"{% endif %}>AA Relaxation</a>
+    </div>
+  </details>
+  <details class="chemfast-nav-group"{% if pagename in ['usage', 'inputs'] or pagename.startswith('api/') %} open{% endif %}>
+    <summary>Reference</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link{% if pagename == 'usage' %} is-current{% endif %}" href="{{ pathto('usage') }}"{% if pagename == 'usage' %} aria-current="page"{% endif %}>Usage Guide</a>
+      <a class="chemfast-nav-link{% if pagename == 'inputs' %} is-current{% endif %}" href="{{ pathto('inputs') }}"{% if pagename == 'inputs' %} aria-current="page"{% endif %}>Input Reference</a>
+      <a class="chemfast-nav-link{% if pagename.startswith('api/') %} is-current{% endif %}" href="{{ pathto('api/index') }}"{% if pagename == 'api/index' %} aria-current="page"{% endif %}>Core API</a>
+    </div>
+  </details>
+  <a class="chemfast-nav-link{% if pagename == 'testing' %} is-current{% endif %}" href="{{ pathto('testing') }}"{% if pagename == 'testing' %} aria-current="page"{% endif %}>Testing</a>
+  <a class="chemfast-nav-link{% if pagename == 'troubleshooting' %} is-current{% endif %}" href="{{ pathto('troubleshooting') }}"{% if pagename == 'troubleshooting' %} aria-current="page"{% endif %}>Troubleshooting</a>
+</nav>

@@ -1,0 +1,10 @@
+[
+  {
+    "name": "acetanilide_rich",
+    "smiles": "CC(=O)NC1=CC=CC=C1"
+  },
+  {
+    "name": "methylammonium",
+    "smiles": "C[NH3+]"
+  }
+]

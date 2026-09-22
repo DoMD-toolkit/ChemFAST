@@ -1,0 +1,41 @@
+{
+  "cg_topology_file": "reaction_final.xml",
+  "reaction_path_file": "reaction_path.txt",
+  "domd_react_dsl": "v1",
+  "reactants": [
+    {
+      "name": "A",
+      "smiles": "O1C(=O)c2ccc(Oc3cc4C(=O)OC(=O)c4cc3)cc2C1=O",
+      "N": 32,
+      "max_valence": 2
+    },
+    {
+      "name": "B1",
+      "smiles": "Nc1ccc(Oc2ccc(N)cc2)cc1",
+      "N": 32,
+      "max_valence": 2
+    }
+  ],
+  "reactions": [
+    {
+      "name": "A-B1",
+      "kind": "general",
+      "reactants": ["A", "B1"],
+      "smarts": "[O:1]=[C:2][O:3][C:4]=[O:5].[N:6]>>[O:1]=[C:2][N:6][C:4]=[O:5].[O:3]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0
+    },
+    {
+      "name": "B1-A",
+      "kind": "general",
+      "reactants": ["B1", "A"],
+      "smarts": "[NH2:6].[O:1]=[C:2][O:3][C:4]=[O:5]>>[O:1]=[C:2][N:6][C:4]=[O:5].[O:3]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0
+    }
+  ]
+}

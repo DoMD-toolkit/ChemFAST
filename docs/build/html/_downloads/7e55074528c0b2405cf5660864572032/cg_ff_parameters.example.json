@@ -1,0 +1,312 @@
+{
+    "bonded": {
+        "A-B1": {
+            "ff_type": "CG",
+            "itype": "BOND",
+            "indices": [],
+            "params": {
+                "k": 1100.0,
+                "r0": 1.22,
+                "ftype": 1
+            },
+            "name": "A-B1",
+            "ff_atom_types": [
+                "A",
+                "B1"
+            ]
+        },
+        "B1-A": {
+            "ff_type": "CG",
+            "itype": "BOND",
+            "indices": [],
+            "params": {
+                "k": 1100.0,
+                "r0": 1.22,
+                "ftype": 1
+            },
+            "name": "B1-A",
+            "ff_atom_types": [
+                "B1",
+                "A"
+            ]
+        },
+        "A-B2": {
+            "ff_type": "CG",
+            "itype": "BOND",
+            "indices": [],
+            "params": {
+                "k": 1100.0,
+                "r0": 0.974,
+                "ftype": 1
+            },
+            "name": "A-B2",
+            "ff_atom_types": [
+                "A",
+                "B2"
+            ]
+        },
+        "B2-A": {
+            "ff_type": "CG",
+            "itype": "BOND",
+            "indices": [],
+            "params": {
+                "k": 1100.0,
+                "r0": 0.974,
+                "ftype": 1
+            },
+            "name": "B2-A",
+            "ff_atom_types": [
+                "B2",
+                "A"
+            ]
+        },
+        "A-C": {
+            "ff_type": "CG",
+            "itype": "BOND",
+            "indices": [],
+            "params": {
+                "k": 1100.0,
+                "r0": 0.974,
+                "ftype": 1
+            },
+            "name": "A-C",
+            "ff_atom_types": [
+                "A",
+                "C"
+            ]
+        },
+        "C-A": {
+            "ff_type": "CG",
+            "itype": "BOND",
+            "indices": [],
+            "params": {
+                "k": 1100.0,
+                "r0": 0.974,
+                "ftype": 1
+            },
+            "name": "C-A",
+            "ff_atom_types": [
+                "C",
+                "A"
+            ]
+        },
+        "B1-A-B1": {
+            "ff_type": "CG",
+            "itype": "ANGLE",
+            "indices": [],
+            "params": {
+                "k": 25.0,
+                "r0": 99.8,
+                "ftype": 1
+            },
+            "name": "B1-A-B1",
+            "ff_atom_types": [
+                "B1",
+                "A",
+                "B1"
+            ]
+        },
+        "A-B1-A": {
+            "ff_type": "CG",
+            "itype": "ANGLE",
+            "indices": [],
+            "params": {
+                "k": 25.0,
+                "r0": 112.6,
+                "ftype": 1
+            },
+            "name": "A-B1-A",
+            "ff_atom_types": [
+                "A",
+                "B1",
+                "A"
+            ]
+        },
+        "B1-A-B2": {
+            "ff_type": "CG",
+            "itype": "ANGLE",
+            "indices": [],
+            "params": {
+                "k": 25.0,
+                "r0": 112.7,
+                "ftype": 1
+            },
+            "name": "B1-A-B2",
+            "ff_atom_types": [
+                "B1",
+                "A",
+                "B2"
+            ]
+        },
+        "B1-A-C": {
+            "ff_type": "CG",
+            "itype": "ANGLE",
+            "indices": [],
+            "params": {
+                "k": 25.0,
+                "r0": 115.8,
+                "ftype": 1
+            },
+            "name": "B1-A-C",
+            "ff_atom_types": [
+                "B1",
+                "A",
+                "C"
+            ]
+        },
+        "B2-A-B2": {
+            "ff_type": "CG",
+            "itype": "ANGLE",
+            "indices": [],
+            "params": {
+                "k": 25.0,
+                "r0": 130.0,
+                "ftype": 1
+            },
+            "name": "B2-A-B2",
+            "ff_atom_types": [
+                "B2",
+                "A",
+                "B2"
+            ]
+        },
+        "A-B2-A": {
+            "ff_type": "CG",
+            "itype": "ANGLE",
+            "indices": [],
+            "params": {
+                "k": 25.0,
+                "r0": 147.0,
+                "ftype": 1
+            },
+            "name": "A-B2-A",
+            "ff_atom_types": [
+                "A",
+                "B2",
+                "A"
+            ]
+        },
+        "B2-A-C": {
+            "ff_type": "CG",
+            "itype": "ANGLE",
+            "indices": [],
+            "params": {
+                "k": 25.0,
+                "r0": 130.3,
+                "ftype": 1
+            },
+            "name": "B2-A-C",
+            "ff_atom_types": [
+                "B2",
+                "A",
+                "C"
+            ]
+        },
+        "C-A-C": {
+            "ff_type": "CG",
+            "itype": "ANGLE",
+            "indices": [],
+            "params": {
+                "k": 25.0,
+                "r0": 134.6,
+                "ftype": 1
+            },
+            "name": "C-A-C",
+            "ff_atom_types": [
+                "C",
+                "A",
+                "C"
+            ]
+        },
+        "A-C-A": {
+            "ff_type": "CG",
+            "itype": "ANGLE",
+            "indices": [],
+            "params": {
+                "k": 25.0,
+                "r0": 97.5,
+                "ftype": 1
+            },
+            "name": "A-C-A",
+            "ff_atom_types": [
+                "A",
+                "C",
+                "A"
+            ]
+        }
+    },
+    "nonbonded": {
+        "A": {
+            "ff_type": "CG",
+            "ff_atom_type": "A",
+            "bond_type": "",
+            "ptype": "A",
+            "params": {
+                "epsilon": 0.663,
+                "sigma": 1.251
+            },
+            "element": null,
+            "mass": 1.0,
+            "charge": 0.0,
+            "hsp": [
+                19.765,
+                11.178,
+                8.281
+            ]
+        },
+        "B1": {
+            "ff_type": "CG",
+            "ff_atom_type": "B1",
+            "bond_type": "",
+            "ptype": "A",
+            "params": {
+                "epsilon": 0.754,
+                "sigma": 1.189
+            },
+            "element": null,
+            "mass": 1.0,
+            "charge": 0.0,
+            "hsp": [
+                20.103,
+                9.342,
+                13.164
+            ]
+        },
+        "B2": {
+            "ff_type": "CG",
+            "ff_atom_type": "B2",
+            "bond_type": "",
+            "ptype": "A",
+            "params": {
+                "epsilon": 0.823,
+                "sigma": 0.697
+            },
+            "element": null,
+            "mass": 1.0,
+            "charge": 0.0,
+            "hsp": [
+                18.653,
+                11.53,
+                15.649
+            ]
+        },
+        "C": {
+            "ff_type": "CG",
+            "ff_atom_type": "C",
+            "bond_type": "",
+            "ptype": "A",
+            "params": {
+                "epsilon": 1.0,
+                "sigma": 0.697
+            },
+            "element": null,
+            "mass": 1.0,
+            "charge": 0.0,
+            "hsp": [
+                19.374,
+                15.031,
+                16.74
+            ]
+        }
+    }
+}

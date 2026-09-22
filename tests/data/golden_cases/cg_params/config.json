@@ -1,0 +1,78 @@
+{
+  "domd_react_dsl": "v1",
+  "reactants": [
+    {
+      "name": "A",
+      "smiles": "C=CC(=O)O",
+      "N": 1,
+      "max_valence": 2
+    },
+    {
+      "name": "B",
+      "smiles": "OCCCC",
+      "N": 1,
+      "max_valence": 1
+    },
+    {
+      "name": "C",
+      "smiles": "OCCOCCOCCOCCO",
+      "N": 1,
+      "max_valence": 2
+    },
+    {
+      "name": "L",
+      "smiles": "[Li+]",
+      "N": 1,
+      "max_valence": 1
+    },
+    {
+      "name": "T",
+      "smiles": "C(F)(F)(F)S(=O)(=O)[N-]S(=O)(=O)C(F)(F)(F)",
+      "N": 1,
+      "max_valence": 1
+    },
+    {
+      "name": "S",
+      "smiles": "N#CCCC#N",
+      "N": 1,
+      "max_valence": 1
+    }
+  ],
+  "reactions": [
+    {
+      "name": "A-A",
+      "kind": "general",
+      "reactants": ["A", "A"],
+      "smarts": "[C:1]=[C:2][C:4](=[O:5])[O:6].[C:3]=[C:7][C:8](=[O:9])[O:10]>>[C:1][C:2]([C:4](=[O:5])[O:6])[C:3]=[C:7][C:8](=[O:9])[O:10]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0
+    },
+    {
+      "name": "B-A",
+      "kind": "general",
+      "reactants": ["A", "B"],
+      "smarts": "[C:4](=[O:5])[#8H1:1].[#6:2][#8H1:3]>>[C:4](=[O:5])[#8:3][#6:2].[#8:1]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0
+    },
+    {
+      "name": "C-A",
+      "kind": "general",
+      "reactants": ["A", "C"],
+      "smarts": "[C:4](=[O:5])[#8H1:1].[#6:2][#8H1:3]>>[C:4](=[O:5])[#8:3][#6:2].[#8:1]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0
+    }
+  ],
+  "box_tensor": [
+    10.0,
+    10.0,
+    10.0
+  ]
+}

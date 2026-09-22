@@ -1,0 +1,20 @@
+; ================================================================
+; Generated with DoMD-FF
+; ================================================================
+
+[ defaults ]
+; nbfunc  comb-rule  gen-pairs  fudgeLJ  fudgeQQ
+  1       3          yes        0.5      0.5
+
+; Include global non-bonded parameters
+#include "atomtypes.itp"
+
+; Include individual molecule bonded topologies
+#include "ethanol_db_S_1.itp"
+
+[ system ]
+system DoMD-FF Automated Composite Architecture
+
+[ molecules ]
+; Compound        #mols
+ethanol_db_S_1   1

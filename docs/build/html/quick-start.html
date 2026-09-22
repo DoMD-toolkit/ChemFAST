@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Quick start: your first polymer &#8212; ChemFAST · Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=b95a8313" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="_static/chemfast.css?v=6c49ce7e" />
+    <script src="_static/documentation_options.js?v=a12e3537"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.svg"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Workflow" href="workflow.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/left_small_logo.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<nav class="chemfast-nav" aria-label="Documentation navigation">
+  <h3 class="chemfast-nav-title">Navigation</h3>
+  <a class="chemfast-nav-link" href="index.html">Introduction</a>
+  <div class="chemfast-nav-label">Get ChemFAST</div>
+  <div class="chemfast-nav-children">
+    <a class="chemfast-nav-link" href="online-tools.html">Online Tools</a>
+    <a class="chemfast-nav-link" href="installation.html">Installation</a>
+  </div>
+  <a class="chemfast-nav-link is-current" href="#" aria-current="page">Quick Start</a>
+  <a class="chemfast-nav-link" href="workflow.html">Workflow</a>
+  <a class="chemfast-nav-link" href="reaction-dsl.html">Reaction DSL</a>
+  <details class="chemfast-nav-group">
+    <summary>Tutorials</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="tutorials/index.html">Overview</a>
+      <a class="chemfast-nav-link" href="tutorials/first-system.html">Linear Polyimide</a>
+      <a class="chemfast-nav-link" href="tutorials/radical-pmma.html">Radical PMMA</a>
+      <a class="chemfast-nav-link" href="tutorials/network.html">Crosslinked Network</a>
+      <a class="chemfast-nav-link" href="tutorials/poss.html">POSS–PMMA</a>
+      <a class="chemfast-nav-link" href="tutorials/spe.html">SPE</a>
+      <a class="chemfast-nav-link" href="tutorials/block-ps-peo.html">PS-b-PEO</a>
+      <a class="chemfast-nav-link" href="tutorials/aa-relaxation.html">AA Relaxation</a>
+    </div>
+  </details>
+  <details class="chemfast-nav-group">
+    <summary>Reference</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link" href="inputs.html">Input Reference</a>
+      <a class="chemfast-nav-link" href="api/index.html">Core API</a>
+    </div>
+  </details>
+  <a class="chemfast-nav-link" href="testing.html">Testing</a>
+  <a class="chemfast-nav-link" href="troubleshooting.html">Troubleshooting</a>
+</nav>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="quick-start-your-first-polymer">
+<h1>Quick start: your first polymer<a class="headerlink" href="#quick-start-your-first-polymer" title="Link to this heading">¶</a></h1>
+<p>This guide builds a linear polyimide, from its chemical definition to a reconstructed all-atom (AA) structure. It follows the <a class="reference internal" href="tutorials/first-system.html"><span class="std std-doc">linear polyimide tutorial</span></a> and introduces each stage of the ChemFAST workflow. You can also <a class="reference internal" href="online-tools.html"><span class="std std-doc">try the online tools</span></a> without a local installation.</p>
+<section id="install-and-obtain-the-example">
+<h2>1. Install and obtain the example<a class="headerlink" href="#install-and-obtain-the-example" title="Link to this heading">¶</a></h2>
+<p>Complete <a class="reference internal" href="installation.html"><span class="std std-doc">Installation</span></a>, then <a class="reference download internal" download="" href="_downloads/98aceda02529ddb64037dc873b799cb2/chemfast-tutorials.zip"><code class="xref download docutils literal notranslate"><span class="pre">download</span> <span class="pre">the</span> <span class="pre">tutorial</span> <span class="pre">archive</span></code></a> and extract it.</p>
+<p>Run the commands below from the extracted archive’s <strong>top-level directory</strong>, which contains <code class="docutils literal notranslate"><span class="pre">prepare_cg.py</span></code> and <code class="docutils literal notranslate"><span class="pre">reconstruct_aa.py</span></code>. Confirm that <code class="docutils literal notranslate"><span class="pre">01_linear_pi/config.json</span></code> is present.</p>
+<p><strong>Fast route (no PyGAMD):</strong> The archive already includes the matching
+<code class="docutils literal notranslate"><span class="pre">01_linear_pi/cg/reaction_final.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">01_linear_pi/cg/reaction_path.txt</span></code>.
+To try AA reconstruction directly, skip Steps 2 and 3 and run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>reconstruct_aa.py<span class="w"> </span>01_linear_pi
+</pre></div>
+</div>
+<p>This route requires the complete OPLS database. Check the AA outputs in Step 4,
+then proceed to Step 5. To generate a new CG result, follow Steps 2 and 3 instead.</p>
+</section>
+<section id="prepare-the-cg-model">
+<h2>2. Prepare the CG model<a class="headerlink" href="#prepare-the-cg-model" title="Link to this heading">¶</a></h2>
+<p>Prepare the coarse-grained (CG) model and polymerization inputs from the example configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>prepare_cg.py<span class="w"> </span>01_linear_pi
+</pre></div>
+</div>
+<p>Check that <code class="docutils literal notranslate"><span class="pre">01_linear_pi/cg/</span></code> contains <code class="docutils literal notranslate"><span class="pre">initial.xml</span></code>, <code class="docutils literal notranslate"><span class="pre">cg_parameters.json</span></code>, and <code class="docutils literal notranslate"><span class="pre">run_pygamd_polymerization.py</span></code>. This step prepares the simulation inputs; it does <strong>not</strong> run molecular dynamics (MD).</p>
+</section>
+<section id="construct-and-relax-the-cg-polymer">
+<h2>3. Construct and relax the CG polymer<a class="headerlink" href="#construct-and-relax-the-cg-polymer" title="Link to this heading">¶</a></h2>
+<p>The next stage constructs the CG polymer and records the reactions that form its connectivity. There are two ways to complete this stage:</p>
+<p><strong>Run the CG simulation.</strong> With a separately installed, compatible PyGAMD backend, run the generated script:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>01_linear_pi/cg
+python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
+<span class="nb">cd</span><span class="w"> </span>../..
+</pre></div>
+</div>
+<p><strong>Use the supplied CG result.</strong> If you chose the fast route in Step 1, the matching CG configuration and ReactionPath are already present. Step 2 and the CG simulation are not required for this route.</p>
+<p>If you run the CG simulation, keep a copy of the supplied files before replacing them with newly generated results. In either case, confirm that <code class="docutils literal notranslate"><span class="pre">reaction_final.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">reaction_path.txt</span></code> are present in <code class="docutils literal notranslate"><span class="pre">01_linear_pi/cg/</span></code>. The former stores the final CG configuration; the latter records the ordered accepted reactions.</p>
+</section>
+<section id="reconstruct-and-export-the-aa-system">
+<h2>4. Reconstruct and export the AA system<a class="headerlink" href="#reconstruct-and-export-the-aa-system" title="Link to this heading">¶</a></h2>
+<p>With the complete OPLS release database installed, reconstruct the AA structure from the CG configuration and reaction history:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>reconstruct_aa.py<span class="w"> </span>01_linear_pi
+</pre></div>
+</div>
+<p>Check that <code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/system.gro</span></code>, <code class="docutils literal notranslate"><span class="pre">system.top</span></code>, and the referenced <code class="docutils literal notranslate"><span class="pre">.itp</span></code> files exist. This is the reconstructed <strong>initial</strong> AA structure, not an equilibrated configuration. See the <a class="reference internal" href="tutorials/first-system.html"><span class="std std-doc">complete example</span></a> for the chemistry, images, and detailed output checks.</p>
+</section>
+<section id="energy-minimize-and-equilibrate-the-aa-system-with-gromacs">
+<h2>5. Energy minimize and equilibrate the AA system with GROMACS<a class="headerlink" href="#energy-minimize-and-equilibrate-the-aa-system-with-gromacs" title="Link to this heading">¶</a></h2>
+<p>Follow the <a class="reference internal" href="tutorials/aa-relaxation.html"><span class="std std-doc">AA relaxation guide</span></a> to turn <code class="docutils literal notranslate"><span class="pre">system.gro</span></code> into <code class="docutils literal notranslate"><span class="pre">em.gro</span></code> and, where an equilibration protocol is supplied, <code class="docutils literal notranslate"><span class="pre">eq.gro</span></code>. Minimization and equilibration are performed by an external MD engine, not automatically by ChemFAST reconstruction. The POSS example supplies EM results only.</p>
+<p><strong>Next:</strong> <a class="reference internal" href="workflow.html"><span class="std std-doc">Workflow</span></a> explains the stages of the construction process; <a class="reference internal" href="reaction-dsl.html"><span class="std std-doc">Reaction-DSL</span></a> explains how to modify the chemistry.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

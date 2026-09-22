@@ -1,0 +1,119 @@
+{
+  "domd_react_dsl": "v1",
+  "box_tensor": [20,20,20],
+  "reactants": [
+    {
+      "name": "P",
+      "smiles": "C=C(C(=O)OC)C",
+      "N": 800,
+      "activate": 0,
+      "max_valence": 2
+    },
+    {
+      "name": "A",
+      "smiles": "OC(=O)C=C(C(=O)OC)C",
+      "N": 12,
+      "activate": 0,
+      "max_valence": 2
+    },
+    {
+      "name": "CN",
+      "smarts": "[N:1]([H:2])[H:3]",
+      "N": 0,
+      "max_valence": 1,
+      "activate": 12
+    }
+  ],
+  "fillers": [
+    {
+      "name": "SiO",
+      "N": 3,
+      "file": "POSS.pdb",
+      "mappings": [
+        {
+          "cg_id": 0,
+          "type": "CN",
+          "atom_idx": [
+            0,
+            32,
+            33
+          ]
+        },
+        {
+          "cg_id": 1,
+          "type": "CN",
+          "atom_idx": [
+            23,
+            38,
+            39
+          ]
+        },
+        {
+          "cg_id": 2,
+          "type": "CN",
+          "atom_idx": [
+            28,
+            51,
+            52
+          ]
+        },
+        {
+          "cg_id": 3,
+          "type": "CN",
+          "atom_idx": [
+            31,
+            58,
+            59
+          ]
+        }
+      ],
+    "filler_idx": [0,1,2]
+    }
+  ],
+  "reactions": [
+    {
+      "name": "P-P",
+      "kind": "radical",
+      "reactants": ["P", "P"],
+      "smarts": "[C:1]=[C;H0:2].[CH2;$([CH2]=[C;H0]):3]>>[C:1][C:2][CH1:3]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0,
+      "activation": {
+        "from": 0,
+        "to": 1
+      }
+    },
+    {
+      "name": "CN-A",
+      "kind": "radical",
+      "reactants": ["CN", "A"],
+      "smarts": "[N:1][H:5].[OH1:2][C:3]=[O:4]>>[N:1][C:3]=[O:4].[O:2][H:5]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0,
+      "activation": {
+        "from": 0,
+        "to": 1
+      }
+    },
+    {
+      "name": "A-P",
+      "kind": "radical",
+      "reactants": ["A", "P"],
+      "smarts": "[CH1:1]=[C;H0:2].[CH2;$([CH2]=[C;H0]):3]>>[CH2:1][C:2][CH1:3]",
+      "prod_idx": [
+        0
+      ],
+      "intrinsic_probability": 1.0,
+      "activation": {
+        "from": 0,
+        "to": 1
+      }
+    }
+  ],
+  "cg_topology_file": "reaction_final.xml",
+  "reaction_path_file": "reaction_path.txt"
+}

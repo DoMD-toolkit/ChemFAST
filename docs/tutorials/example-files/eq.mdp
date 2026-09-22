@@ -1,0 +1,45 @@
+define =
+integrator = md
+dt         = 0.001  ; 1fs
+nsteps     = 10000000 ; 10ns
+comm-grps  = system
+energygrps =
+;
+;nstxout = 5000
+;nstvout = 5000
+;nstfout = 5000
+nstlog  = 1000
+nstenergy = 1000
+nstxout-compressed = 100000
+compressed-x-grps  = system
+;
+annealing = no;
+;
+pbc = xyz
+cutoff-scheme = Verlet
+coulombtype   = PME
+rcoulomb      = 1.2
+fourierspacing= 0.12
+pme-order     = 4
+vdwtype       = cut-off
+rvdw          = 1.2
+DispCorr      = EnerPres
+;
+Tcoupl  = Berendsen
+tau_t   = 0.5
+tc_grps = system
+ref_t   = 500
+;
+Pcoupl     = Berendsen
+pcoupltype = isotropic
+tau_p = 5.0
+ref_p = 1.0
+compressibility = 4.5e-5
+;
+gen_vel  = no
+gen_temp = 0
+gen_seed = -1
+;
+freezegrps  =
+freezedim   =
+constraints = none

@@ -1,0 +1,52 @@
+{
+  "domd_react_dsl": "v1",
+  "cg_topology_file": "cg_final.xml",
+  "reaction_path_file": "reaction_path.txt",
+  "reactants": [
+    {
+      "name": "PEO",
+      "smiles": "OCCO",
+      "N": 100,
+      "max_valence": 2
+    },
+    {
+      "name": "Au_G",
+      "smarts": "[Au]",
+      "N": 0,
+      "max_valence": 1
+    }
+  ],
+  "fillers": [
+    {
+      "name": "AuNP",
+      "N": 2,
+      "file": "au.pdb",
+      "filler_idx": [0, 1],
+      "mappings": [
+        {"cg_id": 0, "type": "Au_G", "atom_idx": [0]},
+        {"cg_id": 18, "type": "Au_G", "atom_idx": [18]},
+        {"cg_id": 49, "type": "Au_G", "atom_idx": [49]},
+        {"cg_id": 50, "type": "Au_G", "atom_idx": [50]},
+        {"cg_id": 146, "type": "Au_G", "atom_idx": [146]}
+      ]
+    }
+  ],
+  "reactions": [
+    {
+      "name": "a",
+      "kind": "general",
+      "reactants": ["PEO", "PEO"],
+      "smarts": "[C:1][O:2].[O:3][C:4]>>[C:1][O:2][C:4].[O:3]",
+      "prod_idx": [0],
+      "intrinsic_probability": 1.0
+    },
+    {
+      "name": "b",
+      "kind": "general",
+      "reactants": ["Au_G", "PEO"],
+      "smarts": "[Au:1].[O:2][C:3]>>[Au:1][O:2][C:3]",
+      "prod_idx": [0],
+      "intrinsic_probability": 1.0
+    }
+  ]
+}

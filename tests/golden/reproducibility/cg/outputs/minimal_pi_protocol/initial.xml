@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<galamost_xml version="1.3">
+<configuration time_step="0" dimensions="3" natoms="2">
+<box lx="6.00000000" ly="6.00000000" lz="6.00000000" xy="0.00000000" xz="0.00000000" yz="0.00000000"/>
+<position num="2">
+-1.926391 0.839479 -0.196390
+-2.951967 -0.684705 -2.504876
+</position>
+<type num="2">
+A
+B1
+</type>
+<image num="2">
+0 0 0
+0 0 0
+</image>
+<body num="2">
+-1
+-1
+</body>
+<monomer_id num="2">
+0
+1
+</monomer_id>
+<charge num="2">
+0.00000000
+0.00000000
+</charge>
+<mass num="2">
+1.00000000
+1.00000000
+</mass>
+<h_init num="2">
+1
+1
+</h_init>
+<h_cris num="2">
+0
+0
+</h_cris>
+<bond num="0">
+</bond>
+<angle num="0">
+</angle>
+<dihedral num="0">
+</dihedral>
+</configuration>
+</galamost_xml>
