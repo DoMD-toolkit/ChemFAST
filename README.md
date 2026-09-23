@@ -132,6 +132,6 @@ Database-dependent tests need the **complete OPLS database**. PyGAMD simulations
 
 ## Documentation and license
 
-[Online documentation]https://chemfast.readthedocs.io/en/latest/) is available. Start with [Installation](docs/installation.md), [Quick start](docs/quick-start.md), [Workflow](docs/workflow.md), and the [API reference](docs/api/index.md). The documentation source is provided in `docs/`; see [Software testing](docs/testing.md#building-the-documentation) for local HTML-build instructions.
+[Online documentation](https://chemfast.readthedocs.io/en/latest/) is available. Start with [Installation](docs/installation.md), [Quick start](docs/quick-start.md), [Workflow](docs/workflow.md), and the [API reference](docs/api/index.md). The documentation source is provided in `docs/`; see [Software testing](docs/testing.md#building-the-documentation) for local HTML-build instructions.
 
 ChemFAST is distributed under the terms of the repository's [LICENSE](LICENSE), which limits use to non-commercial purposes and restricts AI/ML training use. Review the license before use or redistribution.
