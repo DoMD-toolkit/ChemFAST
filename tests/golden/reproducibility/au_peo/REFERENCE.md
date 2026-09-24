@@ -7,7 +7,7 @@ They are not summaries. Review the files themselves before committing this golde
 
 | file | size (bytes) | human check |
 |---|---:|---|
-| `reconstruction/atomistic.sdf` | 74475 | 1 molecule(s), 1003 atoms, 710 bonds |
+| `reconstruction/atomistic.sdf` | 74405 | 1 molecule(s), 1003 atoms, 710 bonds |
 
 ## Comparison policy
 

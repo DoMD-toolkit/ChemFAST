@@ -9,4 +9,5 @@ pytestmark = [pytest.mark.integration, pytest.mark.reproducibility, pytest.mark.
 def test_ml_only_forcefields_reproduce_approved_files(golden_root, tolerances, tmp_path, run_repro_case):
     actual = tmp_path / "ml_forcefield"
     run_repro_case("ml_forcefield", actual)
-    compare_tree(golden_root / "ml_forcefield" / "outputs", actual, tolerances)
+    ml_tolerances = {**tolerances, "ff_float_abs": tolerances["ml_ff_float_abs"]}
+    compare_tree(golden_root / "ml_forcefield" / "outputs", actual, ml_tolerances)

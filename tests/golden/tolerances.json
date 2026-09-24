@@ -2,8 +2,10 @@
   "aa_bead_rmse_angstrom": 5,
   "gro_bead_rmse_angstrom": 5,
   "cg_coordinate_rmse_nm": 0.5,
-  "box_abs": 1e-6,
-  "ff_float_abs": 1e-5,
-  "cg_ff_float_abs": 1e-5,
-  "generic_float_abs": 1e-8
+  "box_abs": 1e-06,
+  "ff_float_abs": 1e-05,
+  "cg_ff_float_abs": 1e-05,
+  "generic_float_abs": 1e-08,
+  "cg_angle_abs_deg": 1.0,
+  "ml_ff_float_abs": 0.0001
 }

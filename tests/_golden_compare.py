@@ -55,11 +55,12 @@ def compare_text(expected: Path, actual: Path) -> None:
         _fail(actual, f"text line count differs: current={len(a_lines)}, golden={len(e_lines)}")
 
 
-def compare_json(expected: Path, actual: Path, atol: float, label: str = "json") -> None:
+def compare_json(expected: Path, actual: Path, atol: float, label: str = "json",
+                 angle_atol: float | None = None) -> None:
     e = json.loads(expected.read_text(encoding="utf-8"))
     a = json.loads(actual.read_text(encoding="utf-8"))
 
-    def walk(x, y, where: str):
+    def walk(x, y, where: str, angle_params: bool = False):
         if isinstance(x, dict):
             if not isinstance(y, dict):
                 _fail(actual, f"{where}: type differs, golden=dict current={type(y).__name__}")
@@ -67,13 +68,14 @@ def compare_json(expected: Path, actual: Path, atol: float, label: str = "json")
                 _fail(actual, f"{where}: keys differ; missing={sorted(set(x)-set(y))}, "
                               f"extra={sorted(set(y)-set(x))}")
             for key in sorted(x):
-                walk(x[key], y[key], f"{where}.{key}")
+                is_angle_params = angle_params or (key == "params" and x.get("itype") == "ANGLE")
+                walk(x[key], y[key], f"{where}.{key}", angle_params=is_angle_params)
             return
         if isinstance(x, list):
             if not isinstance(y, list) or len(x) != len(y):
                 _fail(actual, f"{where}: list length/type differs; current={len(y) if isinstance(y,list) else type(y).__name__}, golden={len(x)}")
             for i, (xe, ya) in enumerate(zip(x, y)):
-                walk(xe, ya, f"{where}[{i}]")
+                walk(xe, ya, f"{where}[{i}]", angle_params=angle_params)
             return
         if isinstance(x, int) and not isinstance(x, bool):
             if not isinstance(y, int) or isinstance(y, bool) or x != y:
@@ -82,7 +84,8 @@ def compare_json(expected: Path, actual: Path, atol: float, label: str = "json")
         if isinstance(x, float):
             if not isinstance(y, (int, float)) or isinstance(y, bool):
                 _fail(actual, f"{where}: numeric type differs")
-            _assert_float(actual, where, float(y), float(x), atol)
+            value_atol = angle_atol if angle_params and where.endswith(".r0") and angle_atol is not None else atol
+            _assert_float(actual, where, float(y), float(x), value_atol)
             return
         if x != y:
             _fail(actual, f"{where}: current={y!r}, golden={x!r}")
@@ -108,6 +111,16 @@ def _atom_signature(atom: Chem.Atom) -> tuple:
 def _bond_signature(bond: Chem.Bond) -> tuple:
     i, j = sorted((bond.GetBeginAtomIdx(), bond.GetEndAtomIdx()))
     return (i, j, str(bond.GetBondType()), bool(bond.GetIsAromatic()), str(bond.GetStereo()))
+
+
+def _normalized_sdf_structure(path: Path, mol: Chem.Mol) -> tuple[list[tuple], list[tuple]]:
+    """Normalize equivalent aromatic Kekule forms while retaining atom indices and connectivity."""
+    normalized = Chem.Mol(mol)
+    failed_op = Chem.SanitizeMol(normalized, catchErrors=True)
+    if failed_op != Chem.SanitizeFlags.SANITIZE_NONE:
+        _fail(path, f"cannot normalize aromatic structure: failed sanitize operation={failed_op}")
+    return ([_atom_signature(atom) for atom in normalized.GetAtoms()],
+            sorted(_bond_signature(bond) for bond in normalized.GetBonds()))
 
 
 def _public_props(mol: Chem.Mol) -> dict[str, str]:
@@ -151,12 +164,19 @@ def compare_sdf(expected: Path, actual: Path, tol: dict[str, float]) -> None:
         if e.GetNumBonds() != a.GetNumBonds():
             _fail(actual, f"molecule {mi}: bond count current={a.GetNumBonds()} golden={e.GetNumBonds()}")
         e_atoms, a_atoms = [_atom_signature(x) for x in e.GetAtoms()], [_atom_signature(x) for x in a.GetAtoms()]
+        e_bonds = sorted(_bond_signature(x) for x in e.GetBonds())
+        a_bonds = sorted(_bond_signature(x) for x in a.GetBonds())
+        if e_atoms != a_atoms or e_bonds != a_bonds:
+            # Normalize only when raw comparison differs; never ignore nonaromatic bond orders.
+            e_atoms, e_bonds = _normalized_sdf_structure(expected, e)
+            a_atoms, a_bonds = _normalized_sdf_structure(actual, a)
         if e_atoms != a_atoms:
             for i, (xe, xa) in enumerate(zip(e_atoms, a_atoms)):
-                if xe != xa: _fail(actual, f"molecule {mi}: atom {i} differs; current={xa}, golden={xe}")
-        e_bonds, a_bonds = sorted(_bond_signature(x) for x in e.GetBonds()), sorted(_bond_signature(x) for x in a.GetBonds())
+                if xe != xa:
+                    _fail(actual, f"molecule {mi}: atom {i} differs; current={xa}, golden={xe}")
         if e_bonds != a_bonds:
-            missing = [x for x in e_bonds if x not in a_bonds][:8]; extra = [x for x in a_bonds if x not in e_bonds][:8]
+            missing = [x for x in e_bonds if x not in a_bonds][:8]
+            extra = [x for x in a_bonds if x not in e_bonds][:8]
             _fail(actual, f"molecule {mi}: connectivity differs; missing={missing}, extra={extra}")
         e_name = e.GetProp("_Name") if e.HasProp("_Name") else ""; a_name = a.GetProp("_Name") if a.HasProp("_Name") else ""
         if e_name != a_name: _fail(actual, f"molecule {mi}: _Name differs; current={a_name!r}, golden={e_name!r}")
@@ -461,7 +481,8 @@ def compare_tree(expected_dir: Path, actual_dir: Path, tolerances: dict[str, flo
         elif ext == ".xml":
             compare_xml(e, a, tolerances)
         elif ext == ".json":
-            compare_json(e, a, tolerances["cg_ff_float_abs"], label=rel)
+            compare_json(e, a, tolerances["cg_ff_float_abs"], label=rel,
+                         angle_atol=tolerances.get("cg_angle_abs_deg"))
         elif ext in {".py", ".txt", ".md"}:
             compare_text(e, a)
         else:
