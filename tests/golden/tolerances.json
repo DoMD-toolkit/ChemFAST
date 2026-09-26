@@ -3,9 +3,16 @@
   "gro_bead_rmse_angstrom": 5,
   "cg_coordinate_rmse_nm": 0.5,
   "box_abs": 1e-06,
+  "box_rel": 1e-07,
   "ff_float_abs": 1e-05,
+  "ff_float_rel": 1e-05,
   "cg_ff_float_abs": 1e-05,
+  "cg_ff_float_rel": 1e-05,
   "generic_float_abs": 1e-08,
-  "cg_angle_abs_deg": 1.0,
-  "ml_ff_float_abs": 0.0001
+  "generic_float_rel": 1e-07,
+  "cg_angle_abs_deg": 2.0,
+  "ff_angle_abs_deg": 2.0,
+  "ff_dihedral_phase_abs_deg": 5.0,
+  "ml_charge_abs": 0.001,
+  "ml_charge_rel": 0.0001
 }

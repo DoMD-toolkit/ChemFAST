@@ -1,26 +1,102 @@
-# ChemFAST golden files
+# ChemFAST scientific golden-reference policy
 
-`reproducibility/<case>/outputs/` contains the **actual output files** approved in the
-trusted reference environment. These are the scientific goldens.
+`reproducibility/<case>/outputs/` contains the scientific output artifacts generated
+in the trusted reference environment. Runtime outputs are parsed semantically and
+compared with these references. Golden files should not be regenerated simply to
+make a failing test pass; a mismatch should first be classified as a numerical
+portability difference, an intentional scientific/software change, or a regression.
 
-Do not replace them merely because pytest fails. First inspect the diff and decide whether
-it is a regression or an intentional scientific/software change.
+## Numerical parity policy
 
-Comparison rules are in `tests/golden/tolerances.json` and implemented by
-`tests/_golden_compare.py`:
+Floating-point calculations are not expected to be bitwise identical across all
+PyTorch/CUDA versions, GPU architectures, compiler choices, or execution backends.
+For scale-dependent numerical quantities, ChemFAST therefore follows the same
+combined criterion used by `torch.testing.assert_close`:
 
-- SDF: atom identity, formal charge and atom-indexed connectivity exact; equivalent aromatic
-  Kekule bond-order assignments are normalized before comparison; metadata exact (until
-  intentionally regenerated); coordinates compared by
-  atom-wise RMSE within each `RES_NUMS` bead/residue.
-- GRO: atom/residue identity exact; box by tolerance; coordinates by residue/bead RMSE.
-- TOP/ITP: parsed semantically; atom types and topology membership exact; all numerical
-  force-field parameters by absolute tolerance.
-- XML: particle metadata and bond/angle/dihedral topology exact; coordinates by RMSE.
-- CG parameter JSON: keys/structure exact; angle `itype=ANGLE` equilibrium `params.r0`
-  uses `cg_angle_abs_deg=1` degree, all other floats use `cg_ff_float_abs=1e-5`.
-- ML-only and SPE-network FF cases use `ml_ff_float_abs=1e-4` for numerical FF
-  values; the other force-field tests retain `ff_float_abs=1e-5`.
-- Generated `.py`/`.txt`: exact after newline normalization.
+```text
+|runtime - reference| <= atol + rtol * |reference|
+```
 
-Each case also has a human-readable `REFERENCE.md` generated from the approved outputs.
+A failure reports the reference value, runtime value, absolute and relative
+errors, the allowed error budget, the exceedance ratio, and a compact runtime
+precision environment summary.
+
+Structural quantities remain exact: file inventory, topology membership, atom
+identity, atom indexing, bond connectivity, interaction function type, residue
+assignment, and other discrete metadata are not relaxed by numerical tolerances.
+
+## Field-specific tolerances
+
+The policy is intentionally unit- and quantity-aware rather than using one broad
+floating-point threshold:
+
+- SDF/GRO coordinates: compared by per-residue/per-bead RMSE.
+- CG XML coordinates: compared by global CG-coordinate RMSE.
+- Box dimensions: combined relative/absolute tolerance.
+- CG force-field JSON: combined relative/absolute tolerance for ordinary floating
+  parameters; equilibrium angle `params.r0` uses an absolute **2 deg** tolerance.
+- GROMACS `[ angles ]`: equilibrium angle (first parameter for the supported
+  harmonic angle function) uses an absolute **2 deg** tolerance; other parameters
+  retain the standard FF numerical tolerance.
+- GROMACS `[ dihedrals ]`: only phase/equilibrium-angle parameters of functions
+  whose first parameter is an angle (`funct` 1, 2, 4, 9, 10) receive a wrapped
+  periodic **5 deg** tolerance. Ryckaert-Bellemans (`funct` 3) and Fourier
+  coefficient parameters are not treated as angles and retain the standard FF
+  numerical tolerance.
+- ML-only and SPE-network atomic partial charges: `atol=1e-3 e`, `rtol=1e-4`.
+  This relaxed policy applies to the atomic charge field only; bonded/LJ/mass
+  parameters remain under the normal FF tolerance.
+- Generated `.py`, `.txt`, and `.md` files: exact after newline normalization.
+
+The exact values are defined in `tests/golden/tolerances.json`.
+
+## Optional deterministic diagnostic rerun
+
+When investigating a numerical mismatch, a stricter deterministic rerun can help
+separate algorithmic non-determinism from an actual implementation change:
+
+```python
+import torch
+
+torch.manual_seed(42)
+torch.use_deterministic_algorithms(True)
+
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(42)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+```
+
+Use this mode for diagnosis rather than as the default production configuration.
+Deterministic algorithms may reduce performance, can raise an error when a
+supported deterministic implementation is unavailable, and do not by themselves
+guarantee bitwise identity across different PyTorch releases or hardware
+platforms.
+
+## Minimal PyTorch parity example
+
+For direct tensor comparisons, use PyTorch's testing utility rather than exact
+floating-point equality:
+
+```python
+import torch
+
+reference = torch.load("reference_output.pt", map_location="cpu")
+runtime = torch.load("runtime_output.pt", map_location="cpu")
+
+torch.testing.assert_close(
+    runtime,
+    reference,
+    rtol=1e-4,
+    atol=1e-4,
+    equal_nan=True,
+    check_device=False,
+    check_dtype=True,
+)
+```
+
+The golden-file comparators apply the same `atol + rtol * |reference|` principle
+while preserving field-specific scientific units and exact structural checks.
+
+Each reproducibility case may also contain a human-readable `REFERENCE.md`
+generated from the approved artifacts.

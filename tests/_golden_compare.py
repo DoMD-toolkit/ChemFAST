@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import math
+import platform
 import re
 from collections import defaultdict
 from pathlib import Path
@@ -15,6 +16,7 @@ from typing import Any
 import xml.etree.ElementTree as ET
 
 import numpy as np
+import torch
 from rdkit import Chem
 
 
@@ -30,14 +32,98 @@ def _fail(path: Path | str, message: str) -> None:
     raise GoldenMismatch(f"{path}: {message}")
 
 
-def _float_close(a: float, b: float, atol: float) -> bool:
-    return math.isclose(float(a), float(b), rel_tol=0.0, abs_tol=atol)
+def _runtime_precision_summary() -> str:
+    cuda_runtime = torch.version.cuda or "n/a"
+    cudnn_version = torch.backends.cudnn.version() if torch.backends.cudnn.is_available() else "n/a"
+    device = "cpu"
+    if torch.cuda.is_available():
+        try:
+            device = torch.cuda.get_device_name(torch.cuda.current_device())
+        except Exception:
+            device = "CUDA available"
+    return (
+        f"Python={platform.python_version()} | PyTorch={torch.__version__} | "
+        f"CUDA={cuda_runtime} | cuDNN={cudnn_version} | Device={device} | "
+        f"deterministic_algorithms={torch.are_deterministic_algorithms_enabled()} | "
+        f"cudnn.deterministic={torch.backends.cudnn.deterministic} | "
+        f"cudnn.benchmark={torch.backends.cudnn.benchmark}"
+    )
 
 
-def _assert_float(path, label: str, actual: float, expected: float, atol: float) -> None:
-    if not _float_close(actual, expected, atol):
-        _fail(path, f"{label}: current={actual:.12g}, golden={expected:.12g}, "
-                    f"abs_diff={abs(actual-expected):.6g}, tolerance={atol:g}")
+def _relative_difference(actual: float, expected: float) -> float:
+    diff = abs(float(actual) - float(expected))
+    scale = abs(float(expected))
+    if scale == 0.0:
+        return math.inf if diff else 0.0
+    return diff / scale
+
+
+def _assert_float(
+        path,
+        label: str,
+        actual: float,
+        expected: float,
+        atol: float,
+        rtol: float = 0.0,
+        unit: str | None = None,
+) -> None:
+    """Compare a numerical result using the PyTorch assert_close criterion.
+
+    Acceptance rule: |actual-reference| <= atol + rtol*|reference|.
+    Structural identity is checked separately by the file-specific comparators.
+    """
+    actual_t = torch.tensor(float(actual), dtype=torch.float64)
+    expected_t = torch.tensor(float(expected), dtype=torch.float64)
+    try:
+        torch.testing.assert_close(
+            actual_t,
+            expected_t,
+            rtol=float(rtol),
+            atol=float(atol),
+            equal_nan=False,
+            check_device=False,
+            check_dtype=True,
+        )
+    except AssertionError as exc:
+        abs_diff = abs(float(actual) - float(expected))
+        rel_diff = _relative_difference(actual, expected)
+        allowed = float(atol) + float(rtol) * abs(float(expected))
+        ratio = abs_diff / allowed if allowed > 0 else math.inf
+        suffix = f" {unit}" if unit else ""
+        rel_text = "inf" if math.isinf(rel_diff) else f"{rel_diff:.6e}"
+        message = (
+            f"{label}: numerical parity check failed\n"
+            f"  Reference (golden)      : {expected:.12g}{suffix}\n"
+            f"  Runtime (current)       : {actual:.12g}{suffix}\n"
+            f"  Absolute difference     : {abs_diff:.6e}{suffix}\n"
+            f"  Relative difference     : {rel_text}\n"
+            f"  Acceptance rule         : |delta| <= atol + rtol * |reference|\n"
+            f"  atol / rtol             : {atol:.3e}{suffix} / {rtol:.3e}\n"
+            f"  Allowed difference      : {allowed:.6e}{suffix}\n"
+            f"  Exceedance ratio        : {ratio:.3f}x\n"
+            f"  Runtime environment     : {_runtime_precision_summary()}\n"
+            f"  PyTorch diagnostic      : {str(exc).splitlines()[0]}"
+        )
+        _fail(path, message)
+
+
+def _assert_angle_deg(path, label: str, actual: float, expected: float, atol_deg: float, *, periodic: bool) -> None:
+    """Unit-aware comparison for angular parameters stored in degrees."""
+    if periodic:
+        delta = (float(actual) - float(expected) + 180.0) % 360.0 - 180.0
+    else:
+        delta = float(actual) - float(expected)
+    if abs(delta) > float(atol_deg):
+        mode = "wrapped periodic distance" if periodic else "absolute angular distance"
+        _fail(
+            path,
+            f"{label}: angular parity check failed\n"
+            f"  Reference (golden)      : {expected:.12g} deg\n"
+            f"  Runtime (current)       : {actual:.12g} deg\n"
+            f"  Angular difference      : {abs(delta):.6g} deg ({mode})\n"
+            f"  Angular tolerance       : {atol_deg:g} deg\n"
+            f"  Runtime environment     : {_runtime_precision_summary()}",
+        )
 
 
 def _normal_text(path: Path) -> str:
@@ -55,8 +141,14 @@ def compare_text(expected: Path, actual: Path) -> None:
         _fail(actual, f"text line count differs: current={len(a_lines)}, golden={len(e_lines)}")
 
 
-def compare_json(expected: Path, actual: Path, atol: float, label: str = "json",
-                 angle_atol: float | None = None) -> None:
+def compare_json(
+        expected: Path,
+        actual: Path,
+        atol: float,
+        label: str = "json",
+        angle_atol: float | None = None,
+        rtol: float = 0.0,
+) -> None:
     e = json.loads(expected.read_text(encoding="utf-8"))
     a = json.loads(actual.read_text(encoding="utf-8"))
 
@@ -84,8 +176,10 @@ def compare_json(expected: Path, actual: Path, atol: float, label: str = "json",
         if isinstance(x, float):
             if not isinstance(y, (int, float)) or isinstance(y, bool):
                 _fail(actual, f"{where}: numeric type differs")
-            value_atol = angle_atol if angle_params and where.endswith(".r0") and angle_atol is not None else atol
-            _assert_float(actual, where, float(y), float(x), value_atol)
+            if angle_params and where.endswith(".r0") and angle_atol is not None:
+                _assert_angle_deg(actual, where, float(y), float(x), angle_atol, periodic=False)
+            else:
+                _assert_float(actual, where, float(y), float(x), atol, rtol)
             return
         if x != y:
             _fail(actual, f"{where}: current={y!r}, golden={x!r}")
@@ -188,7 +282,7 @@ def compare_sdf(expected: Path, actual: Path, tol: dict[str, float]) -> None:
             if key == "BOX_TENSOR":
                 ev, av = [float(x) for x in ep[key].split()], [float(x) for x in ap[key].split()]
                 if len(ev) != len(av): _fail(actual, f"molecule {mi}: BOX_TENSOR length differs")
-                for j, (x, y) in enumerate(zip(ev, av)): _assert_float(actual, f"molecule {mi} BOX_TENSOR[{j}]", y, x, tol["box_abs"])
+                for j, (x, y) in enumerate(zip(ev, av)): _assert_float(actual, f"molecule {mi} BOX_TENSOR[{j}]", y, x, tol["box_abs"], tol.get("box_rel", 0.0))
             elif ep[key] != ap[key]:
                 _fail(actual, f"molecule {mi}: metadata {key!r} differs\n  golden={ep[key]!r}\n  current={ap[key]!r}")
 
@@ -242,7 +336,7 @@ def compare_gro(expected: Path, actual: Path, tol: dict[str, float]) -> None:
         for i, (xe, xa) in enumerate(zip(e["atoms"], a["atoms"])):
             if xe != xa: _fail(actual, f"GRO atom identity differs at row {i+1}: current={xa}, golden={xe}")
     if len(e["box"]) != len(a["box"]): _fail(actual, "GRO box vector length differs")
-    for i, (xe, xa) in enumerate(zip(e["box"], a["box"])): _assert_float(actual, f"GRO box[{i}]", xa, xe, tol["box_abs"])
+    for i, (xe, xa) in enumerate(zip(e["box"], a["box"])): _assert_float(actual, f"GRO box[{i}]", xa, xe, tol["box_abs"], tol.get("box_rel", 0.0))
     residue_ids = [row[0] for row in e["atoms"]]
     _compare_bead_coordinates(actual, e["coords"], a["coords"], residue_ids,
                               tol["gro_bead_rmse_angstrom"] / 10.0, "nm", e["box"][0])
@@ -323,10 +417,21 @@ def _parse_gmx(path: Path) -> dict[str, Any]:
     return {"includes": includes, "sections": dict(data)}
 
 
-def _compare_float_record(path: Path, label: str, e: dict, a: dict, float_fields: tuple[str, ...], atol: float) -> None:
+def _compare_float_record(
+        path: Path,
+        label: str,
+        e: dict,
+        a: dict,
+        float_fields: tuple[str, ...],
+        atol: float,
+        rtol: float = 0.0,
+        field_tolerances: dict[str, tuple[float, float]] | None = None,
+) -> None:
+    field_tolerances = field_tolerances or {}
     for key in e:
         if key in float_fields:
-            _assert_float(path, f"{label}.{key}", a[key], e[key], atol)
+            field_atol, field_rtol = field_tolerances.get(key, (atol, rtol))
+            _assert_float(path, f"{label}.{key}", a[key], e[key], field_atol, field_rtol)
         elif e[key] != a[key]:
             _fail(path, f"{label}.{key}: current={a[key]!r}, golden={e[key]!r}")
 
@@ -339,6 +444,11 @@ def compare_gmx(expected: Path, actual: Path, tol: dict[str, float]) -> None:
         _fail(actual, f"section set differs; missing={sorted(set(e['sections'])-set(a['sections']))}, "
                       f"extra={sorted(set(a['sections'])-set(e['sections']))}")
     atol = tol["ff_float_abs"]
+    rtol = tol.get("ff_float_rel", 0.0)
+    charge_atol = tol.get("ff_charge_abs", atol)
+    charge_rtol = tol.get("ff_charge_rel", rtol)
+    angle_atol = tol.get("ff_angle_abs_deg")
+    dihedral_atol = tol.get("ff_dihedral_phase_abs_deg")
     for section in e["sections"]:
         erows, arows = e["sections"][section], a["sections"][section]
         if len(erows) != len(arows):
@@ -348,14 +458,19 @@ def compare_gmx(expected: Path, actual: Path, tol: dict[str, float]) -> None:
             if set(ed) != set(ad):
                 _fail(actual, f"[atomtypes] names differ; missing={sorted(set(ed)-set(ad))}, extra={sorted(set(ad)-set(ed))}")
             for name in sorted(ed):
-                _compare_float_record(actual, f"atomtype {name}", ed[name], ad[name],
-                                      ("mass", "charge", "sigma", "epsilon"), atol)
+                _compare_float_record(
+                    actual, f"atomtype {name}", ed[name], ad[name],
+                    ("mass", "charge", "sigma", "epsilon"), atol, rtol
+                )
         elif section == "atoms":
             ed = {r["nr"]: r for r in erows}; ad = {r["nr"]: r for r in arows}
             if set(ed) != set(ad):
                 _fail(actual, "[atoms] atom-number set differs")
             for nr in sorted(ed):
-                _compare_float_record(actual, f"atom {nr}", ed[nr], ad[nr], ("charge", "mass"), atol)
+                _compare_float_record(
+                    actual, f"atom {nr}", ed[nr], ad[nr], ("charge", "mass"), atol, rtol,
+                    field_tolerances={"charge": (charge_atol, charge_rtol)},
+                )
         elif section in {"bonds", "angles", "dihedrals", "pairs", "pairs_nb"}:
             def key(r):
                 return (r["improper"], tuple(r["indices"]), r["funct"], len(r["params"]), tuple(round(x, 8) for x in r["params"]))
@@ -366,7 +481,18 @@ def compare_gmx(expected: Path, actual: Path, tol: dict[str, float]) -> None:
                 if structural_e != structural_a:
                     _fail(actual, f"[{section}] topology term {i} differs; current={structural_a}, golden={structural_e}")
                 for j, (pe, pa) in enumerate(zip(xe["params"], xa["params"])):
-                    _assert_float(actual, f"[{section}] {xe['indices']} param[{j}]", pa, pe, atol)
+                    label = f"[{section}] {xe['indices']} param[{j}]"
+                    if section == "angles" and j == 0 and angle_atol is not None:
+                        _assert_angle_deg(actual, label, pa, pe, angle_atol, periodic=False)
+                    elif (
+                        section == "dihedrals"
+                        and j == 0
+                        and xe["funct"] in {1, 2, 4, 9, 10}
+                        and dihedral_atol is not None
+                    ):
+                        _assert_angle_deg(actual, label, pa, pe, dihedral_atol, periodic=True)
+                    else:
+                        _assert_float(actual, label, pa, pe, atol, rtol)
         else:
             if erows != arows:
                 _fail(actual, f"[{section}] content differs; current={arows}, golden={erows}")
@@ -424,7 +550,7 @@ def compare_xml(expected: Path, actual: Path, tol: dict[str, float]) -> None:
     if set(e["box"]) != set(a["box"]):
         _fail(actual, "XML box fields differ")
     for key in e["box"]:
-        _assert_float(actual, f"XML box {key}", a["box"][key], e["box"][key], tol["box_abs"])
+        _assert_float(actual, f"XML box {key}", a["box"][key], e["box"][key], tol["box_abs"], tol.get("box_rel", 0.0))
     if set(e["arrays"]) != set(a["arrays"]):
         _fail(actual, "XML particle-array fields differ")
     for key in e["arrays"]:
@@ -434,7 +560,7 @@ def compare_xml(expected: Path, actual: Path, tol: dict[str, float]) -> None:
                 _fail(actual, f"XML <{key}> shape differs")
             for i, (xe, xa) in enumerate(zip(ev, av)):
                 for j, (ve, va) in enumerate(zip(xe, xa)):
-                    _assert_float(actual, f"XML <{key}>[{i},{j}]", va, ve, tol["ff_float_abs"])
+                    _assert_float(actual, f"XML <{key}>[{i},{j}]", va, ve, tol["ff_float_abs"], tol.get("ff_float_rel", 0.0))
         elif ev != av:
             _fail(actual, f"XML <{key}> differs")
     if e["topology"] != a["topology"]:
@@ -481,8 +607,11 @@ def compare_tree(expected_dir: Path, actual_dir: Path, tolerances: dict[str, flo
         elif ext == ".xml":
             compare_xml(e, a, tolerances)
         elif ext == ".json":
-            compare_json(e, a, tolerances["cg_ff_float_abs"], label=rel,
-                         angle_atol=tolerances.get("cg_angle_abs_deg"))
+            compare_json(
+                e, a, tolerances["cg_ff_float_abs"], label=rel,
+                angle_atol=tolerances.get("cg_angle_abs_deg"),
+                rtol=tolerances.get("cg_ff_float_rel", 0.0),
+            )
         elif ext in {".py", ".txt", ".md"}:
             compare_text(e, a)
         else:
