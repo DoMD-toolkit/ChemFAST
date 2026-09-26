@@ -1,20 +1,24 @@
 name: chemfast
+
 channels:
   - conda-forge
+
 dependencies:
   - python=3.12
-  - pip
-  - numpy
-  - rdkit=2025.09.5
   - openbabel
-  - numba
-  - networkx
-  - pandas
-  - scipy
-  - jupyter
-  - scikit-learn
-  - matplotlib
-  - mdanalysis
+  - pip
+
   - pip:
+      - numpy
+      - scipy
+      - pandas
+      - networkx
+      - scikit-learn
+      - matplotlib
+      - numba
+      - MDAnalysis
+      - rdkit>=2025.09.5
+      - torch
+      - torch-geometric
       - pytest
       - -e .
