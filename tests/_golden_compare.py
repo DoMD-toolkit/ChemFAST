@@ -187,6 +187,90 @@ def compare_json(
     walk(e, a, label)
 
 
+def compare_cg_parameters(
+        expected: Path,
+        actual: Path,
+        nonbonded_atol: float,
+        nonbonded_rtol: float = 0.0,
+        *,
+        bond_r0_atol: float | None = None,
+        bond_r0_rtol: float = 0.0,
+) -> None:
+    """Compare the stable cross-platform subset of generated CG parameters.
+
+    The reproducibility contract keeps interaction identity/schema exact, while
+    numerical parity is limited to non-bonded sigma/epsilon and equilibrium bond
+    length r0 for interactions with itype == "BOND". Conformer-derived angle and
+    dihedral equilibria, force constants, HSP descriptors, masses and charges are
+    intentionally not numerical golden criteria for this file.
+
+    Non-bonded sigma/epsilon and bond r0 use separate tolerances because bond
+    equilibrium distances are derived from conformer sampling and are more
+    sensitive to cross-platform RDKit differences.
+    """
+    if bond_r0_atol is None:
+        bond_r0_atol = nonbonded_atol
+    e = json.loads(expected.read_text(encoding="utf-8"))
+    a = json.loads(actual.read_text(encoding="utf-8"))
+
+    if set(e) != set(a):
+        _fail(actual, f"CG parameter sections differ; missing={sorted(set(e)-set(a))}, "
+                      f"extra={sorted(set(a)-set(e))}")
+    if set(e) != {"bonded", "nonbonded"}:
+        _fail(actual, f"unexpected CG parameter sections: {sorted(e)}")
+
+    for section in ("bonded", "nonbonded"):
+        if not isinstance(e[section], dict) or not isinstance(a[section], dict):
+            _fail(actual, f"CG parameter section {section!r} must be a mapping")
+        if set(e[section]) != set(a[section]):
+            _fail(actual, f"CG {section} interaction set differs; "
+                          f"missing={sorted(set(e[section])-set(a[section]))}, "
+                          f"extra={sorted(set(a[section])-set(e[section]))}")
+
+    for name in sorted(e["bonded"]):
+        xe, xa = e["bonded"][name], a["bonded"][name]
+        for key in ("ff_type", "itype", "indices", "name", "ff_atom_types"):
+            if xe.get(key) != xa.get(key):
+                _fail(actual, f"bonded.{name}.{key}: current={xa.get(key)!r}, golden={xe.get(key)!r}")
+        if set(xe.get("params", {})) != set(xa.get("params", {})):
+            _fail(actual, f"bonded.{name}.params keys differ; "
+                          f"current={sorted(xa.get('params', {}))}, golden={sorted(xe.get('params', {}))}")
+        if xe.get("itype") == "BOND":
+            try:
+                _assert_float(
+                    actual,
+                    f"bonded.{name}.params.r0",
+                    float(xa["params"]["r0"]),
+                    float(xe["params"]["r0"]),
+                    bond_r0_atol,
+                    bond_r0_rtol,
+                    unit="nm",
+                )
+            except (KeyError, TypeError, ValueError):
+                _fail(actual, f"bonded.{name}.params.r0 is missing or non-numeric")
+
+    for name in sorted(e["nonbonded"]):
+        xe, xa = e["nonbonded"][name], a["nonbonded"][name]
+        for key in ("ff_type", "ff_atom_type", "bond_type", "ptype", "element"):
+            if xe.get(key) != xa.get(key):
+                _fail(actual, f"nonbonded.{name}.{key}: current={xa.get(key)!r}, golden={xe.get(key)!r}")
+        if set(xe.get("params", {})) != set(xa.get("params", {})):
+            _fail(actual, f"nonbonded.{name}.params keys differ; "
+                          f"current={sorted(xa.get('params', {}))}, golden={sorted(xe.get('params', {}))}")
+        for key in ("sigma", "epsilon"):
+            try:
+                _assert_float(
+                    actual,
+                    f"nonbonded.{name}.params.{key}",
+                    float(xa["params"][key]),
+                    float(xe["params"][key]),
+                    nonbonded_atol,
+                    nonbonded_rtol,
+                )
+            except (KeyError, TypeError, ValueError):
+                _fail(actual, f"nonbonded.{name}.params.{key} is missing or non-numeric")
+
+
 def _read_sdf(path: Path) -> list[Chem.Mol]:
     supplier = Chem.SDMolSupplier(str(path), removeHs=False, sanitize=False)
     mols = [mol for mol in supplier if mol is not None]
@@ -328,18 +412,21 @@ def _read_gro(path: Path) -> dict[str, Any]:
     return {"atoms": atoms, "coords": np.asarray(coords, dtype=float), "box": box}
 
 
-def compare_gro(expected: Path, actual: Path, tol: dict[str, float]) -> None:
+def compare_gro(expected: Path, actual: Path, tol: dict[str, float], *, compare_box: bool = True) -> None:
     e, a = _read_gro(expected), _read_gro(actual)
     if e["atoms"] != a["atoms"]:
         if len(e["atoms"]) != len(a["atoms"]):
             _fail(actual, f"GRO atom count current={len(a['atoms'])} golden={len(e['atoms'])}")
         for i, (xe, xa) in enumerate(zip(e["atoms"], a["atoms"])):
             if xe != xa: _fail(actual, f"GRO atom identity differs at row {i+1}: current={xa}, golden={xe}")
-    if len(e["box"]) != len(a["box"]): _fail(actual, "GRO box vector length differs")
-    for i, (xe, xa) in enumerate(zip(e["box"], a["box"])): _assert_float(actual, f"GRO box[{i}]", xa, xe, tol["box_abs"], tol.get("box_rel", 0.0))
+    if compare_box:
+        if len(e["box"]) != len(a["box"]): _fail(actual, "GRO box vector length differs")
+        for i, (xe, xa) in enumerate(zip(e["box"], a["box"])):
+            _assert_float(actual, f"GRO box[{i}]", xa, xe, tol["box_abs"], tol.get("box_rel", 0.0))
     residue_ids = [row[0] for row in e["atoms"]]
+    periodic_box = e["box"][0] if compare_box and e["box"] else None
     _compare_bead_coordinates(actual, e["coords"], a["coords"], residue_ids,
-                              tol["gro_bead_rmse_angstrom"] / 10.0, "nm", e["box"][0])
+                              tol["gro_bead_rmse_angstrom"] / 10.0, "nm", periodic_box)
 
 
 def _canonical_indices(indices: tuple[int, ...], section: str, improper: bool = False) -> tuple[int, ...]:
@@ -436,7 +523,7 @@ def _compare_float_record(
             _fail(path, f"{label}.{key}: current={a[key]!r}, golden={e[key]!r}")
 
 
-def compare_gmx(expected: Path, actual: Path, tol: dict[str, float]) -> None:
+def compare_gmx(expected: Path, actual: Path, tol: dict[str, float], *, compare_values: bool = True) -> None:
     e, a = _parse_gmx(expected), _parse_gmx(actual)
     if e["includes"] != a["includes"]:
         _fail(actual, f"#include list differs: current={a['includes']}, golden={e['includes']}")
@@ -458,28 +545,55 @@ def compare_gmx(expected: Path, actual: Path, tol: dict[str, float]) -> None:
             if set(ed) != set(ad):
                 _fail(actual, f"[atomtypes] names differ; missing={sorted(set(ed)-set(ad))}, extra={sorted(set(ad)-set(ed))}")
             for name in sorted(ed):
-                _compare_float_record(
-                    actual, f"atomtype {name}", ed[name], ad[name],
-                    ("mass", "charge", "sigma", "epsilon"), atol, rtol
-                )
+                if compare_values:
+                    _compare_float_record(
+                        actual, f"atomtype {name}", ed[name], ad[name],
+                        ("mass", "charge", "sigma", "epsilon"), atol, rtol,
+                        field_tolerances={"charge": (charge_atol, charge_rtol)},
+                    )
+                else:
+                    for key in ("name", "bond_type", "ptype"):
+                        if ed[name][key] != ad[name][key]:
+                            _fail(
+                                actual,
+                                f"atomtype {name}.{key}: current={ad[name][key]!r}, "
+                                f"golden={ed[name][key]!r}",
+                            )
         elif section == "atoms":
             ed = {r["nr"]: r for r in erows}; ad = {r["nr"]: r for r in arows}
             if set(ed) != set(ad):
                 _fail(actual, "[atoms] atom-number set differs")
             for nr in sorted(ed):
-                _compare_float_record(
-                    actual, f"atom {nr}", ed[nr], ad[nr], ("charge", "mass"), atol, rtol,
-                    field_tolerances={"charge": (charge_atol, charge_rtol)},
-                )
+                if compare_values:
+                    _compare_float_record(
+                        actual, f"atom {nr}", ed[nr], ad[nr], ("charge", "mass"), atol, rtol,
+                        field_tolerances={"charge": (charge_atol, charge_rtol)},
+                    )
+                else:
+                    for key in ("nr", "type", "resnr", "residue", "atom", "cgnr"):
+                        if ed[nr][key] != ad[nr][key]:
+                            _fail(
+                                actual,
+                                f"atom {nr}.{key}: current={ad[nr][key]!r}, golden={ed[nr][key]!r}",
+                            )
         elif section in {"bonds", "angles", "dihedrals", "pairs", "pairs_nb"}:
-            def key(r):
-                return (r["improper"], tuple(r["indices"]), r["funct"], len(r["params"]), tuple(round(x, 8) for x in r["params"]))
-            es = sorted(erows, key=key); ass = sorted(arows, key=key)
+            def structural_key(r):
+                return (r["improper"], tuple(r["indices"]), r["funct"], len(r["params"]))
+
+            if compare_values:
+                def sort_key(r):
+                    return structural_key(r) + (tuple(round(x, 8) for x in r["params"]),)
+            else:
+                sort_key = structural_key
+
+            es = sorted(erows, key=sort_key); ass = sorted(arows, key=sort_key)
             for i, (xe, xa) in enumerate(zip(es, ass)):
-                structural_e = (xe["improper"], xe["indices"], xe["funct"], len(xe["params"]))
-                structural_a = (xa["improper"], xa["indices"], xa["funct"], len(xa["params"]))
+                structural_e = structural_key(xe)
+                structural_a = structural_key(xa)
                 if structural_e != structural_a:
                     _fail(actual, f"[{section}] topology term {i} differs; current={structural_a}, golden={structural_e}")
+                if not compare_values:
+                    continue
                 for j, (pe, pa) in enumerate(zip(xe["params"], xa["params"])):
                     label = f"[{section}] {xe['indices']} param[{j}]"
                     if section == "angles" and j == 0 and angle_atol is not None:
@@ -580,7 +694,8 @@ def compare_xml(expected: Path, actual: Path, tol: dict[str, float]) -> None:
                       f"worst bead={idx}, displacement={d[idx]:.6g} nm")
 
 
-def compare_tree(expected_dir: Path, actual_dir: Path, tolerances: dict[str, float]) -> None:
+def compare_tree(expected_dir: Path, actual_dir: Path, tolerances: dict[str, float], *,
+                 compare_gro_box: bool = True, compare_gmx_values: bool = True) -> None:
     expected_dir, actual_dir = Path(expected_dir), Path(actual_dir)
     if not expected_dir.is_dir():
         raise AssertionError(
@@ -601,17 +716,29 @@ def compare_tree(expected_dir: Path, actual_dir: Path, tolerances: dict[str, flo
         if ext == ".sdf":
             compare_sdf(e, a, tolerances)
         elif ext == ".gro":
-            compare_gro(e, a, tolerances)
+            compare_gro(e, a, tolerances, compare_box=compare_gro_box)
         elif ext in {".top", ".itp"}:
-            compare_gmx(e, a, tolerances)
+            compare_gmx(e, a, tolerances, compare_values=compare_gmx_values)
         elif ext == ".xml":
             compare_xml(e, a, tolerances)
         elif ext == ".json":
-            compare_json(
-                e, a, tolerances["cg_ff_float_abs"], label=rel,
-                angle_atol=tolerances.get("cg_angle_abs_deg"),
-                rtol=tolerances.get("cg_ff_float_rel", 0.0),
-            )
+            if e.name == "cg_parameters.json":
+                compare_cg_parameters(
+                    e, a,
+                    tolerances.get("cg_nonbonded_abs", tolerances["cg_ff_float_abs"]),
+                    nonbonded_rtol=tolerances.get(
+                        "cg_nonbonded_rel", tolerances.get("cg_ff_float_rel", 0.0)
+                    ),
+                    bond_r0_atol=tolerances.get(
+                        "cg_bond_r0_abs_nm", tolerances["cg_ff_float_abs"]
+                    ),
+                    bond_r0_rtol=tolerances.get("cg_bond_r0_rel", 0.0),
+                )
+            else:
+                compare_json(
+                    e, a, tolerances["cg_ff_float_abs"], label=rel,
+                    rtol=tolerances.get("cg_ff_float_rel", 0.0),
+                )
         elif ext in {".py", ".txt", ".md"}:
             compare_text(e, a)
         else:

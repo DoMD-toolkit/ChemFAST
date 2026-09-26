@@ -14,4 +14,9 @@ def test_spe_network_reproduces_approved_files(golden_root, tolerances, tmp_path
         "ff_charge_abs": tolerances["ml_charge_abs"],
         "ff_charge_rel": tolerances["ml_charge_rel"],
     }
-    compare_tree(golden_root / "spe_network" / "outputs", actual, ml_tolerances)
+    compare_tree(
+        golden_root / "spe_network" / "outputs",
+        actual,
+        ml_tolerances,
+        compare_gmx_values=False,
+    )

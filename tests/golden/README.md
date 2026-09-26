@@ -32,9 +32,14 @@ floating-point threshold:
 
 - SDF/GRO coordinates: compared by per-residue/per-bead RMSE.
 - CG XML coordinates: compared by global CG-coordinate RMSE.
-- Box dimensions: combined relative/absolute tolerance.
-- CG force-field JSON: combined relative/absolute tolerance for ordinary floating
-  parameters; equilibrium angle `params.r0` uses an absolute **2 deg** tolerance.
+- Box dimensions: combined relative/absolute tolerance for reconstruction/system cases. The
+  `ml_forcefield` case intentionally ignores GRO box dimensions because the generated
+  single-molecule box is not an ML force-field prediction target.
+- CG force-field JSON: interaction identity/schema remain exact, while cross-platform
+  numerical parity is limited to non-bonded `sigma`/`epsilon` and equilibrium bond
+  `params.r0` for `itype=BOND`, using the CG combined relative/absolute tolerance.
+  Conformer-derived angle/dihedral equilibria and auxiliary CG descriptors are not
+  numerical golden criteria.
 - GROMACS `[ angles ]`: equilibrium angle (first parameter for the supported
   harmonic angle function) uses an absolute **2 deg** tolerance; other parameters
   retain the standard FF numerical tolerance.

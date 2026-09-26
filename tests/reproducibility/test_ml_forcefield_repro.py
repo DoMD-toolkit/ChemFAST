@@ -14,4 +14,4 @@ def test_ml_only_forcefields_reproduce_approved_files(golden_root, tolerances, t
         "ff_charge_abs": tolerances["ml_charge_abs"],
         "ff_charge_rel": tolerances["ml_charge_rel"],
     }
-    compare_tree(golden_root / "ml_forcefield" / "outputs", actual, ml_tolerances)
+    compare_tree(golden_root / "ml_forcefield" / "outputs", actual, ml_tolerances, compare_gro_box=False)
