@@ -29,12 +29,26 @@ into the growing PMMA chain.
 
 ## 2. Construct and relax the CG hybrid
 
+Run this command from the extracted tutorial directory (or replace the paths
+with absolute paths). `--name` identifies the workspace for this example;
+`05_poss_pmma/cg/` receives the generated `initial.xml`,
+`cg_parameters.json`, and `run_pygamd_polymerization.py`.
+
 ```bash
-python prepare_cg.py 05_poss_pmma
-cd 05_poss_pmma/cg
-python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
-cd ../..
+chemfast prepare_cg --json 05_poss_pmma/config.json --name 05_poss_pmma
 ```
+
+Next, switch to `05_poss_pmma/cg/` and run the **generated** PyGAMD script
+with an interpreter that supports PyGAMD:
+
+```bash
+python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
+```
+
+Once PyGAMD finishes, `05_poss_pmma/cg/` should contain the matching
+`reaction_final.xml` and `reaction_path.txt`. Return to the extracted tutorial
+directory before using the relative `--name` in the following command; alternatively,
+provide the absolute workspace path to run the CLI from anywhere.
 
 | Initial CG mixture | Polymerized and pre-equilibrated CG hybrid |
 |---|---|
@@ -47,8 +61,12 @@ reactants.
 ## 3. Reconstruct the atomistic hybrid
 
 ```bash
-python reconstruct_aa.py 05_poss_pmma
+chemfast reconstruct_aa --name 05_poss_pmma
 ```
+
+The CLI reads `05_poss_pmma/config.json` and the two fixed CG outputs from
+`05_poss_pmma/cg/`, then writes the reconstructed SDF and GROMACS files to
+`05_poss_pmma/aa/`. No CG result filenames need to be passed again.
 
 | Final CG hybrid | Energy-minimized AA reconstruction |
 |---|---|

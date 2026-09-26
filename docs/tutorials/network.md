@@ -33,12 +33,26 @@ the atomistic transformation.
 
 ## 2. Construct and relax the CG network
 
+Run this command from the extracted tutorial directory (or replace the paths
+with absolute paths). `--name` identifies the workspace for this example;
+`04_network_pi/cg/` receives the generated `initial.xml`,
+`cg_parameters.json`, and `run_pygamd_polymerization.py`.
+
 ```bash
-python prepare_cg.py 04_network_pi
-cd 04_network_pi/cg
-python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
-cd ../..
+chemfast prepare_cg --json 04_network_pi/config.json --name 04_network_pi
 ```
+
+Next, switch to `04_network_pi/cg/` and run the **generated** PyGAMD script
+with an interpreter that supports PyGAMD:
+
+```bash
+python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
+```
+
+Once PyGAMD finishes, `04_network_pi/cg/` should contain the matching
+`reaction_final.xml` and `reaction_path.txt`. Return to the extracted tutorial
+directory before using the relative `--name` in the following command; alternatively,
+provide the absolute workspace path to run the CLI from anywhere.
 
 | Initial CG mixture | Polymerized and pre-equilibrated CG network |
 |---|---|
@@ -51,8 +65,12 @@ network but does not guarantee that every finite trajectory percolates.
 ## 3. Reconstruct the atomistic network
 
 ```bash
-python reconstruct_aa.py 04_network_pi
+chemfast reconstruct_aa --name 04_network_pi
 ```
+
+The CLI reads `04_network_pi/config.json` and the two fixed CG outputs from
+`04_network_pi/cg/`, then writes the reconstructed SDF and GROMACS files to
+`04_network_pi/aa/`. No CG result filenames need to be passed again.
 
 | Final CG network | Energy-minimized AA reconstruction |
 |---|---|

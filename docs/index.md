@@ -58,8 +58,12 @@ After the first run, learn how the Reaction-DSL changes molecular building block
 ## Suggested learning path
 
 **Introduction → Online tools or Installation → Quick Start → Workflow → Reaction DSL →
-Tutorials → Reference → Testing.** Follow the first three sections to produce a
-result; read the deeper explanations when you need to change chemistry or troubleshoot.
+Tutorials → Reference → Testing.**
+
+Follow the first sections to produce a working model, then use the tutorials to explore
+different polymer systems. The Reference section provides the complete
+[Usage Guide](usage.md), [CLI Reference](cli.md), [Input Reference](inputs.md),
+and [Core API](api/index.md) when more detailed control is needed.
 
 ```{toctree}
 :hidden:
@@ -73,6 +77,7 @@ workflow
 reaction-dsl
 tutorials/index
 usage
+cli
 inputs
 api/index
 testing

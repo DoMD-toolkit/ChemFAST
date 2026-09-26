@@ -1,16 +1,18 @@
 # AA compression, minimization and equilibration
 
 ChemFAST generates initial all-atom (AA) coordinates and topology files.
-Optional compression can be applied after AA coordinate embedding and before
-force-field export. The resulting system can then undergo atomistic energy
-minimization (EM) and, where applicable, equilibration (EQ) with GROMACS.
+Optional residue-rigid density packing can be run as a separate SDF-to-SDF
+stage after standard AA reconstruction. The original, internally matched
+GROMACS files can then undergo atomistic energy minimization (EM) and, where
+applicable, equilibration (EQ); packing the SDF does not update those files.
 
 ## Standard AA reconstruction
 
-From the extracted tutorial root, run:
+For the supplied linear-PI CG result, run from the extracted tutorial directory
+(or supply an absolute workspace path):
 
 ```bash
-python reconstruct_aa.py 01_linear_pi
+chemfast reconstruct_aa --name 01_linear_pi
 ```
 
 The AA coordinates and topology are written to `01_linear_pi/aa/`, including
@@ -37,119 +39,55 @@ gradually introduces Lennard-Jones interactions, and then compresses the
 simulation box toward the target density while continuing to relax the
 configuration.
 
-### Enable compression
+### Run optional density packing with the CLI
 
-Compression can be inserted into `reconstruct_aa.py` after
-`embed_molecules()` and before AA post-processing and force-field export.
-
-Import the function:
-
-```python
-from chemfast.conf.misc._density_optim import run_density_optimization
-```
-
-After AA coordinate embedding, add:
-
-```python
-mols = embed_molecules(mols, graphs, cfg, chunk_per_d=CHUNK_PER_D)
-
-aa_dir.mkdir(parents=True, exist_ok=True)
-
-mols, final_box = run_density_optimization(
-    mols,
-    graphs,
-    cfg,
-    target_density=1.0,
-    work_dir=aa_dir / "compression",
-    gpu=0,
-)
-```
-
-The function generates the compression inputs, executes PyGAMD, and reads the
-resulting AA coordinates and simulation box.
-
-If PyGAMD is installed in a separate Python environment, specify its Python
-interpreter using `python_bin`:
-
-```python
-mols, final_box = run_density_optimization(
-    mols,
-    graphs,
-    cfg,
-    target_density=1.0,
-    work_dir=aa_dir / "compression",
-    gpu=0,
-    python_bin="/path/to/pygamd-env/bin/python",
-)
-```
-
-Replace `python_bin` with the path to the Python interpreter in the PyGAMD
-environment. If omitted, the current Python interpreter is used.
-
-The compression working directory contains the generated inputs and script:
-
-```text
-compression/
-├── ini.xml
-├── inter.json
-├── run_density.py
-└── optimized.xml
-```
-
-The directory also contains intermediate configurations generated during
-compression.
-
-The generated PyGAMD script can be rerun manually from a working directory
-that already contains `ini.xml`, `inter.json`, and `run_density.py`:
+Use the standalone SDF-to-SDF command after AA reconstruction. For the supplied
+linear-PI example, `--sdf_in` refers to the file produced in `01_linear_pi/aa/`:
 
 ```bash
-cd 01_linear_pi/aa/compression
-python run_density.py ini.xml inter.json --gpu=0
+chemfast density_optimization \
+  --sdf_in 01_linear_pi/aa/atomistic.sdf \
+  --density 1.0 --gpu_id 0
 ```
 
-This command runs the compression simulation only; it does not automatically
-transfer the resulting coordinates back into the ChemFAST reconstruction
-workflow. The current `run_density_optimization()` interface performs input
-generation, simulation, and result loading together rather than exposing
-these stages as separate calls.
+If PyGAMD is in a separate environment, add
+`--pygamd_bin /path/to/pygamd-env/bin/python`. Without this option,
+the command uses the active Python interpreter, which must support PyGAMD.
+The CLI reads the ChemFAST-formatted SDF, packs residue-rigid bodies when the
+starting density is below the specified target, and writes
+`01_linear_pi/aa/atomistic_density_optimized.sdf`. The generated PyGAMD inputs
+(`ini.xml`, `inter.json`, `run_density.py`) and any simulation snapshots are
+kept in `01_linear_pi/aa/atomistic_density_optimized_pygamd/` when PyGAMD runs.
+If the starting density already meets or exceeds the target, the current
+implementation skips PyGAMD and writes the output SDF without a packing run.
 
-After calling `run_density_optimization()`, update the AA graph coordinates
-and perform post-processing before the standard SDF and force-field export:
+**The CLI density stage does not regenerate GROMACS outputs.** The original
+`system.gro`, `system.top`, and ITP files still match the *pre-packing* AA
+structure and box, not the optimized SDF. Do not pair the optimized SDF with
+those unchanged files for GROMACS. Generate a matching coordinate/topology
+set before using packed coordinates in subsequent atomistic MD. The GROMACS
+commands below apply to the original, internally consistent reconstruction
+output unless you have regenerated such a set.
 
-```python
-for mol, graph in zip(mols, graphs):
-    positions = mol.GetConformer().GetPositions()
-
-    for atom_id in range(mol.GetNumAtoms()):
-        graph.nodes[atom_id]["x"] = positions[atom_id].copy()
-
-    post_process_aa_mol(mol, graph, final_box)
-```
-
-The standard export steps can then proceed unchanged, with the resulting AA
-files written to `01_linear_pi/aa/`.
-
-**Notes:**
-
-- The default target density is 1.0 g/cm³ and can be adjusted for the system
-  of interest.
-- Compression is skipped if the initial density is already at or above the
-  target density.
-- The procedure preserves the internal geometry of individual residues but
-  does not replace subsequent atomistic EM and equilibration.
-- For an already dense input configuration, a separate soft-potential
-  relaxation protocol may be needed to resolve unfavorable atomic contacts
-  before conventional atomistic MD.
-- The compression procedure currently supports orthorhombic simulation boxes.
+The packing potentials are geometric initialization potentials rather than
+an atomistic OPLS-AA force field. Packing does not replace energy minimization
+or subsequent equilibration. Only orthorhombic boxes are currently supported.
+For options and format validation, see the [CLI reference](../cli.md#3-optional-standalone-sdf-density-optimization).
 
 ## Energy minimization
 
-Enter the AA output directory and copy the supplied MDP files:
+For GROMACS, switch to the corresponding **AA output directory** (for
+example, `01_linear_pi/aa/`) and copy the supplied `em.mdp` and `eq.mdp` from
+the extracted tutorial directory into it. For `01_linear_pi/aa/`, the copy
+command is:
 
 ```bash
-cd 01_linear_pi/aa
 cp ../../em.mdp ../../eq.mdp .
 ```
+
+The following GROMACS commands are run from that AA directory. Use the
+unmodified, matching `system.gro`/`system.top`/ITP export, not the standalone
+packed SDF.
 
 The supplied `em.mdp` uses steepest-descent energy minimization.
 

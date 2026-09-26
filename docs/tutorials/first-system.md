@@ -33,36 +33,52 @@ product.
 ## 2. Choose a CG input route
 
 **Option A — reconstruct the supplied result (no PyGAMD required).** The
-tutorial archive includes a matched pair,
-`01_linear_pi/cg/reaction_final.xml` and
-`01_linear_pi/cg/reaction_path.txt`, supplied as a matched pair. From the
-extracted tutorial root, run:
+tutorial archive includes `01_linear_pi/cg/reaction_final.xml` and
+`01_linear_pi/cg/reaction_path.txt` as a matched pair. Run from the extracted
+tutorial directory (or supply an absolute workspace path):
 
 ```bash
-python reconstruct_aa.py 01_linear_pi
+chemfast reconstruct_aa --name 01_linear_pi
 ```
+
+Here `--name 01_linear_pi` selects the supplied example directory. Its
+`config.json` and two CG result files are read from their fixed locations;
+the AA outputs are written to `01_linear_pi/aa/`.
 
 Continue at Step 4 after this command. This skips CG simulation, **not**
 force-field assignment: the full OPLS database must still be installed
 for the AA export. The supplied coordinates
 are an input for reconstruction, not a claim of final AA equilibration.
 
-**Option B — create your own CG model with PyGAMD.** From the extracted
-tutorial root, prepare the inputs and run the reactive CG protocol:
+**Option B — create your own CG model with PyGAMD.** The supplied
+`01_linear_pi/cg/` already contains the matched fast-route result, whereas
+`prepare_cg` requires an empty output `cg/` directory. Keep that result intact
+and use a **new workspace** named `01_linear_pi_new`:
 
 ```bash
-python prepare_cg.py 01_linear_pi
-cd 01_linear_pi/cg
-python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
-cd ../..
+chemfast prepare_cg --json 01_linear_pi/config.json --name 01_linear_pi_new
 ```
+
+`--name` is the new workspace. The CLI places a copy of the configuration at
+`01_linear_pi_new/config.json` and writes `initial.xml`, `cg_parameters.json`,
+and `run_pygamd_polymerization.py` to `01_linear_pi_new/cg/`.
+
+Switch to `01_linear_pi_new/cg/` and run the generated PyGAMD script:
+
+```bash
+python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
+```
+
+The CG run writes `reaction_final.xml` and `reaction_path.txt` in the same
+`cg/` directory. Return to the extracted tutorial directory before using a
+relative `--name` in Step 3, or supply the absolute workspace path.
 
 | Initial CG mixture | Polymerized and pre-equilibrated CG configuration |
 |---|---|
 | ![Unconnected A and B1 beads in the initial simulation box.](../_static/tutorials/01_linear_pi/cg_ini.png) | ![Connected linear polyimide chains in the final CG box.](../_static/tutorials/01_linear_pi/cg_final.png) |
 
-Option B generates its own CG results and replaces the supplied XML/ReactionPath
-files; keep an untouched copy of the archive if you want to retain Option A.
+Option B generates its own CG results in `01_linear_pi_new/cg/` without
+replacing the supplied fast-route XML and ReactionPath.
 The initial frame contains separate A and B1 beads. During the run, spatially
 accepted reactions create CG connections and are written in order to
 `reaction_path.txt`. The final configuration and ReactionPath must come from
@@ -70,12 +86,17 @@ the same run.
 
 ## 3. Reconstruct the atomistic model
 
-If you completed Option A in Step 2, you have already run this command.
-Otherwise, from the extracted tutorial root, run:
+If you completed Option A in Step 2, AA reconstruction is already finished.
+For Option B, run from the extracted tutorial directory:
 
 ```bash
-python reconstruct_aa.py 01_linear_pi
+chemfast reconstruct_aa --name 01_linear_pi_new
 ```
+
+`--name` must identify the **same workspace** you just prepared. The CLI reads
+`01_linear_pi_new/config.json` and the two files in
+`01_linear_pi_new/cg/`, then writes AA results into `01_linear_pi_new/aa/`.
+The corresponding outputs for Option A are in `01_linear_pi/aa/`.
 
 | Final CG configuration | Energy-minimized AA reconstruction |
 |---|---|

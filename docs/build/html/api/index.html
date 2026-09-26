@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=b95a8313" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../_static/chemfast.css?v=6c49ce7e" />
     <script src="../_static/documentation_options.js?v=a12e3537"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
@@ -84,6 +84,7 @@
     <summary>Reference</summary>
     <div class="chemfast-nav-children">
       <a class="chemfast-nav-link" href="../usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link" href="../cli.html" > CLI Reference</a>
       <a class="chemfast-nav-link" href="../inputs.html">Input Reference</a>
       <a class="chemfast-nav-link is-current" href="#" aria-current="page">Core API</a>
     </div>
@@ -172,10 +173,9 @@
 </pre></div>
 </div>
 <p><code class="docutils literal notranslate"><span class="pre">build_pygamd_protocol</span></code> creates the initial CG system and the PyGAMD runner script; <code class="docutils literal notranslate"><span class="pre">get_cgff_parameters</span></code> creates the CG interaction parameters consumed by that runner.</p>
-<p>The generated protocol is executed separately. Change into the output directory before running it:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>cg
-python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
-<span class="nb">cd</span><span class="w"> </span>..
+<p>The generated protocol is executed separately. Switch to the output <code class="docutils literal notranslate"><span class="pre">cg/</span></code>
+directory before running the generated PyGAMD script:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
 </pre></div>
 </div>
 <p>For reactive construction, the two important products must come from the same run:</p>
@@ -352,7 +352,11 @@ reaction_path.txt    ordered reaction events that created that connectivity
 </section>
 <section id="combine-the-apis-in-a-reusable-script">
 <h2>3. Combine the APIs in a reusable script<a class="headerlink" href="#combine-the-apis-in-a-reusable-script" title="Link to this heading">¶</a></h2>
-<p>A practical ChemFAST script typically combines only the APIs required for a given stage. In the tutorials, this pattern is organized into two reusable functions: one prepares the CG input files and simulation protocol, while the other reconstructs the atomistic system and exports the resulting force-field files.</p>
+<p>A practical ChemFAST script typically combines only the APIs required for a
+given stage. The example below organizes the workflow into two reusable
+functions: one prepares the CG input files and simulation protocol, while the
+other reconstructs the atomistic system and exports the resulting force-field
+files.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -424,20 +428,12 @@ reaction_path.txt    ordered reaction events that created that connectivity
     <span class="p">)</span>
 </pre></div>
 </div>
-<p>For each tutorial case, the execution sequence is the same:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Prepare the CG input and runner.</span>
-python<span class="w"> </span>prepare_cg.py<span class="w"> </span>CASE
-
-<span class="c1"># 2. Enter the generated CG directory and run the protocol.</span>
-<span class="nb">cd</span><span class="w"> </span>CASE/cg
-python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
-<span class="nb">cd</span><span class="w"> </span>../..
-
-<span class="c1"># 3. Reconstruct AA and export the force field.</span>
-python<span class="w"> </span>reconstruct_aa.py<span class="w"> </span>CASE
-</pre></div>
-</div>
-<p>Here, <code class="docutils literal notranslate"><span class="pre">CASE</span></code> only selects the working directory containing the corresponding config.json and generated files. The ChemFAST API calls and execution pattern remain unchanged across the tutorials; what differs between examples is the Reaction-DSL that defines the chemistry. Continue with the <a class="reference internal" href="../tutorials/index.html"><span class="std std-doc">tutorial sequence</span></a> to see how different systems are expressed through the DSL while using the same workflow.</p>
+<p>For standard workflows, the installed ChemFAST CLI provides command-line
+wrappers around these APIs, including workspace and input/output path
+management. See the <a class="reference internal" href="../cli.html"><span class="std std-doc">CLI Reference</span></a> for command options and the
+<a class="reference internal" href="../tutorials/index.html"><span class="std std-doc">Tutorials</span></a> for complete examples.</p>
+<p>The Python APIs above remain useful when integrating ChemFAST into custom
+workflows or when individual stages need to be called directly.</p>
 </section>
 </section>
 

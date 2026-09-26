@@ -23,10 +23,11 @@
       <a class="chemfast-nav-link{% if pagename == 'tutorials/aa-relaxation' %} is-current{% endif %}" href="{{ pathto('tutorials/aa-relaxation') }}"{% if pagename == 'tutorials/aa-relaxation' %} aria-current="page"{% endif %}>AA Relaxation</a>
     </div>
   </details>
-  <details class="chemfast-nav-group"{% if pagename in ['usage', 'inputs'] or pagename.startswith('api/') %} open{% endif %}>
+  <details class="chemfast-nav-group"{% if pagename in ['usage', 'cli', 'inputs'] or pagename.startswith('api/') %} open{% endif %}>
     <summary>Reference</summary>
     <div class="chemfast-nav-children">
       <a class="chemfast-nav-link{% if pagename == 'usage' %} is-current{% endif %}" href="{{ pathto('usage') }}"{% if pagename == 'usage' %} aria-current="page"{% endif %}>Usage Guide</a>
+      <a class="chemfast-nav-link{% if pagename == 'cli' %} is-current{% endif %}" href="{{ pathto('cli') }}" {% if pagename == 'cli' %}aria-current="page"{% endif %}> CLI Reference</a>
       <a class="chemfast-nav-link{% if pagename == 'inputs' %} is-current{% endif %}" href="{{ pathto('inputs') }}"{% if pagename == 'inputs' %} aria-current="page"{% endif %}>Input Reference</a>
       <a class="chemfast-nav-link{% if pagename.startswith('api/') %} is-current{% endif %}" href="{{ pathto('api/index') }}"{% if pagename == 'api/index' %} aria-current="page"{% endif %}>Core API</a>
     </div>

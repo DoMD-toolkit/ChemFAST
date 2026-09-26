@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>CLI Reference &#8212; ChemFAST · Documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=b95a8313" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
+    <link rel="stylesheet" type="text/css" href="_static/chemfast.css?v=6c49ce7e" />
+    <script src="_static/documentation_options.js?v=a12e3537"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.svg"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Input reference" href="inputs.html" />
+    <link rel="prev" title="Usage guide" href="usage.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="index.html">
+    <img class="logo" src="_static/left_small_logo.png" alt="Logo" />
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+<nav class="chemfast-nav" aria-label="Documentation navigation">
+  <h3 class="chemfast-nav-title">Navigation</h3>
+  <a class="chemfast-nav-link" href="index.html">Introduction</a>
+  <div class="chemfast-nav-label">Get ChemFAST</div>
+  <div class="chemfast-nav-children">
+    <a class="chemfast-nav-link" href="online-tools.html">Online Tools</a>
+    <a class="chemfast-nav-link" href="installation.html">Installation</a>
+  </div>
+  <a class="chemfast-nav-link" href="quick-start.html">Quick Start</a>
+  <a class="chemfast-nav-link" href="workflow.html">Workflow</a>
+  <a class="chemfast-nav-link" href="reaction-dsl.html">Reaction DSL</a>
+  <details class="chemfast-nav-group">
+    <summary>Tutorials</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="tutorials/index.html">Overview</a>
+      <a class="chemfast-nav-link" href="tutorials/first-system.html">Linear Polyimide</a>
+      <a class="chemfast-nav-link" href="tutorials/radical-pmma.html">Radical PMMA</a>
+      <a class="chemfast-nav-link" href="tutorials/network.html">Crosslinked Network</a>
+      <a class="chemfast-nav-link" href="tutorials/poss.html">POSS–PMMA</a>
+      <a class="chemfast-nav-link" href="tutorials/spe.html">SPE</a>
+      <a class="chemfast-nav-link" href="tutorials/block-ps-peo.html">PS-b-PEO</a>
+      <a class="chemfast-nav-link" href="tutorials/aa-relaxation.html">AA Relaxation</a>
+    </div>
+  </details>
+  <details class="chemfast-nav-group" open>
+    <summary>Reference</summary>
+    <div class="chemfast-nav-children">
+      <a class="chemfast-nav-link" href="usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link is-current" href="#" aria-current="page"> CLI Reference</a>
+      <a class="chemfast-nav-link" href="inputs.html">Input Reference</a>
+      <a class="chemfast-nav-link" href="api/index.html">Core API</a>
+    </div>
+  </details>
+  <a class="chemfast-nav-link" href="testing.html">Testing</a>
+  <a class="chemfast-nav-link" href="troubleshooting.html">Troubleshooting</a>
+</nav>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="cli-reference">
+<h1>CLI Reference<a class="headerlink" href="#cli-reference" title="Link to this heading">¶</a></h1>
+<p>Install ChemFAST in the intended environment from the repository root:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+chemfast<span class="w"> </span>--help
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> entry point is <code class="docutils literal notranslate"><span class="pre">chemfast</span> <span class="pre">=</span> <span class="pre">&quot;chemfast.cli:main&quot;</span></code>; the three
+subcommands use the existing tutorial protocols rather than a separate simulation
+implementation. Input paths and <code class="docutils literal notranslate"><span class="pre">--name</span></code> can be absolute or relative to the <strong>shell
+working directory</strong>; PDB filler paths declared inside JSON are resolved against
+the JSON’s directory. The tool never searches upward through arbitrary directories.</p>
+<section id="generate-cg-inputs-does-not-run-pygamd">
+<h2>1. Generate CG inputs (does not run PyGAMD)<a class="headerlink" href="#generate-cg-inputs-does-not-run-pygamd" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>prepare_cg<span class="w"> </span>--json<span class="w"> </span>/data/input/config.json<span class="w"> </span>--name<span class="w"> </span>/data/work/SAMPLE
+<span class="c1"># If you need a nondefault initial XML filename:</span>
+chemfast<span class="w"> </span>prepare_cg<span class="w"> </span>--json<span class="w"> </span>/data/input/config.json<span class="w"> </span>--name<span class="w"> </span>/data/work/OTHER<span class="w"> </span>--xml<span class="w"> </span>custom_initial.xml
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--xml</span></code> is an <strong>output filename</strong> inside <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/cg</span></code>, not an input XML path.
+The default is <code class="docutils literal notranslate"><span class="pre">initial.xml</span></code>, matching the existing tutorial. The command runs
+<code class="docutils literal notranslate"><span class="pre">build_pygamd_protocol(...,</span> <span class="pre">use_builtin=True,</span> <span class="pre">mass_density=0.5,</span> <span class="pre">random_seed=2026)</span></code> and <code class="docutils literal notranslate"><span class="pre">get_cgff_parameters(...,</span> <span class="pre">random_seed=2026)</span></code>, writing:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>SAMPLE/
+  config.json                    # a copied config when --json is outside SAMPLE
+  input_files/                   # copies of JSON-referenced PDB fillers, when needed
+  cg/
+    initial.xml
+    run_pygamd_polymerization.py
+    cg_parameters.json
+</pre></div>
+</div>
+<p>An existing nonempty <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/cg</span></code> is a <strong>hard error</strong>: no files are deleted.
+If <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/config.json</span></code> is already present, the command allows that file only
+when it is the actual supplied <code class="docutils literal notranslate"><span class="pre">--json</span></code>. Otherwise it refuses to replace it.
+When copying an external JSON into the workspace, the tool also copies its
+referenced PDB fillers and rewrites only the workspace copy of the relative
+<code class="docutils literal notranslate"><span class="pre">fillers[*].file</span></code> paths. The original JSON/PDB files are unchanged. You must
+specify each filler file <strong>inside config.json</strong>, e.g.:</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="nt">&quot;fillers&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;NP&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;N&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;nanoparticle.pdb&quot;</span><span class="p">,</span><span class="w"> </span><span class="nt">&quot;mappings&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[]}]}</span>
+</pre></div>
+</div>
+<p>The shown filler is only an illustration of a <strong>file path</strong>, not a complete
+chemically valid ChemFAST filler configuration. There is no separate <code class="docutils literal notranslate"><span class="pre">--pdb</span></code>
+option. You may use <code class="docutils literal notranslate"><span class="pre">--mass-density</span></code> (g/cm³; default <code class="docutils literal notranslate"><span class="pre">0.5</span></code>) and <code class="docutils literal notranslate"><span class="pre">--seed</span></code>
+(default <code class="docutils literal notranslate"><span class="pre">2026</span></code>) to override the tutorial’s CG initialization defaults. The
+CLI’s <code class="docutils literal notranslate"><span class="pre">0.5</span> <span class="pre">g/cm³</span></code> tutorial-protocol default is distinct from the low-level
+<code class="docutils literal notranslate"><span class="pre">build_pygamd_protocol</span></code> API default of <code class="docutils literal notranslate"><span class="pre">0.9</span> <span class="pre">g/cm³</span></code>.</p>
+<p><strong>Run PyGAMD yourself</strong> using a Python interpreter/environment where PyGAMD is
+functional. For the default initial XML name:</p>
+<p>Switch to <code class="docutils literal notranslate"><span class="pre">/data/work/SAMPLE/cg/</span></code>, the directory just created by
+<code class="docutils literal notranslate"><span class="pre">--name</span> <span class="pre">/data/work/SAMPLE</span></code>, and run the generated script there:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/path/to/pygamd-env/bin/python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
+</pre></div>
+</div>
+<p>If <code class="docutils literal notranslate"><span class="pre">--xml</span> <span class="pre">custom_initial.xml</span></code> was passed, use that name instead of <code class="docutils literal notranslate"><span class="pre">initial.xml</span></code>.
+The reactive protocol should produce <code class="docutils literal notranslate"><span class="pre">cg/reaction_final.xml</span></code> and
+<code class="docutils literal notranslate"><span class="pre">cg/reaction_path.txt</span></code>. They must come from the same PyGAMD run, with consistent
+particle indices; neither file is synthesized from the other by this CLI.</p>
+</section>
+<section id="reconstruct-aa-and-assign-force-fields">
+<h2>2. Reconstruct AA and assign force fields<a class="headerlink" href="#reconstruct-aa-and-assign-force-fields" title="Link to this heading">¶</a></h2>
+<p>For the default workspace layout, run the command below from <strong>any</strong>
+directory; <code class="docutils literal notranslate"><span class="pre">--name</span></code> is the same workspace used during CG preparation:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--name<span class="w"> </span>/data/work/SAMPLE
+</pre></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">--name</span></code> and no explicit inputs, the command reads <em>only</em> these paths:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;name&gt;/config.json
+&lt;name&gt;/cg/reaction_final.xml
+&lt;name&gt;/cg/reaction_path.txt
+</pre></div>
+</div>
+<p>Missing files cause an immediate error; there is no recursive search or
+ReactionPath inference. Any explicitly given <code class="docutils literal notranslate"><span class="pre">--xml</span></code>, <code class="docutils literal notranslate"><span class="pre">--json</span></code>, or
+<code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code> overrides only its corresponding default:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>/data/work/SAMPLE<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--json<span class="w"> </span>/data/external/config.json<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--xml<span class="w"> </span>/data/cg/new_final.xml<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--reactionpath<span class="w"> </span>/data/cg/new_reaction_path.txt<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--chunk-per-d<span class="w"> </span><span class="m">1</span>
+</pre></div>
+</div>
+<p>When <code class="docutils literal notranslate"><span class="pre">--name</span></code> is omitted but <code class="docutils literal notranslate"><span class="pre">--json</span></code> is supplied, the workspace defaults to
+the input JSON’s parent directory. <code class="docutils literal notranslate"><span class="pre">--chunk-per-d</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>, as in the
+standard tutorial; increase it for a large network when needed. The AA
+workflow uses the existing <code class="docutils literal notranslate"><span class="pre">parse_config</span></code>, <code class="docutils literal notranslate"><span class="pre">topology_builder</span></code>,
+<code class="docutils literal notranslate"><span class="pre">embed_molecules</span></code>, <code class="docutils literal notranslate"><span class="pre">post_process_aa_mol</span></code>, and <code class="docutils literal notranslate"><span class="pre">run_adv_top_mode</span></code>, preserving
+the tutorial’s GMX -&gt; BOSS -&gt; ML force-field assignment order.</p>
+<p>All AA results are written under <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/aa/</span></code>: <code class="docutils literal notranslate"><span class="pre">atomistic.sdf</span></code>, <code class="docutils literal notranslate"><span class="pre">system.gro</span></code>,
+<code class="docutils literal notranslate"><span class="pre">system.top</span></code>, <code class="docutils literal notranslate"><span class="pre">atomtypes.itp</span></code> and component <code class="docutils literal notranslate"><span class="pre">.itp</span></code> files. This step does <strong>not</strong>
+run GROMACS energy minimization or molecular dynamics.</p>
+</section>
+<section id="optional-standalone-sdf-density-optimization">
+<h2>3. Optional standalone SDF density optimization<a class="headerlink" href="#optional-standalone-sdf-density-optimization" title="Link to this heading">¶</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>density_optimization<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--sdf_in<span class="w"> </span>/data/work/SAMPLE/aa/atomistic.sdf<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--sdf_out<span class="w"> </span>/data/work/SAMPLE/aa/atomistic_dense.sdf<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--density<span class="w"> </span><span class="m">1</span>.0<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--pygamd_bin<span class="w"> </span>/path/to/pygamd-env/bin/python<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--gpu_id<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--compression-steps<span class="w"> </span><span class="m">100000</span><span class="w"> </span>--relaxation-steps<span class="w"> </span><span class="m">100000</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--morse-steps<span class="w"> </span><span class="m">100000</span><span class="w"> </span>--dt<span class="w"> </span><span class="m">0</span>.0001<span class="w"> </span>--temperature<span class="w"> </span><span class="m">1</span>.0
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--pygamd_bin</span></code> defaults to the current <code class="docutils literal notranslate"><span class="pre">sys.executable</span></code> if not given. In that
+case, <strong>the active Python environment must be able to run PyGAMD</strong>; it is not
+a command to a PyGAMD executable but the Python interpreter that runs its
+generated script. Other options: <code class="docutils literal notranslate"><span class="pre">--work-dir</span></code>, <code class="docutils literal notranslate"><span class="pre">--cutoff-nm</span></code> (default <code class="docutils literal notranslate"><span class="pre">1.2</span></code>),
+<code class="docutils literal notranslate"><span class="pre">--morse-alpha</span></code> (default <code class="docutils literal notranslate"><span class="pre">10.0</span></code>), <code class="docutils literal notranslate"><span class="pre">--gamma</span></code> (default <code class="docutils literal notranslate"><span class="pre">10.0</span></code>).
+<code class="docutils literal notranslate"><span class="pre">--temperature</span></code> is a PyGAMD <strong>reduced packing temperature</strong>, not kelvin.
+<code class="docutils literal notranslate"><span class="pre">--morse-steps</span></code> defaults to the number of relaxation steps if omitted.</p>
+<p>The input must be the <strong>ChemFAST multi-record SDF format</strong> produced by the
+reconstruction workflow. Every molecule record must contain <code class="docutils literal notranslate"><span class="pre">RES_NAMES</span></code> and
+<code class="docutils literal notranslate"><span class="pre">RES_NUMS</span></code> with exactly one token per atom, <code class="docutils literal notranslate"><span class="pre">BOX_TENSOR</span></code> with consistent
+positive orthorhombic box dimensions (3 or 9 numbers, in Å), and one finite
+3D conformer. Invalid/missing metadata, malformed SDF records, inconsistent
+boxes, and tilted boxes are rejected rather than assigned fallback residue IDs.</p>
+<p>The original atom/bond order and residue metadata are retained; the final
+<code class="docutils literal notranslate"><span class="pre">BOX_TENSOR</span></code> is stored as nine numbers (three lengths plus six zeros). The
+result is validated by re-reading it with the same strict ChemFAST reader
+before being committed to <code class="docutils literal notranslate"><span class="pre">--sdf_out</span></code>. The source SDF is never overwritten.</p>
+<p>The generated PyGAMD files (<code class="docutils literal notranslate"><span class="pre">ini.xml</span></code>, <code class="docutils literal notranslate"><span class="pre">inter.json</span></code>, <code class="docutils literal notranslate"><span class="pre">run_density.py</span></code>, output
+snapshots) are retained in <code class="docutils literal notranslate"><span class="pre">&lt;sdf_out_stem&gt;_pygamd/</span></code> alongside the output, or
+in a custom <strong>empty</strong> <code class="docutils literal notranslate"><span class="pre">--work-dir</span></code>. The procedure performs geometric packing
+with simplified potentials, <strong>not</strong> OPLS-AA equilibration. If the initial
+density is already at/above the requested target, PyGAMD is skipped but an
+output SDF is still written.</p>
+<p><strong>Important:</strong> density optimization writes an SDF only; the earlier <code class="docutils literal notranslate"><span class="pre">.gro</span></code>,
+<code class="docutils literal notranslate"><span class="pre">.itp</span></code> and <code class="docutils literal notranslate"><span class="pre">.top</span></code> files still describe the <em>pre-optimization</em> coordinates and
+box. Do not combine those files with the optimized SDF for MD without
+regenerating coordinate/topology outputs consistently.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

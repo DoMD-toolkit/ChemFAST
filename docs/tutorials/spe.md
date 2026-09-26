@@ -38,12 +38,26 @@ and assigns the median normalized epsilon of the multi-atom reactants.
 
 ## 2. Construct and relax the CG system
 
+Run this command from the extracted tutorial directory (or replace the paths
+with absolute paths). `--name` identifies the workspace for this example;
+`06_spe/cg/` receives the generated `initial.xml`,
+`cg_parameters.json`, and `run_pygamd_polymerization.py`.
+
 ```bash
-python prepare_cg.py 06_spe
-cd 06_spe/cg
-python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
-cd ../..
+chemfast prepare_cg --json 06_spe/config.json --name 06_spe
 ```
+
+Next, switch to `06_spe/cg/` and run the **generated** PyGAMD script
+with an interpreter that supports PyGAMD:
+
+```bash
+python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
+```
+
+Once PyGAMD finishes, `06_spe/cg/` should contain the matching
+`reaction_final.xml` and `reaction_path.txt`. Return to the extracted tutorial
+directory before using the relative `--name` in the following command; alternatively,
+provide the absolute workspace path to run the CLI from anywhere.
 
 | Initial multicomponent CG mixture | Polymerized and pre-equilibrated CG system |
 |---|---|
@@ -56,8 +70,12 @@ checked separately.
 ## 3. Reconstruct the atomistic system
 
 ```bash
-python reconstruct_aa.py 06_spe
+chemfast reconstruct_aa --name 06_spe
 ```
+
+The CLI reads `06_spe/config.json` and the two fixed CG outputs from
+`06_spe/cg/`, then writes the reconstructed SDF and GROMACS files to
+`06_spe/aa/`. No CG result filenames need to be passed again.
 
 | Final CG configuration | Energy-minimized AA reconstruction |
 |---|---|

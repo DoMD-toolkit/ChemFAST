@@ -33,12 +33,26 @@ atomistic bond change.
 
 ## 2. Run radical CG polymerization
 
+Run this command from the extracted tutorial directory (or replace the paths
+with absolute paths). `--name` identifies the workspace for this example;
+`02_radical_pmma/cg/` receives the generated `initial.xml`,
+`cg_parameters.json`, and `run_pygamd_polymerization.py`.
+
 ```bash
-python prepare_cg.py 02_radical_pmma
-cd 02_radical_pmma/cg
-python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
-cd ../..
+chemfast prepare_cg --json 02_radical_pmma/config.json --name 02_radical_pmma
 ```
+
+Next, switch to `02_radical_pmma/cg/` and run the **generated** PyGAMD script
+with an interpreter that supports PyGAMD:
+
+```bash
+python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
+```
+
+Once PyGAMD finishes, `02_radical_pmma/cg/` should contain the matching
+`reaction_final.xml` and `reaction_path.txt`. Return to the extracted tutorial
+directory before using the relative `--name` in the following command; alternatively,
+provide the absolute workspace path to run the CLI from anywhere.
 
 | Initial CG monomers | Polymerized and pre-equilibrated CG configuration |
 |---|---|
@@ -51,8 +65,12 @@ final chain length.
 ## 3. Reconstruct the atomistic model
 
 ```bash
-python reconstruct_aa.py 02_radical_pmma
+chemfast reconstruct_aa --name 02_radical_pmma
 ```
+
+The CLI reads `02_radical_pmma/config.json` and the two fixed CG outputs from
+`02_radical_pmma/cg/`, then writes the reconstructed SDF and GROMACS files to
+`02_radical_pmma/aa/`. No CG result filenames need to be passed again.
 
 | Final CG configuration | Energy-minimized AA reconstruction |
 |---|---|

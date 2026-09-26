@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=b95a8313" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="_static/chemfast.css?v=6c49ce7e" />
     <script src="_static/documentation_options.js?v=a12e3537"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Core API" href="api/index.html" />
-    <link rel="prev" title="Usage guide" href="usage.html" />
+    <link rel="prev" title="CLI Reference" href="cli.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -84,6 +84,7 @@
     <summary>Reference</summary>
     <div class="chemfast-nav-children">
       <a class="chemfast-nav-link" href="usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link" href="cli.html" > CLI Reference</a>
       <a class="chemfast-nav-link is-current" href="#" aria-current="page">Input Reference</a>
       <a class="chemfast-nav-link" href="api/index.html">Core API</a>
     </div>
@@ -125,7 +126,7 @@ defines the fields, reaction semantics and structured-filler mappings. The
 <td><p>CG preparation</p></td>
 <td><p>PyGAMD XML: initial particles, coordinates and connectivity</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cg_ff_parameters.json</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">cg_parameters.json</span></code></p></td>
 <td><p>CG parameterization</p></td>
 <td><p>JSON: bonded and non-bonded CG parameters</p></td>
 </tr>
@@ -175,9 +176,12 @@ with the following ChemFAST options:</p>
 </tr>
 </tbody>
 </table>
-<p>For <code class="docutils literal notranslate"><span class="pre">build_pygamd_protocol</span></code>, omitting <code class="docutils literal notranslate"><span class="pre">box_tensor</span></code> generates a cubic box from the
-total system mass and <code class="docutils literal notranslate"><span class="pre">mass_density</span></code>, whose default is <strong>0.9 g/cm³</strong>. Set a box
-explicitly in the configuration dictionary, or supply a density to the function:</p>
+<p>For the low-level <code class="docutils literal notranslate"><span class="pre">build_pygamd_protocol</span></code> API, omitting <code class="docutils literal notranslate"><span class="pre">box_tensor</span></code> generates
+a cubic box from the total system mass and <code class="docutils literal notranslate"><span class="pre">mass_density</span></code>; the API default is
+<strong>0.9 g/cm³</strong>. The <code class="docutils literal notranslate"><span class="pre">chemfast</span> <span class="pre">prepare_cg</span></code> CLI uses <strong>0.5 g/cm³</strong> as its
+tutorial-protocol default and accepts <code class="docutils literal notranslate"><span class="pre">--mass-density</span></code> to override it. Set a
+box explicitly in the configuration dictionary, or supply a density to the
+function:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Explicit initial box (nm):</span>
 <span class="n">config</span><span class="p">[</span><span class="s2">&quot;box_tensor&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">20.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">,</span> <span class="mf">20.0</span><span class="p">]</span>
 <span class="n">protocol</span> <span class="o">=</span> <span class="n">build_pygamd_protocol</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;cg&quot;</span><span class="p">)</span>
@@ -273,9 +277,11 @@ simulation. For fields outside this workflow, consult the engine’s XML referen
 </section>
 <section id="cg-force-field-parameters-json">
 <span id="cg-ff-parameters"></span><h2>CG force-field parameters: JSON<a class="headerlink" href="#cg-force-field-parameters-json" title="Link to this heading">¶</a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">get_cgff_parameters</span></code> writes this file. <code class="docutils literal notranslate"><span class="pre">cg_ff_parameters.json</span></code> and the examples’
-<code class="docutils literal notranslate"><span class="pre">cg_parameters.json</span></code> use the same schema: the filename is selected by <code class="docutils literal notranslate"><span class="pre">output</span></code>.
-Pass the matching file as the parameter argument to the generated runner.</p>
+<p><code class="docutils literal notranslate"><span class="pre">get_cgff_parameters</span></code> writes this file. The CLI and tutorials use
+<code class="docutils literal notranslate"><span class="pre">cg_parameters.json</span></code>; low-level API calls may select another filename through
+the <code class="docutils literal notranslate"><span class="pre">output</span></code> argument, for example <code class="docutils literal notranslate"><span class="pre">output=&quot;cg_ff_parameters.json&quot;</span></code>. The
+schema is unchanged. Pass the matching file as the parameter argument to the
+generated runner.</p>
 <p>The two top-level objects are <code class="docutils literal notranslate"><span class="pre">bonded</span></code> and <code class="docutils literal notranslate"><span class="pre">nonbonded</span></code>. This excerpt shows one
 bond, one angle and one particle type from the supplied example; it is not a
 complete runnable parameter set:</p>

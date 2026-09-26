@@ -1,16 +1,15 @@
 # Usage guide
 
-This page follows the [workflow](workflow.md) in code: define the chemistry,
-prepare and run CG polymerization, reconstruct AA coordinates, and export
-GROMACS files. After installation, `chemfast` can be imported from any directory
-in the installed environment. Use your own working directory for inputs and
-outputs; the ChemFAST source checkout is not required as the working directory.
+This guide runs the [workflow](workflow.md) using the installed `chemfast`
+CLI: define chemistry, prepare CG inputs, run PyGAMD yourself, then reconstruct
+and export the AA model. Commands accept absolute file and workspace paths,
+so the ChemFAST source checkout does not need to be your working directory.
 
 Download and extract the {download}`working example <_static/usage-example.zip>`.
-It contains `system.json` and the three scripts shown below. Each script resolves
-paths relative to its own location, so it can also be launched by absolute path.
-The [first tutorial](tutorials/first-system.md) explains the chemistry and result
-checks in more detail.
+It contains the `system.json` input. Relative paths below assume the extracted
+example directory as the starting location; use absolute paths when calling
+ChemFAST from elsewhere. The [first tutorial](tutorials/first-system.md)
+explains the chemistry and result checks in more detail.
 
 ## 1. Define the chemistry with Reaction-DSL
 
@@ -33,81 +32,86 @@ The `domd_react_dsl` marker identifies the ChemFAST v1.0.0 Reaction-DSL schema. 
 
 ## 2. Generate the initial XML, PyGAMD script and CG parameters
 
-Save the following as `prepare_cg.py` next to `system.json`, then run
-`python prepare_cg.py` in your ChemFAST environment.
+Create a named workspace from the extracted `system.json`:
 
-```{literalinclude} usage-example/prepare_cg.py
-:language: python
+```bash
+chemfast prepare_cg --json system.json --name MY_SYSTEM
 ```
 
-The `cg/` directory receives `initial.xml`, `run_pygamd_polymerization.py` and
-`cg_parameters.json`. These calls prepare files; the simulation is run separately.
-The CG parameter call in this example uses a DSL without external filler files;
-for structured components, resolve those references before passing a dictionary.
+`--name MY_SYSTEM` is the workspace used in subsequent commands. The CLI
+copies the configuration to `MY_SYSTEM/config.json`; a different absolute
+`--name` can be used without changing the input JSON.
+
+The `MY_SYSTEM/cg/` directory receives `initial.xml`,
+`run_pygamd_polymerization.py`, and `cg_parameters.json`. The CLI prepares
+files; molecular dynamics must be run separately. For structured components,
+specify the PDB file under `fillers[*].file` in the input JSON. Paths there
+are resolved relative to the JSON's location, not the shell directory.
 
 ## 3. Run PyGAMD
 
 Install PyGAMD following its [official installation guide](https://pygamd-v1.readthedocs.io/en/latest/installation.html).
 PyGAMD can be used in the same Python environment as ChemFAST.
 
-From the extracted example directory:
+Switch to the newly created `MY_SYSTEM/cg/` directory and run its generated
+PyGAMD script:
 
 ```bash
-cd cg
 python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
-cd ..
 ```
 
-Run the generated script from `cg/` so its relative input and output paths
-resolve correctly. After the run, keep `cg/reaction_final.xml` and
-`cg/reaction_path.txt` together for AA reconstruction.
+The generated script requires its CG working directory for relative inputs
+and outputs. When the simulation completes, the matching
+`MY_SYSTEM/cg/reaction_final.xml` and `MY_SYSTEM/cg/reaction_path.txt` are
+ready for AA reconstruction. Return to the extracted example directory to
+use a relative `--name` below, or pass its absolute path from anywhere.
 
 (reconstruct-existing-cg-output)=
 ## 4. Reconstruct the AA system
 
-From an environment with ChemFAST installed, save the following as
-`reconstruct_aa.py` next to `system.json`, then run `python reconstruct_aa.py`.
+Reconstruct using the workspace you just prepared:
 
-```{literalinclude} usage-example/reconstruct_aa.py
-:language: python
+```bash
+chemfast reconstruct_aa --name MY_SYSTEM
 ```
 
-The output is `aa/atomistic.sdf`, containing AA coordinates and the residue/box
-metadata needed for export. The two CG result paths are supplied in memory:
-**you do not need to edit or rewrite `system.json` after the simulation**.
-For an existing external CG run, point `cg_dir` to that run's directory and use
-the corresponding DSL and recorded filenames. See the [FG API](api/fg.md).
+Without explicit `--xml`, `--json`, or `--reactionpath`, the CLI reads only
+`MY_SYSTEM/config.json`, `MY_SYSTEM/cg/reaction_final.xml`, and
+`MY_SYSTEM/cg/reaction_path.txt`. No manual edits to the JSON are required.
+
+The CLI writes `MY_SYSTEM/aa/atomistic.sdf` (including residue/box
+metadata), plus matching GROMACS `system.gro`, `system.top`, and ITP files.
+For external CG results, use explicit `--xml`, `--reactionpath`, and `--json`
+paths with `--name` to direct the output. See [CLI reference](cli.md)
+and the [FG API](api/fg.md).
 
 (parameterize-an-existing-aa-structure)=
-## 5. Assign the force field and generate GRO coordinates
+## 5. Use the exported GROMACS files
 
-Save the following as `export_gromacs.py` next to `system.json`, then run
-`python export_gromacs.py`.
-
-```{literalinclude} usage-example/export_gromacs.py
-:language: python
-```
-
-This assigns parameters and writes a matching set of files in `gromacs/`.
-`system.gro` contains coordinates and box dimensions, with atom ordering matched
-to the exported topology. An external AA input must have explicit bonds,
-hydrogens, coordinates and the required export metadata.
-
-## 6. Use the TOP and ITP files
-
-The same export call also writes:
+The `chemfast reconstruct_aa` command already assigns the force field and
+exports a matched `MY_SYSTEM/aa/` set:
 
 | File | Use |
 |---|---|
-| `system.top` | Complete system topology, including molecule counts and ITP references |
+| `system.gro` | Reconstructed AA coordinates and simulation box |
+| `system.top` | System topology, component counts, and included ITP files |
 | `atomtypes.itp` | Shared atom-type parameters |
-| Molecule `.itp` files | Connectivity and force-field terms for each exported molecule type |
+| Molecule `.itp` files | Bonded interactions and per-molecule topology |
 
-Use `system.gro`, `system.top` and its included ITP files together. They are
-generated in one call so their molecule and atom ordering agree. If you need
-separate molecule-level exports instead, use `run_itp_mode(mols, output_dir=...)`;
-see the [FF API](api/ff.md) for this alternative. Validate GROMACS preprocessing
-and relax the reconstructed system before production simulation.
+Use the GRO, TOP, and ITP files from **the same run**. The exported coordinates
+require atomistic energy minimization before production MD; see the
+[AA relaxation guide](tutorials/aa-relaxation.md).
+
+Optional density packing is available as a separate CLI stage:
+
+```bash
+chemfast density_optimization --sdf_in MY_SYSTEM/aa/atomistic.sdf --density 1.0
+```
+
+It creates `MY_SYSTEM/aa/atomistic_density_optimized.sdf` only and does
+**not** update the GROMACS exports. Do not combine its coordinates/box with
+the unmodified GRO/TOP/ITP set. See [CLI reference](cli.md) for
+`--pygamd_bin`, GPU, step counts, and strict SDF requirements.
 
 ## Browser workflows
 

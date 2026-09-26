@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="../_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="../_static/alabaster.css?v=b95a8313" />
-    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="../_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="../_static/chemfast.css?v=6c49ce7e" />
     <script src="../_static/documentation_options.js?v=a12e3537"></script>
     <script src="../_static/doctools.js?v=9bcbadda"></script>
@@ -85,6 +85,7 @@
     <summary>Reference</summary>
     <div class="chemfast-nav-children">
       <a class="chemfast-nav-link" href="../usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link" href="../cli.html" > CLI Reference</a>
       <a class="chemfast-nav-link" href="../inputs.html">Input Reference</a>
       <a class="chemfast-nav-link" href="../api/index.html">Core API</a>
     </div>
@@ -103,13 +104,15 @@
   <section id="aa-compression-minimization-and-equilibration">
 <h1>AA compression, minimization and equilibration<a class="headerlink" href="#aa-compression-minimization-and-equilibration" title="Link to this heading">¶</a></h1>
 <p>ChemFAST generates initial all-atom (AA) coordinates and topology files.
-Optional compression can be applied after AA coordinate embedding and before
-force-field export. The resulting system can then undergo atomistic energy
-minimization (EM) and, where applicable, equilibration (EQ) with GROMACS.</p>
+Optional residue-rigid density packing can be run as a separate SDF-to-SDF
+stage after standard AA reconstruction. The original, internally matched
+GROMACS files can then undergo atomistic energy minimization (EM) and, where
+applicable, equilibration (EQ); packing the SDF does not update those files.</p>
 <section id="standard-aa-reconstruction">
 <h2>Standard AA reconstruction<a class="headerlink" href="#standard-aa-reconstruction" title="Link to this heading">¶</a></h2>
-<p>From the extracted tutorial root, run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>reconstruct_aa.py<span class="w"> </span>01_linear_pi
+<p>For the supplied linear-PI CG result, run from the extracted tutorial directory
+(or supply an absolute workspace path):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--name<span class="w"> </span>01_linear_pi
 </pre></div>
 </div>
 <p>The AA coordinates and topology are written to <code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/</span></code>, including
@@ -133,102 +136,50 @@ orientations and inter-residue bonds to rearrange.</p>
 gradually introduces Lennard-Jones interactions, and then compresses the
 simulation box toward the target density while continuing to relax the
 configuration.</p>
-<section id="enable-compression">
-<h3>Enable compression<a class="headerlink" href="#enable-compression" title="Link to this heading">¶</a></h3>
-<p>Compression can be inserted into <code class="docutils literal notranslate"><span class="pre">reconstruct_aa.py</span></code> after
-<code class="docutils literal notranslate"><span class="pre">embed_molecules()</span></code> and before AA post-processing and force-field export.</p>
-<p>Import the function:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.misc._density_optim</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_density_optimization</span>
+<section id="run-optional-density-packing-with-the-cli">
+<h3>Run optional density packing with the CLI<a class="headerlink" href="#run-optional-density-packing-with-the-cli" title="Link to this heading">¶</a></h3>
+<p>Use the standalone SDF-to-SDF command after AA reconstruction. For the supplied
+linear-PI example, <code class="docutils literal notranslate"><span class="pre">--sdf_in</span></code> refers to the file produced in <code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>density_optimization<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--sdf_in<span class="w"> </span>01_linear_pi/aa/atomistic.sdf<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--density<span class="w"> </span><span class="m">1</span>.0<span class="w"> </span>--gpu_id<span class="w"> </span><span class="m">0</span>
 </pre></div>
 </div>
-<p>After AA coordinate embedding, add:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mols</span> <span class="o">=</span> <span class="n">embed_molecules</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="n">graphs</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">chunk_per_d</span><span class="o">=</span><span class="n">CHUNK_PER_D</span><span class="p">)</span>
-
-<span class="n">aa_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="n">mols</span><span class="p">,</span> <span class="n">final_box</span> <span class="o">=</span> <span class="n">run_density_optimization</span><span class="p">(</span>
-    <span class="n">mols</span><span class="p">,</span>
-    <span class="n">graphs</span><span class="p">,</span>
-    <span class="n">cfg</span><span class="p">,</span>
-    <span class="n">target_density</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="n">work_dir</span><span class="o">=</span><span class="n">aa_dir</span> <span class="o">/</span> <span class="s2">&quot;compression&quot;</span><span class="p">,</span>
-    <span class="n">gpu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>The function generates the compression inputs, executes PyGAMD, and reads the
-resulting AA coordinates and simulation box.</p>
-<p>If PyGAMD is installed in a separate Python environment, specify its Python
-interpreter using <code class="docutils literal notranslate"><span class="pre">python_bin</span></code>:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mols</span><span class="p">,</span> <span class="n">final_box</span> <span class="o">=</span> <span class="n">run_density_optimization</span><span class="p">(</span>
-    <span class="n">mols</span><span class="p">,</span>
-    <span class="n">graphs</span><span class="p">,</span>
-    <span class="n">cfg</span><span class="p">,</span>
-    <span class="n">target_density</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
-    <span class="n">work_dir</span><span class="o">=</span><span class="n">aa_dir</span> <span class="o">/</span> <span class="s2">&quot;compression&quot;</span><span class="p">,</span>
-    <span class="n">gpu</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-    <span class="n">python_bin</span><span class="o">=</span><span class="s2">&quot;/path/to/pygamd-env/bin/python&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>Replace <code class="docutils literal notranslate"><span class="pre">python_bin</span></code> with the path to the Python interpreter in the PyGAMD
-environment. If omitted, the current Python interpreter is used.</p>
-<p>The compression working directory contains the generated inputs and script:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>compression/
-├── ini.xml
-├── inter.json
-├── run_density.py
-└── optimized.xml
-</pre></div>
-</div>
-<p>The directory also contains intermediate configurations generated during
-compression.</p>
-<p>The generated PyGAMD script can be rerun manually from a working directory
-that already contains <code class="docutils literal notranslate"><span class="pre">ini.xml</span></code>, <code class="docutils literal notranslate"><span class="pre">inter.json</span></code>, and <code class="docutils literal notranslate"><span class="pre">run_density.py</span></code>:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>01_linear_pi/aa/compression
-python<span class="w"> </span>run_density.py<span class="w"> </span>ini.xml<span class="w"> </span>inter.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
-</pre></div>
-</div>
-<p>This command runs the compression simulation only; it does not automatically
-transfer the resulting coordinates back into the ChemFAST reconstruction
-workflow. The current <code class="docutils literal notranslate"><span class="pre">run_density_optimization()</span></code> interface performs input
-generation, simulation, and result loading together rather than exposing
-these stages as separate calls.</p>
-<p>After calling <code class="docutils literal notranslate"><span class="pre">run_density_optimization()</span></code>, update the AA graph coordinates
-and perform post-processing before the standard SDF and force-field export:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">mol</span><span class="p">,</span> <span class="n">graph</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="n">graphs</span><span class="p">):</span>
-    <span class="n">positions</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetConformer</span><span class="p">()</span><span class="o">.</span><span class="n">GetPositions</span><span class="p">()</span>
-
-    <span class="k">for</span> <span class="n">atom_id</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()):</span>
-        <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="n">atom_id</span><span class="p">][</span><span class="s2">&quot;x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">positions</span><span class="p">[</span><span class="n">atom_id</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-    <span class="n">post_process_aa_mol</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="n">final_box</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The standard export steps can then proceed unchanged, with the resulting AA
-files written to <code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/</span></code>.</p>
-<p><strong>Notes:</strong></p>
-<ul class="simple">
-<li><p>The default target density is 1.0 g/cm³ and can be adjusted for the system
-of interest.</p></li>
-<li><p>Compression is skipped if the initial density is already at or above the
-target density.</p></li>
-<li><p>The procedure preserves the internal geometry of individual residues but
-does not replace subsequent atomistic EM and equilibration.</p></li>
-<li><p>For an already dense input configuration, a separate soft-potential
-relaxation protocol may be needed to resolve unfavorable atomic contacts
-before conventional atomistic MD.</p></li>
-<li><p>The compression procedure currently supports orthorhombic simulation boxes.</p></li>
-</ul>
+<p>If PyGAMD is in a separate environment, add
+<code class="docutils literal notranslate"><span class="pre">--pygamd_bin</span> <span class="pre">/path/to/pygamd-env/bin/python</span></code>. Without this option,
+the command uses the active Python interpreter, which must support PyGAMD.
+The CLI reads the ChemFAST-formatted SDF, packs residue-rigid bodies when the
+starting density is below the specified target, and writes
+<code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/atomistic_density_optimized.sdf</span></code>. The generated PyGAMD inputs
+(<code class="docutils literal notranslate"><span class="pre">ini.xml</span></code>, <code class="docutils literal notranslate"><span class="pre">inter.json</span></code>, <code class="docutils literal notranslate"><span class="pre">run_density.py</span></code>) and any simulation snapshots are
+kept in <code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/atomistic_density_optimized_pygamd/</span></code> when PyGAMD runs.
+If the starting density already meets or exceeds the target, the current
+implementation skips PyGAMD and writes the output SDF without a packing run.</p>
+<p><strong>The CLI density stage does not regenerate GROMACS outputs.</strong> The original
+<code class="docutils literal notranslate"><span class="pre">system.gro</span></code>, <code class="docutils literal notranslate"><span class="pre">system.top</span></code>, and ITP files still match the <em>pre-packing</em> AA
+structure and box, not the optimized SDF. Do not pair the optimized SDF with
+those unchanged files for GROMACS. Generate a matching coordinate/topology
+set before using packed coordinates in subsequent atomistic MD. The GROMACS
+commands below apply to the original, internally consistent reconstruction
+output unless you have regenerated such a set.</p>
+<p>The packing potentials are geometric initialization potentials rather than
+an atomistic OPLS-AA force field. Packing does not replace energy minimization
+or subsequent equilibration. Only orthorhombic boxes are currently supported.
+For options and format validation, see the <a class="reference internal" href="../cli.html#optional-standalone-sdf-density-optimization"><span class="std std-ref">CLI reference</span></a>.</p>
 </section>
 </section>
 <section id="energy-minimization">
 <h2>Energy minimization<a class="headerlink" href="#energy-minimization" title="Link to this heading">¶</a></h2>
-<p>Enter the AA output directory and copy the supplied MDP files:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>01_linear_pi/aa
-cp<span class="w"> </span>../../em.mdp<span class="w"> </span>../../eq.mdp<span class="w"> </span>.
+<p>For GROMACS, switch to the corresponding <strong>AA output directory</strong> (for
+example, <code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/</span></code>) and copy the supplied <code class="docutils literal notranslate"><span class="pre">em.mdp</span></code> and <code class="docutils literal notranslate"><span class="pre">eq.mdp</span></code> from
+the extracted tutorial directory into it. For <code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/</span></code>, the copy
+command is:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>../../em.mdp<span class="w"> </span>../../eq.mdp<span class="w"> </span>.
 </pre></div>
 </div>
+<p>The following GROMACS commands are run from that AA directory. Use the
+unmodified, matching <code class="docutils literal notranslate"><span class="pre">system.gro</span></code>/<code class="docutils literal notranslate"><span class="pre">system.top</span></code>/ITP export, not the standalone
+packed SDF.</p>
 <p>The supplied <code class="docutils literal notranslate"><span class="pre">em.mdp</span></code> uses steepest-descent energy minimization.</p>
 <p>Run:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gmx<span class="w"> </span>grompp<span class="w"> </span>-f<span class="w"> </span>em.mdp<span class="w"> </span>-c<span class="w"> </span>system.gro<span class="w"> </span>-p<span class="w"> </span>system.top<span class="w"> </span>-o<span class="w"> </span>em.tpr

@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=b95a8313" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="_static/chemfast.css?v=6c49ce7e" />
     <script src="_static/documentation_options.js?v=a12e3537"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
@@ -84,6 +84,7 @@
     <summary>Reference</summary>
     <div class="chemfast-nav-children">
       <a class="chemfast-nav-link" href="usage.html">Usage Guide</a>
+      <a class="chemfast-nav-link" href="cli.html" > CLI Reference</a>
       <a class="chemfast-nav-link" href="inputs.html">Input Reference</a>
       <a class="chemfast-nav-link" href="api/index.html">Core API</a>
     </div>
@@ -105,43 +106,65 @@
 <section id="install-and-obtain-the-example">
 <h2>1. Install and obtain the example<a class="headerlink" href="#install-and-obtain-the-example" title="Link to this heading">¶</a></h2>
 <p>Complete <a class="reference internal" href="installation.html"><span class="std std-doc">Installation</span></a>, then <a class="reference download internal" download="" href="_downloads/98aceda02529ddb64037dc873b799cb2/chemfast-tutorials.zip"><code class="xref download docutils literal notranslate"><span class="pre">download</span> <span class="pre">the</span> <span class="pre">tutorial</span> <span class="pre">archive</span></code></a> and extract it.</p>
-<p>Run the commands below from the extracted archive’s <strong>top-level directory</strong>, which contains <code class="docutils literal notranslate"><span class="pre">prepare_cg.py</span></code> and <code class="docutils literal notranslate"><span class="pre">reconstruct_aa.py</span></code>. Confirm that <code class="docutils literal notranslate"><span class="pre">01_linear_pi/config.json</span></code> is present.</p>
+<p>The installed <code class="docutils literal notranslate"><span class="pre">chemfast</span></code> CLI handles CG preparation and AA reconstruction; the
+archive’s old helper scripts are not required. Relative example paths below
+assume the extracted tutorial directory as the starting location. The same CLI
+commands also work from anywhere with absolute <code class="docutils literal notranslate"><span class="pre">--name</span></code> and <code class="docutils literal notranslate"><span class="pre">--json</span></code> paths.
+Confirm that <code class="docutils literal notranslate"><span class="pre">01_linear_pi/config.json</span></code> is present.</p>
 <p><strong>Fast route (no PyGAMD):</strong> The archive already includes the matching
 <code class="docutils literal notranslate"><span class="pre">01_linear_pi/cg/reaction_final.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">01_linear_pi/cg/reaction_path.txt</span></code>.
-To try AA reconstruction directly, skip Steps 2 and 3 and run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>reconstruct_aa.py<span class="w"> </span>01_linear_pi
+To try AA reconstruction directly, use the command below instead of Steps 2–4:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--name<span class="w"> </span>01_linear_pi
 </pre></div>
 </div>
-<p>This route requires the complete OPLS database. Check the AA outputs in Step 4,
-then proceed to Step 5. To generate a new CG result, follow Steps 2 and 3 instead.</p>
+<p>This route requires the complete OPLS database. The AA results are written to
+<code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/</span></code>; proceed to Step 5. To generate a new CG result, follow Steps 2 and 3 instead.</p>
 </section>
 <section id="prepare-the-cg-model">
 <h2>2. Prepare the CG model<a class="headerlink" href="#prepare-the-cg-model" title="Link to this heading">¶</a></h2>
-<p>Prepare the coarse-grained (CG) model and polymerization inputs from the example configuration:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>prepare_cg.py<span class="w"> </span>01_linear_pi
+<p>To generate a <em>new</em> coarse-grained (CG) model, keep the supplied
+<code class="docutils literal notranslate"><span class="pre">01_linear_pi/cg/</span></code> result intact: <code class="docutils literal notranslate"><span class="pre">prepare_cg</span></code> requires its destination
+<code class="docutils literal notranslate"><span class="pre">cg/</span></code> to be empty. Create a separate workspace:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>prepare_cg<span class="w"> </span>--json<span class="w"> </span>01_linear_pi/config.json<span class="w"> </span>--name<span class="w"> </span>01_linear_pi_new
 </pre></div>
 </div>
-<p>Check that <code class="docutils literal notranslate"><span class="pre">01_linear_pi/cg/</span></code> contains <code class="docutils literal notranslate"><span class="pre">initial.xml</span></code>, <code class="docutils literal notranslate"><span class="pre">cg_parameters.json</span></code>, and <code class="docutils literal notranslate"><span class="pre">run_pygamd_polymerization.py</span></code>. This step prepares the simulation inputs; it does <strong>not</strong> run molecular dynamics (MD).</p>
+<p><code class="docutils literal notranslate"><span class="pre">--name</span></code> identifies the workspace just created. The CLI saves the configuration
+as <code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/config.json</span></code> and writes <code class="docutils literal notranslate"><span class="pre">initial.xml</span></code>,
+<code class="docutils literal notranslate"><span class="pre">cg_parameters.json</span></code>, and <code class="docutils literal notranslate"><span class="pre">run_pygamd_polymerization.py</span></code> under
+<code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/cg/</span></code>. This prepares the simulation inputs; it does <strong>not</strong>
+run molecular dynamics (MD).</p>
 </section>
 <section id="construct-and-relax-the-cg-polymer">
 <h2>3. Construct and relax the CG polymer<a class="headerlink" href="#construct-and-relax-the-cg-polymer" title="Link to this heading">¶</a></h2>
 <p>The next stage constructs the CG polymer and records the reactions that form its connectivity. There are two ways to complete this stage:</p>
-<p><strong>Run the CG simulation.</strong> With a separately installed, compatible PyGAMD backend, run the generated script:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>01_linear_pi/cg
-python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
-<span class="nb">cd</span><span class="w"> </span>../..
+<p><strong>Run the CG simulation.</strong> With a separately installed, compatible PyGAMD
+backend, switch to <code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/cg/</span></code> and run its generated script:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
 </pre></div>
 </div>
+<p>The generated runner uses relative input/output paths, so <strong>this is the one
+stage that needs its <code class="docutils literal notranslate"><span class="pre">cg/</span></code> working directory</strong>. You may use a separate
+PyGAMD-capable Python interpreter if ChemFAST and PyGAMD are installed in
+different environments.</p>
 <p><strong>Use the supplied CG result.</strong> If you chose the fast route in Step 1, the matching CG configuration and ReactionPath are already present. Step 2 and the CG simulation are not required for this route.</p>
-<p>If you run the CG simulation, keep a copy of the supplied files before replacing them with newly generated results. In either case, confirm that <code class="docutils literal notranslate"><span class="pre">reaction_final.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">reaction_path.txt</span></code> are present in <code class="docutils literal notranslate"><span class="pre">01_linear_pi/cg/</span></code>. The former stores the final CG configuration; the latter records the ordered accepted reactions.</p>
+<p>For the new run, confirm that <code class="docutils literal notranslate"><span class="pre">reaction_final.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">reaction_path.txt</span></code>
+are present together in <code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/cg/</span></code>. The supplied fast-route files
+remain under <code class="docutils literal notranslate"><span class="pre">01_linear_pi/cg/</span></code>. The XML stores final CG connectivity and
+coordinates; the ReactionPath records the ordered accepted reactions.</p>
 </section>
 <section id="reconstruct-and-export-the-aa-system">
 <h2>4. Reconstruct and export the AA system<a class="headerlink" href="#reconstruct-and-export-the-aa-system" title="Link to this heading">¶</a></h2>
-<p>With the complete OPLS release database installed, reconstruct the AA structure from the CG configuration and reaction history:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>reconstruct_aa.py<span class="w"> </span>01_linear_pi
+<p>With the complete OPLS release database installed, return to the extracted
+tutorial directory and run the CLI on the <strong>same
+workspace you just prepared</strong> (or use its absolute path from anywhere):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--name<span class="w"> </span>01_linear_pi_new
 </pre></div>
 </div>
-<p>Check that <code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/system.gro</span></code>, <code class="docutils literal notranslate"><span class="pre">system.top</span></code>, and the referenced <code class="docutils literal notranslate"><span class="pre">.itp</span></code> files exist. This is the reconstructed <strong>initial</strong> AA structure, not an equilibrated configuration. See the <a class="reference internal" href="tutorials/first-system.html"><span class="std std-doc">complete example</span></a> for the chemistry, images, and detailed output checks.</p>
+<p>The CLI reads <code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/config.json</span></code> and the fixed CG results under
+<code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/cg/</span></code>. Check that <code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/aa/system.gro</span></code>,
+<code class="docutils literal notranslate"><span class="pre">system.top</span></code>, and the referenced <code class="docutils literal notranslate"><span class="pre">.itp</span></code> files exist. If you took the fast route,
+its AA outputs are instead in <code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/</span></code>.</p>
+<p>This is the reconstructed <strong>initial</strong> AA structure, not an equilibrated configuration. See the <a class="reference internal" href="tutorials/first-system.html"><span class="std std-doc">complete example</span></a> for the chemistry, images, and detailed output checks.</p>
 </section>
 <section id="energy-minimize-and-equilibrate-the-aa-system-with-gromacs">
 <h2>5. Energy minimize and equilibrate the AA system with GROMACS<a class="headerlink" href="#energy-minimize-and-equilibrate-the-aa-system-with-gromacs" title="Link to this heading">¶</a></h2>

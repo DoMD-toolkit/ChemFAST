@@ -58,12 +58,11 @@ cg/
 
 `build_pygamd_protocol` creates the initial CG system and the PyGAMD runner script; `get_cgff_parameters` creates the CG interaction parameters consumed by that runner.
 
-The generated protocol is executed separately. Change into the output directory before running it:
+The generated protocol is executed separately. Switch to the output `cg/`
+directory before running the generated PyGAMD script:
 
 ```bash
-cd cg
 python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
-cd ..
 ```
 
 For reactive construction, the two important products must come from the same run:
@@ -244,7 +243,11 @@ For lower-level output details, see [Force-field and file-output API details](ff
 
 ## 3. Combine the APIs in a reusable script
 
-A practical ChemFAST script typically combines only the APIs required for a given stage. In the tutorials, this pattern is organized into two reusable functions: one prepares the CG input files and simulation protocol, while the other reconstructs the atomistic system and exports the resulting force-field files.
+A practical ChemFAST script typically combines only the APIs required for a
+given stage. The example below organizes the workflow into two reusable
+functions: one prepares the CG input files and simulation protocol, while the
+other reconstructs the atomistic system and exports the resulting force-field
+files.
 
 ```python
 import json
@@ -318,19 +321,10 @@ def reconstruct_aa(root):
     )
 ```
 
-For each tutorial case, the execution sequence is the same:
+For standard workflows, the installed ChemFAST CLI provides command-line
+wrappers around these APIs, including workspace and input/output path
+management. See the [CLI Reference](../cli.md) for command options and the
+[Tutorials](../tutorials/index.md) for complete examples.
 
-```bash
-# 1. Prepare the CG input and runner.
-python prepare_cg.py CASE
-
-# 2. Enter the generated CG directory and run the protocol.
-cd CASE/cg
-python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
-cd ../..
-
-# 3. Reconstruct AA and export the force field.
-python reconstruct_aa.py CASE
-```
-
-Here, `CASE` only selects the working directory containing the corresponding config.json and generated files. The ChemFAST API calls and execution pattern remain unchanged across the tutorials; what differs between examples is the Reaction-DSL that defines the chemistry. Continue with the [tutorial sequence](../tutorials/index.md) to see how different systems are expressed through the DSL while using the same workflow.
+The Python APIs above remain useful when integrating ChemFAST into custom
+workflows or when individual stages need to be called directly.

@@ -9,7 +9,7 @@
     <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
     <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
     <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=b95a8313" />
-    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css?v=8cd3d715" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.11b39860a7a0cbfd473a3ad8a317855267ff0bd372690045ca344a6b62be495e.css" />
     <link rel="stylesheet" type="text/css" href="_static/chemfast.css?v=6c49ce7e" />
     <script src="_static/documentation_options.js?v=a12e3537"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
@@ -17,7 +17,7 @@
     <link rel="icon" href="_static/favicon.svg"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Input reference" href="inputs.html" />
+    <link rel="next" title="CLI Reference" href="cli.html" />
     <link rel="prev" title="AA compression, minimization and equilibration" href="tutorials/aa-relaxation.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
@@ -84,6 +84,7 @@
     <summary>Reference</summary>
     <div class="chemfast-nav-children">
       <a class="chemfast-nav-link is-current" href="#" aria-current="page">Usage Guide</a>
+      <a class="chemfast-nav-link" href="cli.html" > CLI Reference</a>
       <a class="chemfast-nav-link" href="inputs.html">Input Reference</a>
       <a class="chemfast-nav-link" href="api/index.html">Core API</a>
     </div>
@@ -101,16 +102,15 @@
             
   <section id="usage-guide">
 <h1>Usage guide<a class="headerlink" href="#usage-guide" title="Link to this heading">¶</a></h1>
-<p>This page follows the <a class="reference internal" href="workflow.html"><span class="std std-doc">workflow</span></a> in code: define the chemistry,
-prepare and run CG polymerization, reconstruct AA coordinates, and export
-GROMACS files. After installation, <code class="docutils literal notranslate"><span class="pre">chemfast</span></code> can be imported from any directory
-in the installed environment. Use your own working directory for inputs and
-outputs; the ChemFAST source checkout is not required as the working directory.</p>
+<p>This guide runs the <a class="reference internal" href="workflow.html"><span class="std std-doc">workflow</span></a> using the installed <code class="docutils literal notranslate"><span class="pre">chemfast</span></code>
+CLI: define chemistry, prepare CG inputs, run PyGAMD yourself, then reconstruct
+and export the AA model. Commands accept absolute file and workspace paths,
+so the ChemFAST source checkout does not need to be your working directory.</p>
 <p>Download and extract the <a class="reference download internal" download="" href="_downloads/3841eba8e975f58878604abeab760420/usage-example.zip"><code class="xref download docutils literal notranslate"><span class="pre">working</span> <span class="pre">example</span></code></a>.
-It contains <code class="docutils literal notranslate"><span class="pre">system.json</span></code> and the three scripts shown below. Each script resolves
-paths relative to its own location, so it can also be launched by absolute path.
-The <a class="reference internal" href="tutorials/first-system.html"><span class="std std-doc">first tutorial</span></a> explains the chemistry and result
-checks in more detail.</p>
+It contains the <code class="docutils literal notranslate"><span class="pre">system.json</span></code> input. Relative paths below assume the extracted
+example directory as the starting location; use absolute paths when calling
+ChemFAST from elsewhere. The <a class="reference internal" href="tutorials/first-system.html"><span class="std std-doc">first tutorial</span></a>
+explains the chemistry and result checks in more detail.</p>
 <section id="define-the-chemistry-with-reaction-dsl">
 <h2>1. Define the chemistry with Reaction-DSL<a class="headerlink" href="#define-the-chemistry-with-reaction-dsl" title="Link to this heading">¶</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">system.json</span></code> specifies two bifunctional polyimide reactants and their reaction
@@ -184,128 +184,53 @@ definitions. The same file is used for CG preparation and AA reconstruction.</p>
 </section>
 <section id="generate-the-initial-xml-pygamd-script-and-cg-parameters">
 <h2>2. Generate the initial XML, PyGAMD script and CG parameters<a class="headerlink" href="#generate-the-initial-xml-pygamd-script-and-cg-parameters" title="Link to this heading">¶</a></h2>
-<p>Save the following as <code class="docutils literal notranslate"><span class="pre">prepare_cg.py</span></code> next to <code class="docutils literal notranslate"><span class="pre">system.json</span></code>, then run
-<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">prepare_cg.py</span></code> in your ChemFAST environment.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.cg.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_pygamd_protocol</span><span class="p">,</span> <span class="n">get_cgff_parameters</span>
-
-<span class="n">work_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
-<span class="n">dsl_file</span> <span class="o">=</span> <span class="n">work_dir</span> <span class="o">/</span> <span class="s2">&quot;system.json&quot;</span>
-<span class="n">cg_dir</span> <span class="o">=</span> <span class="n">work_dir</span> <span class="o">/</span> <span class="s2">&quot;cg&quot;</span>
-
-<span class="n">protocol</span> <span class="o">=</span> <span class="n">build_pygamd_protocol</span><span class="p">(</span>
-    <span class="n">dsl_file</span><span class="p">,</span>
-    <span class="n">output_dir</span><span class="o">=</span><span class="n">cg_dir</span><span class="p">,</span>
-    <span class="n">use_builtin</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">mass_density</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-    <span class="n">random_seed</span><span class="o">=</span><span class="mi">2026</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="n">dsl</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">dsl_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
-<span class="n">get_cgff_parameters</span><span class="p">(</span><span class="n">dsl</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">cg_dir</span> <span class="o">/</span> <span class="s2">&quot;cg_parameters.json&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">protocol</span><span class="o">.</span><span class="n">xml</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">protocol</span><span class="o">.</span><span class="n">runner</span><span class="p">)</span>
+<p>Create a named workspace from the extracted <code class="docutils literal notranslate"><span class="pre">system.json</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>prepare_cg<span class="w"> </span>--json<span class="w"> </span>system.json<span class="w"> </span>--name<span class="w"> </span>MY_SYSTEM
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">cg/</span></code> directory receives <code class="docutils literal notranslate"><span class="pre">initial.xml</span></code>, <code class="docutils literal notranslate"><span class="pre">run_pygamd_polymerization.py</span></code> and
-<code class="docutils literal notranslate"><span class="pre">cg_parameters.json</span></code>. These calls prepare files; the simulation is run separately.
-The CG parameter call in this example uses a DSL without external filler files;
-for structured components, resolve those references before passing a dictionary.</p>
+<p><code class="docutils literal notranslate"><span class="pre">--name</span> <span class="pre">MY_SYSTEM</span></code> is the workspace used in subsequent commands. The CLI
+copies the configuration to <code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/config.json</span></code>; a different absolute
+<code class="docutils literal notranslate"><span class="pre">--name</span></code> can be used without changing the input JSON.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/cg/</span></code> directory receives <code class="docutils literal notranslate"><span class="pre">initial.xml</span></code>,
+<code class="docutils literal notranslate"><span class="pre">run_pygamd_polymerization.py</span></code>, and <code class="docutils literal notranslate"><span class="pre">cg_parameters.json</span></code>. The CLI prepares
+files; molecular dynamics must be run separately. For structured components,
+specify the PDB file under <code class="docutils literal notranslate"><span class="pre">fillers[*].file</span></code> in the input JSON. Paths there
+are resolved relative to the JSON’s location, not the shell directory.</p>
 </section>
 <section id="run-pygamd">
 <h2>3. Run PyGAMD<a class="headerlink" href="#run-pygamd" title="Link to this heading">¶</a></h2>
 <p>Install PyGAMD following its <a class="reference external" href="https://pygamd-v1.readthedocs.io/en/latest/installation.html">official installation guide</a>.
 PyGAMD can be used in the same Python environment as ChemFAST.</p>
-<p>From the extracted example directory:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>cg
-python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
-<span class="nb">cd</span><span class="w"> </span>..
+<p>Switch to the newly created <code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/cg/</span></code> directory and run its generated
+PyGAMD script:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
 </pre></div>
 </div>
-<p>Run the generated script from <code class="docutils literal notranslate"><span class="pre">cg/</span></code> so its relative input and output paths
-resolve correctly. After the run, keep <code class="docutils literal notranslate"><span class="pre">cg/reaction_final.xml</span></code> and
-<code class="docutils literal notranslate"><span class="pre">cg/reaction_path.txt</span></code> together for AA reconstruction.</p>
+<p>The generated script requires its CG working directory for relative inputs
+and outputs. When the simulation completes, the matching
+<code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/cg/reaction_final.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/cg/reaction_path.txt</span></code> are
+ready for AA reconstruction. Return to the extracted example directory to
+use a relative <code class="docutils literal notranslate"><span class="pre">--name</span></code> below, or pass its absolute path from anywhere.</p>
 </section>
 <section id="reconstruct-the-aa-system">
 <span id="reconstruct-existing-cg-output"></span><h2>4. Reconstruct the AA system<a class="headerlink" href="#reconstruct-the-aa-system" title="Link to this heading">¶</a></h2>
-<p>From an environment with ChemFAST installed, save the following as
-<code class="docutils literal notranslate"><span class="pre">reconstruct_aa.py</span></code> next to <code class="docutils literal notranslate"><span class="pre">system.json</span></code>, then run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">reconstruct_aa.py</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf</span><span class="w"> </span><span class="kn">import</span> <span class="n">topology_builder</span><span class="p">,</span> <span class="n">embed_molecules</span><span class="p">,</span> <span class="n">write_mols_to_sdf</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.conf.misc.parser</span><span class="w"> </span><span class="kn">import</span> <span class="n">parse_config</span><span class="p">,</span> <span class="n">post_process_aa_mol</span>
-
-<span class="n">work_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
-<span class="n">dsl_file</span> <span class="o">=</span> <span class="n">work_dir</span> <span class="o">/</span> <span class="s2">&quot;system.json&quot;</span>
-<span class="n">cg_dir</span> <span class="o">=</span> <span class="n">work_dir</span> <span class="o">/</span> <span class="s2">&quot;cg&quot;</span>
-<span class="n">aa_dir</span> <span class="o">=</span> <span class="n">work_dir</span> <span class="o">/</span> <span class="s2">&quot;aa&quot;</span>
-
-<span class="n">dsl</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">dsl_file</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
-<span class="n">fg_input</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dsl</span><span class="p">)</span>
-<span class="n">fg_input</span><span class="p">[</span><span class="s2">&quot;cg_topology_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cg_dir</span> <span class="o">/</span> <span class="s2">&quot;reaction_final.xml&quot;</span><span class="p">)</span>
-<span class="n">fg_input</span><span class="p">[</span><span class="s2">&quot;reaction_path_file&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">cg_dir</span> <span class="o">/</span> <span class="s2">&quot;reaction_path.txt&quot;</span><span class="p">)</span>
-<span class="n">cfg</span> <span class="o">=</span> <span class="n">parse_config</span><span class="p">(</span><span class="n">fg_input</span><span class="p">,</span> <span class="n">work_dir</span><span class="o">=</span><span class="n">dsl_file</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
-
-<span class="n">mols</span><span class="p">,</span> <span class="n">aa_graphs</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">cg_graph</span><span class="p">,</span> <span class="n">reaction_path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">cg_graphs</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">reaction_list</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="n">mol</span><span class="p">,</span> <span class="n">aa_graph</span> <span class="o">=</span> <span class="n">topology_builder</span><span class="p">(</span>
-        <span class="n">cfg</span><span class="o">.</span><span class="n">reactant_config</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">reaction_template</span><span class="p">,</span>
-        <span class="n">cfg</span><span class="o">.</span><span class="n">filler_config</span><span class="p">,</span> <span class="n">cg_graph</span><span class="p">,</span> <span class="n">reaction_path</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="n">mols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
-    <span class="n">aa_graphs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">aa_graph</span><span class="p">)</span>
-
-<span class="n">mols</span> <span class="o">=</span> <span class="n">embed_molecules</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="n">aa_graphs</span><span class="p">,</span> <span class="n">cfg</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">mol</span><span class="p">,</span> <span class="n">aa_graph</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="n">aa_graphs</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="n">post_process_aa_mol</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">aa_graph</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">box_tensor</span><span class="p">)</span>
-
-<span class="n">aa_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">write_mols_to_sdf</span><span class="p">(</span><span class="n">mols</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">aa_dir</span> <span class="o">/</span> <span class="s2">&quot;atomistic.sdf&quot;</span><span class="p">))</span>
+<p>Reconstruct using the workspace you just prepared:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--name<span class="w"> </span>MY_SYSTEM
 </pre></div>
 </div>
-<p>The output is <code class="docutils literal notranslate"><span class="pre">aa/atomistic.sdf</span></code>, containing AA coordinates and the residue/box
-metadata needed for export. The two CG result paths are supplied in memory:
-<strong>you do not need to edit or rewrite <code class="docutils literal notranslate"><span class="pre">system.json</span></code> after the simulation</strong>.
-For an existing external CG run, point <code class="docutils literal notranslate"><span class="pre">cg_dir</span></code> to that run’s directory and use
-the corresponding DSL and recorded filenames. See the <a class="reference internal" href="api/fg.html"><span class="std std-doc">FG API</span></a>.</p>
+<p>Without explicit <code class="docutils literal notranslate"><span class="pre">--xml</span></code>, <code class="docutils literal notranslate"><span class="pre">--json</span></code>, or <code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code>, the CLI reads only
+<code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/config.json</span></code>, <code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/cg/reaction_final.xml</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/cg/reaction_path.txt</span></code>. No manual edits to the JSON are required.</p>
+<p>The CLI writes <code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/aa/atomistic.sdf</span></code> (including residue/box
+metadata), plus matching GROMACS <code class="docutils literal notranslate"><span class="pre">system.gro</span></code>, <code class="docutils literal notranslate"><span class="pre">system.top</span></code>, and ITP files.
+For external CG results, use explicit <code class="docutils literal notranslate"><span class="pre">--xml</span></code>, <code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code>, and <code class="docutils literal notranslate"><span class="pre">--json</span></code>
+paths with <code class="docutils literal notranslate"><span class="pre">--name</span></code> to direct the output. See <a class="reference internal" href="cli.html"><span class="std std-doc">CLI reference</span></a>
+and the <a class="reference internal" href="api/fg.html"><span class="std std-doc">FG API</span></a>.</p>
 </section>
-<section id="assign-the-force-field-and-generate-gro-coordinates">
-<span id="parameterize-an-existing-aa-structure"></span><h2>5. Assign the force field and generate GRO coordinates<a class="headerlink" href="#assign-the-force-field-and-generate-gro-coordinates" title="Link to this heading">¶</a></h2>
-<p>Save the following as <code class="docutils literal notranslate"><span class="pre">export_gromacs.py</span></code> next to <code class="docutils literal notranslate"><span class="pre">system.json</span></code>, then run
-<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">export_gromacs.py</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chem</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">chemfast.ff.pipeline</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_adv_top_mode</span>
-
-<span class="n">work_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span><span class="o">.</span><span class="n">parent</span>
-<span class="n">sdf_file</span> <span class="o">=</span> <span class="n">work_dir</span> <span class="o">/</span> <span class="s2">&quot;aa&quot;</span> <span class="o">/</span> <span class="s2">&quot;atomistic.sdf&quot;</span>
-<span class="n">mols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">SDMolSupplier</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sdf_file</span><span class="p">),</span> <span class="n">removeHs</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">mols</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">(</span><span class="n">mol</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">mols</span><span class="p">):</span>
-    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The input SDF contains no molecules or an unreadable record.&quot;</span><span class="p">)</span>
-
-<span class="n">run_adv_top_mode</span><span class="p">(</span>
-    <span class="n">mols</span><span class="p">,</span>
-    <span class="n">output_dir</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">work_dir</span> <span class="o">/</span> <span class="s2">&quot;gromacs&quot;</span><span class="p">),</span>
-    <span class="n">base_name</span><span class="o">=</span><span class="s2">&quot;system&quot;</span><span class="p">,</span>
-    <span class="n">useGMX</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">useBOSS</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">useML</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span>
-</pre></div>
-</div>
-<p>This assigns parameters and writes a matching set of files in <code class="docutils literal notranslate"><span class="pre">gromacs/</span></code>.
-<code class="docutils literal notranslate"><span class="pre">system.gro</span></code> contains coordinates and box dimensions, with atom ordering matched
-to the exported topology. An external AA input must have explicit bonds,
-hydrogens, coordinates and the required export metadata.</p>
-</section>
-<section id="use-the-top-and-itp-files">
-<h2>6. Use the TOP and ITP files<a class="headerlink" href="#use-the-top-and-itp-files" title="Link to this heading">¶</a></h2>
-<p>The same export call also writes:</p>
+<section id="use-the-exported-gromacs-files">
+<span id="parameterize-an-existing-aa-structure"></span><h2>5. Use the exported GROMACS files<a class="headerlink" href="#use-the-exported-gromacs-files" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">chemfast</span> <span class="pre">reconstruct_aa</span></code> command already assigns the force field and
+exports a matched <code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/aa/</span></code> set:</p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>File</p></th>
@@ -313,22 +238,31 @@ hydrogens, coordinates and the required export metadata.</p>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">system.top</span></code></p></td>
-<td><p>Complete system topology, including molecule counts and ITP references</p></td>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">system.gro</span></code></p></td>
+<td><p>Reconstructed AA coordinates and simulation box</p></td>
 </tr>
-<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">atomtypes.itp</span></code></p></td>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">system.top</span></code></p></td>
+<td><p>System topology, component counts, and included ITP files</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">atomtypes.itp</span></code></p></td>
 <td><p>Shared atom-type parameters</p></td>
 </tr>
-<tr class="row-even"><td><p>Molecule <code class="docutils literal notranslate"><span class="pre">.itp</span></code> files</p></td>
-<td><p>Connectivity and force-field terms for each exported molecule type</p></td>
+<tr class="row-odd"><td><p>Molecule <code class="docutils literal notranslate"><span class="pre">.itp</span></code> files</p></td>
+<td><p>Bonded interactions and per-molecule topology</p></td>
 </tr>
 </tbody>
 </table>
-<p>Use <code class="docutils literal notranslate"><span class="pre">system.gro</span></code>, <code class="docutils literal notranslate"><span class="pre">system.top</span></code> and its included ITP files together. They are
-generated in one call so their molecule and atom ordering agree. If you need
-separate molecule-level exports instead, use <code class="docutils literal notranslate"><span class="pre">run_itp_mode(mols,</span> <span class="pre">output_dir=...)</span></code>;
-see the <a class="reference internal" href="api/ff.html"><span class="std std-doc">FF API</span></a> for this alternative. Validate GROMACS preprocessing
-and relax the reconstructed system before production simulation.</p>
+<p>Use the GRO, TOP, and ITP files from <strong>the same run</strong>. The exported coordinates
+require atomistic energy minimization before production MD; see the
+<a class="reference internal" href="tutorials/aa-relaxation.html"><span class="std std-doc">AA relaxation guide</span></a>.</p>
+<p>Optional density packing is available as a separate CLI stage:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>density_optimization<span class="w"> </span>--sdf_in<span class="w"> </span>MY_SYSTEM/aa/atomistic.sdf<span class="w"> </span>--density<span class="w"> </span><span class="m">1</span>.0
+</pre></div>
+</div>
+<p>It creates <code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/aa/atomistic_density_optimized.sdf</span></code> only and does
+<strong>not</strong> update the GROMACS exports. Do not combine its coordinates/box with
+the unmodified GRO/TOP/ITP set. See <a class="reference internal" href="cli.html"><span class="std std-doc">CLI reference</span></a> for
+<code class="docutils literal notranslate"><span class="pre">--pygamd_bin</span></code>, GPU, step counts, and strict SDF requirements.</p>
 </section>
 <section id="browser-workflows">
 <h2>Browser workflows<a class="headerlink" href="#browser-workflows" title="Link to this heading">¶</a></h2>

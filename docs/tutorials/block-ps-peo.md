@@ -43,14 +43,25 @@ records.
 
 ## 2. Build and relax the prescribed CG chains
 
-From the extracted tutorial root, run:
+This example is the **predefined-topology exception**: `chemfast prepare_cg`
+generates reactive CG inputs, not fixed PS-b-PEO connectivity. The existing
+example generator is therefore still needed. From the extracted tutorial
+directory, run:
 
 ```bash
 python 03_ps_b_peo/generate_predefined_cg.py
-cd 03_ps_b_peo/cg
-python ../run_pygamd_pre_equilibration.py --gpu=0
-cd ../..
 ```
+
+It writes inputs to `03_ps_b_peo/cg/`. Switch to that `cg/` directory and
+run the supplied PyGAMD pre-equilibration script from there:
+
+```bash
+python ../run_pygamd_pre_equilibration.py --gpu=0
+```
+
+The script writes `reaction_final.xml` alongside the existing
+`reaction_path.txt`. Return to the extracted tutorial directory before using
+the relative `--name` below, or use an absolute workspace path.
 
 The generator writes `cg/initial.xml`, `cg/cg_parameters.json`, and the
 predefined `cg/reaction_path.txt`. PyGAMD then relaxes the CG configuration
@@ -66,29 +77,29 @@ sequence, connectivity, and ReactionPath remain unchanged.
 
 ## 3. Reconstruct the atomistic model
 
-For standard AA reconstruction, run from the extracted tutorial root:
+Run AA reconstruction through the installed CLI:
 
 ```bash
-python reconstruct_aa.py 03_ps_b_peo
+chemfast reconstruct_aa --name 03_ps_b_peo
 ```
 
-The AA coordinates and topology are written to `03_ps_b_peo/aa/`.
+`--name` points to the case you just generated. The CLI reads the fixed
+`config.json`, `cg/reaction_final.xml`, and `cg/reaction_path.txt` paths and
+writes `atomistic.sdf`, `system.gro`, `system.top`, and ITP files into
+`03_ps_b_peo/aa/`.
 
-Alternatively, run the advanced workflow with rigid-body density optimization:
+Optional residue-rigid density packing is now a **separate** CLI operation:
 
 ```bash
-python reconstruct_aa_adv.py 03_ps_b_peo
+chemfast density_optimization --sdf_in 03_ps_b_peo/aa/atomistic.sdf --density 1.0
 ```
 
-This workflow reconstructs the AA model and calls PyGAMD to rearrange
-residues as rigid bodies while adjusting the simulation box toward the
-target density. The resulting AA coordinates and topology are written to
-`03_ps_b_peo/aa_density_optim/`.
-
-Both workflows use the prescribed `S-S`, `S-O`, and `O-O` ReactionPath
-records to reconstruct atomistic connectivity, including the junction
-between the PS and PEO blocks. See [AA relaxation](aa-relaxation.md) for
-the density-optimization procedure and subsequent GROMACS steps.
+It produces `03_ps_b_peo/aa/atomistic_density_optimized.sdf`, not a matching
+replacement GRO/TOP/ITP set. Do **not** combine that optimized SDF with the
+unmodified GROMACS files. The reconstruction itself uses the prescribed
+`S-S`, `S-O`, and `O-O` ReactionPath records, including the block junction.
+See [AA relaxation](aa-relaxation.md) for the optional density stage and the
+separate GROMACS minimization/equilibration workflow.
 
 | Final CG configuration | Energy-minimized AA reconstruction |
 |---|---|
@@ -100,8 +111,9 @@ initial AA coordinates produced directly by ChemFAST.
 ## 4. Minimize and equilibrate the AA model
 
 The reconstructed AA configuration requires atomistic energy minimization
-before further MD. Follow [AA relaxation](aa-relaxation.md) using the output
-directory of the selected reconstruction workflow.
+before further MD. Follow [AA relaxation](aa-relaxation.md) with
+`03_ps_b_peo/aa/` and its unmodified, internally matched GRO/TOP/ITP files.
+If you use the optional packed SDF, regenerate matching GROMACS outputs before MD.
 
 For tutorials with an EQ stage, the supplied example MDP settings provide
 a short AA continuation after EM.

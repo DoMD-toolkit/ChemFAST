@@ -6,54 +6,78 @@ This guide builds a linear polyimide, from its chemical definition to a reconstr
 
 Complete [Installation](installation.md), then {download}`download the tutorial archive <_static/chemfast-tutorials.zip>` and extract it.
 
-Run the commands below from the extracted archive's **top-level directory**, which contains `prepare_cg.py` and `reconstruct_aa.py`. Confirm that `01_linear_pi/config.json` is present.
+The installed `chemfast` CLI handles CG preparation and AA reconstruction; the
+archive's old helper scripts are not required. Relative example paths below
+assume the extracted tutorial directory as the starting location. The same CLI
+commands also work from anywhere with absolute `--name` and `--json` paths.
+Confirm that `01_linear_pi/config.json` is present.
 
 **Fast route (no PyGAMD):** The archive already includes the matching
 `01_linear_pi/cg/reaction_final.xml` and `01_linear_pi/cg/reaction_path.txt`.
-To try AA reconstruction directly, skip Steps 2 and 3 and run:
+To try AA reconstruction directly, use the command below instead of Steps 2–4:
 
 ```bash
-python reconstruct_aa.py 01_linear_pi
+chemfast reconstruct_aa --name 01_linear_pi
 ```
 
-This route requires the complete OPLS database. Check the AA outputs in Step 4,
-then proceed to Step 5. To generate a new CG result, follow Steps 2 and 3 instead.
+This route requires the complete OPLS database. The AA results are written to
+`01_linear_pi/aa/`; proceed to Step 5. To generate a new CG result, follow Steps 2 and 3 instead.
 
 ## 2. Prepare the CG model
 
-Prepare the coarse-grained (CG) model and polymerization inputs from the example configuration:
+To generate a *new* coarse-grained (CG) model, keep the supplied
+`01_linear_pi/cg/` result intact: `prepare_cg` requires its destination
+`cg/` to be empty. Create a separate workspace:
 
 ```bash
-python prepare_cg.py 01_linear_pi
+chemfast prepare_cg --json 01_linear_pi/config.json --name 01_linear_pi_new
 ```
 
-Check that `01_linear_pi/cg/` contains `initial.xml`, `cg_parameters.json`, and `run_pygamd_polymerization.py`. This step prepares the simulation inputs; it does **not** run molecular dynamics (MD).
+`--name` identifies the workspace just created. The CLI saves the configuration
+as `01_linear_pi_new/config.json` and writes `initial.xml`,
+`cg_parameters.json`, and `run_pygamd_polymerization.py` under
+`01_linear_pi_new/cg/`. This prepares the simulation inputs; it does **not**
+run molecular dynamics (MD).
 
 ## 3. Construct and relax the CG polymer
 
 The next stage constructs the CG polymer and records the reactions that form its connectivity. There are two ways to complete this stage:
 
-**Run the CG simulation.** With a separately installed, compatible PyGAMD backend, run the generated script:
+**Run the CG simulation.** With a separately installed, compatible PyGAMD
+backend, switch to `01_linear_pi_new/cg/` and run its generated script:
 
 ```bash
-cd 01_linear_pi/cg
 python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
-cd ../..
 ```
+
+The generated runner uses relative input/output paths, so **this is the one
+stage that needs its `cg/` working directory**. You may use a separate
+PyGAMD-capable Python interpreter if ChemFAST and PyGAMD are installed in
+different environments.
 
 **Use the supplied CG result.** If you chose the fast route in Step 1, the matching CG configuration and ReactionPath are already present. Step 2 and the CG simulation are not required for this route.
 
-If you run the CG simulation, keep a copy of the supplied files before replacing them with newly generated results. In either case, confirm that `reaction_final.xml` and `reaction_path.txt` are present in `01_linear_pi/cg/`. The former stores the final CG configuration; the latter records the ordered accepted reactions.
+For the new run, confirm that `reaction_final.xml` and `reaction_path.txt`
+are present together in `01_linear_pi_new/cg/`. The supplied fast-route files
+remain under `01_linear_pi/cg/`. The XML stores final CG connectivity and
+coordinates; the ReactionPath records the ordered accepted reactions.
 
 ## 4. Reconstruct and export the AA system
 
-With the complete OPLS release database installed, reconstruct the AA structure from the CG configuration and reaction history:
+With the complete OPLS release database installed, return to the extracted
+tutorial directory and run the CLI on the **same
+workspace you just prepared** (or use its absolute path from anywhere):
 
 ```bash
-python reconstruct_aa.py 01_linear_pi
+chemfast reconstruct_aa --name 01_linear_pi_new
 ```
 
-Check that `01_linear_pi/aa/system.gro`, `system.top`, and the referenced `.itp` files exist. This is the reconstructed **initial** AA structure, not an equilibrated configuration. See the [complete example](tutorials/first-system.md) for the chemistry, images, and detailed output checks.
+The CLI reads `01_linear_pi_new/config.json` and the fixed CG results under
+`01_linear_pi_new/cg/`. Check that `01_linear_pi_new/aa/system.gro`,
+`system.top`, and the referenced `.itp` files exist. If you took the fast route,
+its AA outputs are instead in `01_linear_pi/aa/`.
+
+This is the reconstructed **initial** AA structure, not an equilibrated configuration. See the [complete example](tutorials/first-system.md) for the chemistry, images, and detailed output checks.
 
 ## 5. Energy minimize and equilibrate the AA system with GROMACS
 

@@ -10,7 +10,7 @@ defines the fields, reaction semantics and structured-filler mappings. The
 | `system.json` | User | JSON: reactants, reaction rules and ChemFAST input options |
 | Filler reference | User | PDB: reference geometry, with mappings declared in the DSL |
 | `initial.xml` | CG preparation | PyGAMD XML: initial particles, coordinates and connectivity |
-| `cg_ff_parameters.json` | CG parameterization | JSON: bonded and non-bonded CG parameters |
+| `cg_parameters.json` | CG parameterization | JSON: bonded and non-bonded CG parameters |
 | `run_pygamd_polymerization.py` | CG preparation | Python: simulation and reaction-execution protocol |
 | `reaction_final.xml` | CG simulation | PyGAMD XML: final configuration consumed by FG |
 | `reaction_path.txt` | CG simulation | Text: one ordered reaction tuple per line, consumed by FG |
@@ -31,9 +31,12 @@ with the following ChemFAST options:
 | `reaction_path_file` | Path to the matching tuple-per-line ReactionPath text file for FG |
 | `box_tensor` | Optional initial CG box lengths `[Lx, Ly, Lz]` in nm for an orthorhombic box |
 
-For `build_pygamd_protocol`, omitting `box_tensor` generates a cubic box from the
-total system mass and `mass_density`, whose default is **0.9 g/cm³**. Set a box
-explicitly in the configuration dictionary, or supply a density to the function:
+For the low-level `build_pygamd_protocol` API, omitting `box_tensor` generates
+a cubic box from the total system mass and `mass_density`; the API default is
+**0.9 g/cm³**. The `chemfast prepare_cg` CLI uses **0.5 g/cm³** as its
+tutorial-protocol default and accepts `--mass-density` to override it. Set a
+box explicitly in the configuration dictionary, or supply a density to the
+function:
 
 ```python
 # Explicit initial box (nm):
@@ -117,9 +120,11 @@ simulation. For fields outside this workflow, consult the engine's XML reference
 (cg-ff-parameters)=
 ## CG force-field parameters: JSON
 
-`get_cgff_parameters` writes this file. `cg_ff_parameters.json` and the examples'
-`cg_parameters.json` use the same schema: the filename is selected by `output`.
-Pass the matching file as the parameter argument to the generated runner.
+`get_cgff_parameters` writes this file. The CLI and tutorials use
+`cg_parameters.json`; low-level API calls may select another filename through
+the `output` argument, for example `output="cg_ff_parameters.json"`. The
+schema is unchanged. Pass the matching file as the parameter argument to the
+generated runner.
 
 The two top-level objects are `bonded` and `nonbonded`. This excerpt shows one
 bond, one angle and one particle type from the supplied example; it is not a
@@ -235,4 +240,3 @@ empirical mean bead size and `epsilon = 1` rather than HSP predictions; see the 
 | AA LJ parameters | `sigma` in nm and `epsilon` in kJ mol⁻¹ |
 | Corrected AA `ff.charges` | Elementary charge units |
 | CG temperature/time settings | Follow the chosen CG units; `temperature=1.0` does not mean 1 K |
-

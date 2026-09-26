@@ -1,26 +1,158 @@
 # Tutorials: build different polymer systems
 
-Start with [Quick start](../quick-start.md), then read the [Workflow](../workflow.md)
-and [Reaction-DSL tutorial](../reaction-dsl.md). You do **not** need to read the
-Core API before running the examples. The {download}`complete tutorial archive
-<../_static/chemfast-tutorials.zip>` includes six case inputs, shared scripts, and a matched CG result for the first example.
+The tutorials demonstrate how ChemFAST turns chemical definitions into
+simulation-ready atomistic polymer models. Although the examples differ in
+polymerization chemistry, topology, composition, and structural complexity,
+most workflows follow the same three-stage procedure:
 
-The first five examples follow the same reactive CG preparation and atomistic
-reconstruction pattern; the linear PI example also offers a ready-made CG result
-for reconstructing AA without running PyGAMD. Read them in order: each changes a small part of the input
-chemistry while preserving the basic workflow. The last example, PS-b-PEO, uses a
-**separate predefined-topology route**, so it is deliberately placed last.
-Directory names retain their original numbers for compatibility with the
-supplied files; the table below is the **recommended reading order**.
+```text
+1. Prepare CG model
+   chemfast prepare_cg
+          ↓
+2. Run CG construction / pre-equilibration
+   run_pygamd_polymerization.py
+          ↓
+3. Reconstruct the atomistic model
+   chemfast reconstruct_aa
+```
 
-| Reading order | Example directory | Case | What changes relative to the preceding example |
+These three stages separate **chemical system definition**, **coarse-grained
+construction**, and **atomistic reconstruction**, so the same workflow can be
+applied to different polymer systems with only the system-specific chemical
+inputs changed.
+
+All standard examples use the installed `chemfast` command-line interface.
+For complete command options and path conventions, see
+[CLI Reference](../cli.md).
+
+## The three core steps
+
+### 1. Prepare the coarse-grained system
+
+A ChemFAST workflow starts from a `config.json` describing the molecular
+components, Reaction-DSL rules, composition, and optional structured
+components.
+
+For a reactive system:
+
+```bash
+chemfast prepare_cg --json CASE/config.json --name CASE
+```
+
+Here, `--name CASE` defines the workspace for the system being constructed.
+ChemFAST creates the CG preparation files under:
+
+```text
+CASE/
+├── config.json
+└── cg/
+    ├── initial.xml
+    ├── cg_parameters.json
+    └── run_pygamd_polymerization.py
+```
+
+`initial.xml` contains the initial CG configuration,
+`cg_parameters.json` contains the generated CG interaction parameters, and
+`run_pygamd_polymerization.py` contains the executable PyGAMD construction
+protocol.
+
+### 2. Run the CG construction and pre-equilibration
+
+ChemFAST prepares the CG simulation, but the generated PyGAMD simulation is
+run explicitly by the user.
+
+At this stage, switch to the generated `CASE/cg/` directory and run:
+
+```bash
+python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
+```
+
+The CG simulation establishes or relaxes the system connectivity according to
+the generated protocol and records the corresponding reaction history.
+
+The two outputs required for atomistic reconstruction are:
+
+```text
+CASE/cg/reaction_final.xml
+CASE/cg/reaction_path.txt
+```
+
+`reaction_final.xml` contains the final CG configuration and connectivity,
+while `reaction_path.txt` records the ordered reaction history used to
+reconstruct the corresponding atomistic topology.
+
+Generated protocols are intended for CG construction and pre-equilibration;
+they are not intended to represent quantitative reaction kinetics or final
+production equilibration.
+
+### 3. Reconstruct the atomistic model
+
+Once the final CG configuration and ReactionPath are available, they will be
+stored together with the original system definition under the `CASE`
+workspace. You can then run the atomistic reconstruction command from the
+tutorial directory, or from anywhere when an absolute workspace path is
+provided:
+
+```bash
+chemfast reconstruct_aa --name CASE
+```
+
+When only `--name` is supplied, ChemFAST reads the fixed workspace paths:
+
+```text
+CASE/config.json
+CASE/cg/reaction_final.xml
+CASE/cg/reaction_path.txt
+```
+
+and writes the atomistic outputs to:
+
+```text
+CASE/aa/
+├── atomistic.sdf
+├── system.gro
+├── system.top
+└── *.itp
+```
+
+The CG configuration provides the spatial organization of the system, while
+the ReactionPath and Reaction-DSL definitions determine how the molecular
+reactants are reconstructed into the atomistic topology.
+
+The resulting atomistic model can then be minimized and equilibrated with an
+external MD engine. See
+[AA minimization and equilibration](aa-relaxation.md).
+
+## Optional density optimization
+
+Optional residue-rigid density packing is available after AA reconstruction;
+see [AA relaxation](aa-relaxation.md) and the
+[CLI Reference](../cli.md#3-optional-standalone-sdf-density-optimization).
+
+## Tutorial systems
+
+The examples below progressively introduce different polymer-construction
+problems while preserving the same overall ChemFAST workflow where
+applicable.
+
+Start with [Quick start](../quick-start.md), then read the
+[Workflow](../workflow.md) and [Reaction-DSL tutorial](../reaction-dsl.md).
+
+The {download}`complete tutorial archive <../_static/chemfast-tutorials.zip>`
+contains the input files used throughout these tutorials.
+
+The archive focuses on the inputs required to reproduce each workflow rather
+than storing every generated intermediate and atomistic output. Individual
+tutorial pages describe case-specific starting files and workflow differences.
+
+| Reading order | Example directory | Case | Main concept introduced |
 |---|---|---|---|
 | 1 | `01_linear_pi` | [Linear polyimide](first-system.md) | General step-growth reactions and mapped SMARTS |
 | 2 | `02_radical_pmma` | [Radical PMMA](radical-pmma.md) | Radical initiation and active-state transfer |
 | 3 | `04_network_pi` | [Cross-linked polyimide](network.md) | Multifunctional reactants and CG reaction capacity |
 | 4 | `05_poss_pmma` | [POSS-PMMA](poss.md) | Structured PDB fillers and mapped reactive arms |
 | 5 | `06_spe` | [Multicomponent SPE](spe.md) | Crosslinker, molecular spectators, and ions in one system |
-| 6 | `03_ps_b_peo` | [PS-b-PEO](block-ps-peo.md) | **Alternative:** prescribed block connectivity and ReactionPath generated by a script |
+| 6 | `03_ps_b_peo` | [PS-b-PEO](block-ps-peo.md) | Prescribed polymer connectivity and predefined ReactionPath |
 
 ```{toctree}
 :maxdepth: 1
@@ -34,60 +166,12 @@ block-ps-peo
 aa-relaxation
 ```
 
-## Before starting
+## Path conventions
 
-**Fast route for the first example:** from the extracted tutorial root, run
-`python reconstruct_aa.py 01_linear_pi`. The archive includes matching CG XML
-and ReactionPath files in `01_linear_pi/cg/`, so this route skips PyGAMD.
-It still requires the full OPLS database to complete force-field export.
-For the full CG workflow, follow the commands below.
+`--name` identifies the workspace containing the `cg/` and `aa/`
+subdirectories. Relative and absolute paths are both supported, so ChemFAST
+commands can be run from any directory. The generated PyGAMD runner is the
+exception: it should be executed from the corresponding `CASE/cg/` directory
+because its inputs and outputs use relative paths.
 
-Extract the tutorial archive and run the commands from its **top-level directory**.
-For the first five examples, only the case name and Reaction-DSL change:
-
-```bash
-python prepare_cg.py CASE
-cd CASE/cg
-python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
-cd ../..
-python reconstruct_aa.py CASE
-```
-
-Use the full directory name (for example `04_network_pi`) in place of `CASE`.
-PyGAMD is installed separately; see [MD engine installation](../installation.md#md-simulation-engines).
-Generated protocols demonstrate CG construction/pre-equilibration, not quantitative
-kinetics or production equilibration. All supplied `config.json` files use `"domd_react_dsl": "v1"`.
-
-For **PS-b-PEO only**, the fixed architecture and ReactionPath are generated by a
-separate script. It does not use the general reaction-selection step:
-
-```bash
-python 03_ps_b_peo/generate_predefined_cg.py
-cd 03_ps_b_peo/cg
-python ../run_pygamd_pre_equilibration.py --gpu=0
-cd ../..
-python reconstruct_aa.py 03_ps_b_peo
-```
-
-The CG run relaxes coordinates while preserving the prescribed connections and
-ReactionPath node identifiers.
-
-## Output checkpoints
-
-```text
-config.json
-  → prepare_cg.py → cg/initial.xml + cg/cg_parameters.json + generated runner
-  → CG run → cg/reaction_final.xml + cg/reaction_path.txt
-  → reconstruct_aa.py → aa/atomistic.sdf + aa/system.gro + aa/system.top + aa/*.itp
-  → optional external GROMACS EM/EQ → aa/em.gro + aa/eq.gro
-```
-
-The PS-b-PEO generator replaces the first two reactive stages. For AA relaxation,
-see [AA minimization and equilibration](aa-relaxation.md).
-
-The archive intentionally does **not** include generated `cg_parameters.json`,
-CG runner scripts, or AA outputs: prepare each system with the installed
-ChemFAST version, and review the resulting CG parameters before simulation.
-The sole exception is the matched `01_linear_pi/cg/reaction_final.xml` and
-`reaction_path.txt` pair for the first example’s fast route. See
-[Input reference](../inputs.md#non-bonded-terms).
+For complete path and command options, see the [CLI Reference](../cli.md).
