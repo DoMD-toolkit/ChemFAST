@@ -175,6 +175,10 @@ PS-b-PEO uses its supplied generator and pre-equilibration runner. POSS–PMMA i
 
 For structured components, `fillers[*].file` accepts **PDB files**. See [Reaction-DSL](docs/reaction-dsl.md) for reactive-group definitions and mappings.
 
+## Data
+
+The [polyimide dataset and BOSS-generated force-field parameter data](https://drive.google.com/file/d/1gjorYia5Tp012TrJT6zt5BZV3NwX0Tig/view?usp=sharing) from this work are available for download.
+
 ## Testing
 
 Run tests from the ChemFAST project root in the installed environment:
