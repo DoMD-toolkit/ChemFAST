@@ -1,28 +1,25 @@
 # Tutorials: build different polymer systems
 
 The tutorials demonstrate how ChemFAST turns chemical definitions into
-simulation-ready atomistic polymer models. Although the examples differ in
-polymerization chemistry, topology, composition, and structural complexity,
-most workflows follow the same three-stage procedure:
+simulation-ready atomistic polymer models. Most examples follow three steps:
 
-```text
-1. Prepare CG model
-   chemfast prepare_cg
-          ↓
-2. Run CG construction / pre-equilibration
-   run_pygamd_polymerization.py
-          ↓
-3. Reconstruct the atomistic model
-   chemfast reconstruct_aa
-```
+| Step | Tool | Entry point |
+|---|---|---|
+| **1. Prepare the CG model** | **ChemFAST CLI** | `chemfast prepare_cg` |
+| **2. Run CG construction / pre-equilibration** | **PyGAMD** | `python run_pygamd_polymerization.py` |
+| **3. Reconstruct the AA model and assign force fields** | **ChemFAST CLI** | `chemfast reconstruct_aa` |
 
-These three stages separate **chemical system definition**, **coarse-grained
-construction**, and **atomistic reconstruction**, so the same workflow can be
-applied to different polymer systems with only the system-specific chemical
-inputs changed.
+**ChemFAST CLI** is the command-line interface installed with the package.
+Steps 1 and 3 use the `chemfast` command; Step 2 runs the generated simulation
+script with a separately installed PyGAMD backend. Complete commands and
+required arguments are provided below.
 
-All standard examples use the installed `chemfast` command-line interface.
-For complete command options and path conventions, see
+The examples introduce different reaction types, polymer architectures, and
+structured components. Most reuse this workflow with different chemical
+inputs; the PS-b-PEO example uses a dedicated generator for prescribed block
+connectivity.
+
+For complete command options and path conventions, see the
 [CLI Reference](../cli.md).
 
 ## The three core steps
