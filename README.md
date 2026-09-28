@@ -49,7 +49,7 @@ conda create -n chemfast -c conda-forge python=3.12 "rdkit>=2025.09.5" openbabel
 conda activate chemfast
 
 python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
-python -m pip install torch-geometric pytest
+python -m pip install torch-geometric pytest gsd tqdm
 python -m pip install -e .
 ```
 
