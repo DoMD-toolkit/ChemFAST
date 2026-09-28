@@ -16,6 +16,8 @@ dependencies:
       - scikit-learn
       - matplotlib
       - numba
+      - gsd
+      - tqdm
       - MDAnalysis
       - rdkit>=2025.09.5
       - torch
