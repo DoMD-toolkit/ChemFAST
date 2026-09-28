@@ -1,6 +1,6 @@
 # Online Tools
 
-[Open DoMD Online Tools](https://domd.today/tools) to access browser-based molecular modeling workflows without installing ChemFAST or learning command-line commands first.
+[Open DoMD Online Tools](https://domd.today/tools) to access browser-based molecular modeling workflows without installing ChemFAST or learning command-line commands first. Further documentation and examples can be found at [DoMD-Toolkit/Docs](https://github.com/DoMD-toolkit/Docs).
 
 The DoMD Workbench provides three scientific tools: **DoMD Topology**, **OPLS AutoFF**, and **DoMD AL**. DoMD Topology and OPLS AutoFF can be used independently or connected through Task IDs. DoMD AL integrates both modules with an additional field-theory-based polymerization stage.
 
