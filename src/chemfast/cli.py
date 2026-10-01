@@ -133,9 +133,25 @@ def reconstruct_aa(args: argparse.Namespace) -> None:
         if args.xml
         else _existing_file(root / "cg" / DEFAULT_CG_XML, "default CG XML")
     )
-    raw = _absolute_filler_paths(
-        _load_json(json_file), json_file.parent
-    )
+    raw = _absolute_filler_paths(_load_json(json_file), json_file.parent)
+
+    if args.xml is not None:
+        xml_file = _existing_file(args.xml, "--xml")
+
+    elif raw.get("cg_topology_file"):
+        xml_file = Path(raw["cg_topology_file"])
+
+        if not xml_file.is_absolute():
+            xml_file = json_file.parent / xml_file
+
+        xml_file = _existing_file(xml_file, "cg_topology_file in config.json")
+
+    else:
+        xml_file = _existing_file(
+            root / "cg" / DEFAULT_CG_XML,
+            "default CG XML"
+        )
+
     raw["cg_topology_file"] = str(xml_file)
     # Resolve ReactionPath, falling back to BFS when none is supplied.
     if args.reactionpath is not None:
