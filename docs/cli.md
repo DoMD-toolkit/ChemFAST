@@ -79,17 +79,45 @@ directory; `--name` is the same workspace used during CG preparation:
 chemfast reconstruct_aa --name /data/work/SAMPLE
 ```
 
-With `--name` and no explicit inputs, the command reads *only* these paths:
+The command resolves its input files in the following order:
 
-```text
-<name>/config.json
-<name>/cg/reaction_final.xml
-<name>/cg/reaction_path.txt
+| Input | Resolution order |
+|---|---|
+| JSON | `--json` → `<name>/config.json` |
+| CG XML | `--xml` → `cg_topology_file` in JSON → `<name>/cg/reaction_final.xml` |
+| ReactionPath | `--reactionpath` → `reaction_path_file` in JSON → `<name>/cg/reaction_path.txt` → BFS inference |
+
+Command-line paths are resolved relative to the shell working directory.
+Relative paths declared in the JSON configuration are resolved against the
+JSON file's directory.
+
+Explicitly specified files must exist; otherwise, the command raises an
+error. If no ReactionPath is specified and the default file does not exist,
+ChemFAST infers a reconstruction path from the final CG connectivity using
+breadth-first search (BFS). When a default ReactionPath is available, ChemFAST
+uses it rather than invoking BFS.
+
+BFS inference requires compatible reaction rules and does not necessarily
+recover the original reaction sequence. A recorded ReactionPath is therefore
+recommended for systems in which reaction order affects the reconstructed
+atomistic topology.
+
+For example, the following command uses the CG XML specified in
+`config.json`, or the workspace default if the JSON does not specify one:
+
+```bash
+chemfast reconstruct_aa --json config.json
 ```
 
-Missing files cause an immediate error; there is no recursive search or
-ReactionPath inference. Any explicitly given `--xml`, `--json`, or
-`--reactionpath` overrides only its corresponding default:
+To explicitly select a different CG configuration:
+
+```bash
+chemfast reconstruct_aa \
+    --json config.json \
+    --xml cg/final_npt.xml
+```
+
+A matching ReactionPath can also be supplied explicitly:
 
 ```bash
 chemfast reconstruct_aa \

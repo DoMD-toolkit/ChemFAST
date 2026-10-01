@@ -128,11 +128,6 @@ def reconstruct_aa(args: argparse.Namespace) -> None:
         if args.json
         else _existing_file(root / "config.json", "config.json")
     )
-    xml_file = (
-        _existing_file(args.xml, "--xml")
-        if args.xml
-        else _existing_file(root / "cg" / DEFAULT_CG_XML, "default CG XML")
-    )
     raw = _absolute_filler_paths(_load_json(json_file), json_file.parent)
 
     if args.xml is not None:
@@ -282,11 +277,11 @@ def build_parser() -> argparse.ArgumentParser:
     cg.add_argument("--seed", type=int, default=2026)
     cg.set_defaults(action=prepare_cg)
 
-    aa = subs.add_parser("reconstruct_aa", help="CG final XML + JSON + ReactionPath -> AA SDF/GRO/ITP/TOP")
+    aa = subs.add_parser("reconstruct_aa", help="CG final XML + JSON -> AA SDF/GRO/ITP/TOP; ReactionPath optional")
     aa.add_argument("--name", help="Workspace directory; defaults to --json's directory if --json provided")
-    aa.add_argument("--xml", help="Final CG XML; otherwise <name>/cg/reaction_final.xml")
+    aa.add_argument("--xml", help="Final CG XML; otherwise JSON setting or workspace default")
     aa.add_argument("--json", help="DSL config; otherwise <name>/config.json")
-    aa.add_argument("--reactionpath", help="ReactionPath; otherwise <name>/cg/reaction_path.txt")
+    aa.add_argument("--reactionpath", help="ReactionPath; otherwise JSON setting, workspace default, or BFS")
     aa.add_argument("--chunk-per-d", type=int, default=1, help="AA embedding chunk count along each dimension")
     aa.set_defaults(action=reconstruct_aa)
 

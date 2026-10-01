@@ -166,15 +166,49 @@ directory; <code class="docutils literal notranslate"><span class="pre">--name</
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--name<span class="w"> </span>/data/work/SAMPLE
 </pre></div>
 </div>
-<p>With <code class="docutils literal notranslate"><span class="pre">--name</span></code> and no explicit inputs, the command reads <em>only</em> these paths:</p>
-<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>&lt;name&gt;/config.json
-&lt;name&gt;/cg/reaction_final.xml
-&lt;name&gt;/cg/reaction_path.txt
+<p>The command resolves its input files in the following order:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Input</p></th>
+<th class="head"><p>Resolution order</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>JSON</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--json</span></code> → <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/config.json</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>CG XML</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--xml</span></code> → <code class="docutils literal notranslate"><span class="pre">cg_topology_file</span></code> in JSON → <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/cg/reaction_final.xml</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>ReactionPath</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code> → <code class="docutils literal notranslate"><span class="pre">reaction_path_file</span></code> in JSON → <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/cg/reaction_path.txt</span></code> → BFS inference</p></td>
+</tr>
+</tbody>
+</table>
+<p>Command-line paths are resolved relative to the shell working directory.
+Relative paths declared in the JSON configuration are resolved against the
+JSON file’s directory.</p>
+<p>Explicitly specified files must exist; otherwise, the command raises an
+error. If no ReactionPath is specified and the default file does not exist,
+ChemFAST infers a reconstruction path from the final CG connectivity using
+breadth-first search (BFS). When a default ReactionPath is available, ChemFAST
+uses it rather than invoking BFS.</p>
+<p>BFS inference requires compatible reaction rules and does not necessarily
+recover the original reaction sequence. A recorded ReactionPath is therefore
+recommended for systems in which reaction order affects the reconstructed
+atomistic topology.</p>
+<p>For example, the following command uses the CG XML specified in
+<code class="docutils literal notranslate"><span class="pre">config.json</span></code>, or the workspace default if the JSON does not specify one:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--json<span class="w"> </span>config.json
 </pre></div>
 </div>
-<p>Missing files cause an immediate error; there is no recursive search or
-ReactionPath inference. Any explicitly given <code class="docutils literal notranslate"><span class="pre">--xml</span></code>, <code class="docutils literal notranslate"><span class="pre">--json</span></code>, or
-<code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code> overrides only its corresponding default:</p>
+<p>To explicitly select a different CG configuration:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--json<span class="w"> </span>config.json<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--xml<span class="w"> </span>cg/final_npt.xml
+</pre></div>
+</div>
+<p>A matching ReactionPath can also be supplied explicitly:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--name<span class="w"> </span>/data/work/SAMPLE<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--json<span class="w"> </span>/data/external/config.json<span class="w"> </span><span class="se">\</span>
