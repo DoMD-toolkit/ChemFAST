@@ -27,8 +27,8 @@ with the following ChemFAST options:
 
 | Field | Purpose and format |
 |---|---|
-| `cg_topology_file` | Path to the final PyGAMD XML configuration for FG |
-| `reaction_path_file` | Path to the matching tuple-per-line ReactionPath text file for FG |
+| `cg_topology_file` | Optional path to the final PyGAMD XML for FG; relative to the JSON file |
+| `reaction_path_file` | Optional path to the matching tuple-per-line ReactionPath for FG; relative to the JSON file |
 | `box_tensor` | Optional initial CG box lengths `[Lx, Ly, Lz]` in nm for an orthorhombic box |
 
 For the low-level `build_pygamd_protocol` API, omitting `box_tensor` generates
@@ -52,11 +52,18 @@ Import this function from `chemfast.cg.pipeline`. An explicit box takes preceden
 over density. **During FG, the box is read from the final XML; `box_tensor` in the
 JSON is ignored.**
 
-The two FG files need not exist during CG preparation. After simulation, pass
-their actual paths in a copy of the configuration dictionary; the JSON need not
-be rewritten. For file-based `build_pygamd_protocol`, relative reference paths
-resolve against the JSON directory. Direct FG `parse_config` calls resolve them
-against `work_dir`; pass the JSON parent directory or use absolute paths.
+The two FG files need not exist during CG preparation. For a JSON stored at
+the workspace root, the standard declarations are `"cg_topology_file":
+"cg/reaction_final.xml"` and `"reaction_path_file": "cg/reaction_path.txt"`.
+During `reconstruct_aa`, CLI flags (`--xml`, `--reactionpath`) override these
+fields; when a field is absent, the CLI uses its corresponding
+`<workspace>/cg/` default. A declared path that does not exist raises an
+error; there is **no fallback or automatic BFS inference**. The workspace
+(`--name`, otherwise the current directory) and JSON (`--json`, otherwise
+`<workspace>/config.json`) are resolved independently. For file-based
+`build_pygamd_protocol`, relative reference paths resolve against the JSON
+directory. Direct FG `parse_config` calls resolve them against `work_dir`;
+pass the JSON parent directory or use absolute paths.
 
 ### Reactants
 

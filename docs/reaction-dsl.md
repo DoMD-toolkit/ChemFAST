@@ -269,6 +269,20 @@ atoms, and the selected reference fragment must match the pattern. These indices
 are not PDB serial numbers, atom-map labels or global CG particle IDs. Preserve
 the reference atom order and hydrogen representation after preparing mappings.
 
+```{warning} Explicit hydrogens in rigid fillers
+Rigid filler coordinates are reconstructed by **rotation and translation** of
+an existing reference structure. ChemFAST does not generate coordinates for
+new hydrogen atoms on a filler during reconstruction. The reference PDB/SDF 
+file must include **all hydrogen atoms explicitly**.
+
+Reactions involving fillers currently support bond formation between existing
+atoms and removal of explicitly represented atoms or groups. They must **not
+produce implicit hydrogens on the filler**. In particular, map any hydrogens
+or leaving groups to be removed correctly, and verify the resulting atomistic
+valences and bond orders. A reaction requiring newly generated filler hydrogen
+atoms is not supported by the current rigid-body reconstruction.
+```
+
 For reconstruction, supply `filler_idx` from the actual final XML `body` values.
 For example, `[4, 9]` would associate two rigid bodies with this reference only if
 those are their recorded IDs. `N: 2` alone does not identify them. Reference-path

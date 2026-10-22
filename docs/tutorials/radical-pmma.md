@@ -72,8 +72,8 @@ The CLI reads `02_radical_pmma/config.json` and the two fixed CG outputs from
 `02_radical_pmma/cg/`, then writes the reconstructed SDF and GROMACS files to
 `02_radical_pmma/aa/`. No CG result filenames need to be passed again.
 
-| Final CG configuration | Energy-minimized AA reconstruction |
-|---|---|
+| Final CG configuration | Energy-minimized AA model                                                                    |
+|---|----------------------------------------------------------------------------------------------|
 | ![Final CG PMMA configuration used for reconstruction.](../_static/tutorials/02_radical_pmma/cg_final.png) | ![Atomistic PMMA after energy minimization.](../_static/tutorials/02_radical_pmma/aa_em.png) |
 
 ReactionPath replay converts each accepted `P-P` event into its mapped

@@ -160,8 +160,8 @@ workspace you just prepared</strong> (or use its absolute path from anywhere):</
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--name<span class="w"> </span>01_linear_pi_new
 </pre></div>
 </div>
-<p>The CLI reads <code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/config.json</span></code> and the fixed CG results under
-<code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/cg/</span></code>. Check that <code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/aa/system.gro</span></code>,
+<p>The CLI reads <code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/config.json</span></code>, whose relative CG input paths
+point to the matched files under <code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/cg/</span></code>. Check that <code class="docutils literal notranslate"><span class="pre">01_linear_pi_new/aa/system.gro</span></code>,
 <code class="docutils literal notranslate"><span class="pre">system.top</span></code>, and the referenced <code class="docutils literal notranslate"><span class="pre">.itp</span></code> files exist. If you took the fast route,
 its AA outputs are instead in <code class="docutils literal notranslate"><span class="pre">01_linear_pi/aa/</span></code>.</p>
 <p>This is the reconstructed <strong>initial</strong> AA structure, not an equilibrated configuration. See the <a class="reference internal" href="tutorials/first-system.html"><span class="std std-doc">complete example</span></a> for the chemistry, images, and detailed output checks.</p>

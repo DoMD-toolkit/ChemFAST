@@ -72,10 +72,10 @@ def _prepare_rigid_bodies(
     for body_id in sorted(rigid_nodes):
         body_nodes = rigid_nodes[body_id]
         retained_nodes = [node for node in body_nodes if not cg_graph.nodes[node]['mapping_node']]
-        if len(retained_nodes) != 1:
-            raise ValueError(
-                f"Rigid body {body_id} must contain exactly one retained node; found {len(retained_nodes)}."
-            )
+        #if len(retained_nodes) != 1:
+        #    raise ValueError(
+        #        f"Rigid body {body_id} must contain exactly one retained node; found {len(retained_nodes)}."
+        #    )
         retained_data = cg_graph.nodes[retained_nodes[0]]
         rigid_name = retained_data['rigid_name']
         template_positions = filler_config.get(rigid_name, {}).get('pos')

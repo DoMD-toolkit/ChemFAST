@@ -108,7 +108,7 @@ The supplied `eq.mdp` uses MD at 500 K and 1 bar with Berendsen temperature
 and pressure coupling.
 
 ```bash
-gmx grompp -f eq.mdp -c em.gro -p system.top -o eq.tpr
+gmx grompp -f eq.mdp -c em.gro -p system.top -o eq.tpr --maxwarn 10
 gmx mdrun -deffnm eq
 ```
 

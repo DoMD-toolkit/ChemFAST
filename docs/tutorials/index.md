@@ -94,7 +94,8 @@ provided:
 chemfast reconstruct_aa --name CASE
 ```
 
-When only `--name` is supplied, ChemFAST reads the fixed workspace paths:
+For the supplied example JSON, these paths resolve relative to the JSON at
+the workspace root:
 
 ```text
 CASE/config.json
@@ -112,7 +113,10 @@ CASE/aa/
 └── *.itp
 ```
 
-The CG configuration provides the spatial organization of the system, while
+The CG simulation generated files can be specified in the configuration JSON file with keys `cg_topology_file` and `reaction_path_file`. If the JSON omits the key `cg_topology_file` or `reaction_path_file`, the CLI uses
+the corresponding `<workspace>/cg/` default. 
+
+The CG output provides the configurations of the system, while
 the ReactionPath and Reaction-DSL definitions determine how the molecular
 reactants are reconstructed into the atomistic topology.
 

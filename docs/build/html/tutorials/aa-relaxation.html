@@ -194,7 +194,7 @@ to confirm that minimization completed successfully.</p>
 <p>For tutorials with an EQ stage, run from the same output directory.
 The supplied <code class="docutils literal notranslate"><span class="pre">eq.mdp</span></code> uses MD at 500 K and 1 bar with Berendsen temperature
 and pressure coupling.</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gmx<span class="w"> </span>grompp<span class="w"> </span>-f<span class="w"> </span>eq.mdp<span class="w"> </span>-c<span class="w"> </span>em.gro<span class="w"> </span>-p<span class="w"> </span>system.top<span class="w"> </span>-o<span class="w"> </span>eq.tpr
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gmx<span class="w"> </span>grompp<span class="w"> </span>-f<span class="w"> </span>eq.mdp<span class="w"> </span>-c<span class="w"> </span>em.gro<span class="w"> </span>-p<span class="w"> </span>system.top<span class="w"> </span>-o<span class="w"> </span>eq.tpr<span class="w"> </span>--maxwarn<span class="w"> </span><span class="m">10</span>
 gmx<span class="w"> </span>mdrun<span class="w"> </span>-deffnm<span class="w"> </span>eq
 </pre></div>
 </div>

@@ -68,8 +68,8 @@ The CLI reads `05_poss_pmma/config.json` and the two fixed CG outputs from
 `05_poss_pmma/cg/`, then writes the reconstructed SDF and GROMACS files to
 `05_poss_pmma/aa/`. No CG result filenames need to be passed again.
 
-| Final CG hybrid | Energy-minimized AA reconstruction |
-|---|---|
+| Final CG hybrid | Energy-minimized AA model                                                                            |
+|---|------------------------------------------------------------------------------------------------------|
 | ![Final CG POSS-PMMA configuration used for reconstruction.](../_static/tutorials/05_poss_pmma/cg_final.png) | ![Atomistic POSS-PMMA model after energy minimization.](../_static/tutorials/05_poss_pmma/aa_em.png) |
 
 Rigid-body alignment restores each full PDB structure at its CG position.

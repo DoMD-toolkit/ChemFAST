@@ -75,9 +75,11 @@ Reconstruct using the workspace you just prepared:
 chemfast reconstruct_aa --name MY_SYSTEM
 ```
 
-Without explicit `--xml`, `--json`, or `--reactionpath`, the CLI reads only
-`MY_SYSTEM/config.json`, `MY_SYSTEM/cg/reaction_final.xml`, and
-`MY_SYSTEM/cg/reaction_path.txt`. No manual edits to the JSON are required.
+Without explicit `--xml`, `--json`, or `--reactionpath`, the CLI reads
+`MY_SYSTEM/config.json`. The bundled JSON explicitly references
+`cg/reaction_final.xml` and `cg/reaction_path.txt` relative to its own location,
+so no manual edits are required. If those fields are omitted, the same files
+are selected from the workspace `cg/` defaults.
 
 The CLI writes `MY_SYSTEM/aa/atomistic.sdf` (including residue/box
 metadata), plus matching GROMACS `system.gro`, `system.top`, and ITP files.

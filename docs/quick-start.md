@@ -72,8 +72,8 @@ workspace you just prepared** (or use its absolute path from anywhere):
 chemfast reconstruct_aa --name 01_linear_pi_new
 ```
 
-The CLI reads `01_linear_pi_new/config.json` and the fixed CG results under
-`01_linear_pi_new/cg/`. Check that `01_linear_pi_new/aa/system.gro`,
+The CLI reads `01_linear_pi_new/config.json`, whose relative CG input paths
+point to the matched files under `01_linear_pi_new/cg/`. Check that `01_linear_pi_new/aa/system.gro`,
 `system.top`, and the referenced `.itp` files exist. If you took the fast route,
 its AA outputs are instead in `01_linear_pi/aa/`.
 

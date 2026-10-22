@@ -1,6 +1,6 @@
 {
-  "cg_topology_file": "reaction_final.xml",
-  "reaction_path_file": "reaction_path.txt",
+  "cg_topology_file": "cg/reaction_final.xml",
+  "reaction_path_file": "cg/reaction_path.txt",
   "box_tensor": [10,10,10],
   "domd_react_dsl": "v1",
   "reactants": [

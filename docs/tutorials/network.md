@@ -72,8 +72,8 @@ The CLI reads `04_network_pi/config.json` and the two fixed CG outputs from
 `04_network_pi/cg/`, then writes the reconstructed SDF and GROMACS files to
 `04_network_pi/aa/`. No CG result filenames need to be passed again.
 
-| Final CG network | Energy-minimized AA reconstruction |
-|---|---|
+| Final CG network | Energy-minimized AA model                                                                                   |
+|---|--------------------------------------------------------------------------------------------------------------|
 | ![Final CG network used for reconstruction.](../_static/tutorials/04_network_pi/cg_final.png) | ![Atomistic cross-linked polyimide after energy minimization.](../_static/tutorials/04_network_pi/aa_em.png) |
 
 ReactionPath replay assigns the correct diamine or trifunctional amine to every

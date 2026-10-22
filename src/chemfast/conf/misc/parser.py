@@ -289,8 +289,12 @@ def _extract_raw_data_from_gsd(gsd_path: str) -> Tuple[Dict[str, Any], np.ndarra
             'Current version does not support rigid bodies from GSD; use a PyGAMD-formatted XML file.')
     return raw_data, box_tensor
 
+def _eigenvectors(centered_pos: np.ndarray) -> np.ndarray:
+    rg = np.dot(centered_pos.T, centered_pos) / len(centered_pos)
+    values, vectors = np.linalg.eigh(rg)
+    return vectors[:, np.argsort(values)[::-1]].T
 
-def _build_global_system_graph(raw_data: Dict[str, Any], reactants_config: Dict[str, Any]) -> nx.Graph:
+def _build_global_system_graph(raw_data: Dict[str, Any], reactants_config: Dict[str, Any], rigid_configs: Dict[str, Any], box_tensor):
     """Builds a global networkx graph and applies virtual edges to unify rigid topologies."""
     cg_sys = nx.Graph()
     num_nodes = len(raw_data['type'])
@@ -302,15 +306,80 @@ def _build_global_system_graph(raw_data: Dict[str, Any], reactants_config: Dict[
         smiles = reactants_config.get(raw_type, {}).get('smiles', None)
         if body_id >= 0:
             rigid_groups.setdefault(body_id, []).append(tag)
-        cg_sys.add_node(tag, type=raw_type, smiles=smiles, x=pos, body=body_id)
+        cg_sys.add_node(tag, cg_id=tag, type=raw_type, smiles=smiles, x=pos, body=body_id)
     for bond_type, u, v in raw_data['bond']:
         cg_sys.add_edge(u, v, bond_type=bond_type, is_virtual=False)
+    body_meta = {}
+    global_res_id_body = {}
+    body_com = {}
     for body_id, tags in rigid_groups.items():
-        if len(tags) > 1:
-            for i in range(len(tags) - 1):
-                cg_sys.add_edge(tags[i], tags[i + 1], is_virtual=True, bond_type='VIRTUAL')
-    return cg_sys
-
+        body_graph = nx.Graph()
+        pos = raw_data['position'][tags]
+        aa_pos = rigid_configs['x'][rigid_configs[body_id]['name']]
+        rigid_mol = rigid_configs['mol'][rigid_configs[body_id]['name']]
+        cg_com, centered_cg, unwrapped_cg = _center_molecule_pbc(pos, box_tensor)
+        ev_cg = _eigenvectors(centered_cg) + 1e-8
+        ev_aa = _eigenvectors(aa_pos)
+        local_to_global = {local_idx: node for local_idx, node in enumerate(tags)}
+        global_to_local = {node: local_idx for local_idx, node in enumerate(tags)}
+        global_to_site = {}
+        sites_config = rigid_configs[body_id].get('mapping', {})
+        for local_idx, site in sorted(sites_config.items()):
+            node = local_to_global[local_idx]
+            global_to_site[node] = local_idx
+            atom_idx = site[ATOM_IDX_CONF]
+            smarts = site.get('smarts')
+            if smarts is None:
+                if len(atom_idx) != 1:
+                    raise NotImplementedError(
+                        'Automatic SMARTS extraction is currently supported only for one mapped atom.')
+                atom = rigid_mol.GetAtomWithIdx(atom_idx[0])
+                site['smarts'] = f'[{atom.GetSymbol()}]'
+            ev_cg = np.vstack((ev_cg, centered_cg[local_idx]))
+            ev_aa = np.vstack((ev_aa, aa_pos[atom_idx].mean(axis=0)))
+        rotation, _ = Rotation.align_vectors(ev_cg, ev_aa)
+        for tag in tags:
+            rigid_name = rigid_configs[body_id]['name']
+            body_meta[tag] = {'cg_com': cg_com,                  'global_res_id': tags[0],
+                              'body_id': body_id,                'rigid_name': rigid_name,
+                              'type': cg_sys.nodes[tag]['type'], 'orient': rotation.as_matrix()}
+            if global_to_site.get(tag) is None:
+                body_meta[tag]['mapping_node'] = False
+                body_meta[tag]['atom_idx'] = rigid_configs['remaining_atom_idx'][rigid_name]
+            else:
+                site = global_to_site[tag]
+                body_meta[tag]['mapping_node'] = True
+                body_meta[tag]['atom_idx'] = rigid_configs[body_id]['mapping'][site]['atom_idx']
+            if len(tags) > 1:
+                for i in range(len(tags) - 1):
+                    cg_sys.add_edge(tags[i], tags[i + 1], is_virtual=True, bond_type='VIRTUAL')
+    output = nx.Graph()
+    for node, data in cg_sys.nodes(data=True):
+        if data['body'] != -1:
+            output.add_node(node, cg_id=node, global_res_id=body_meta[node]['global_res_id'],
+                                  type=body_meta[node]['type'], body_id=body_meta[node]['body_id'],
+                                  mapping_node=body_meta[node]['mapping_node'], x=body_meta[node]['cg_com'],
+                                  rigid_name=body_meta[node]['rigid_name'], atom_idx=body_meta[node]['atom_idx'],
+                                  orient=body_meta[node]['orient'])
+            if body_meta[node]['mapping_node']:
+                output.nodes[node]['smarts'] = reactants_config.get(body_meta[node]['type']).get('smarts')
+        else:
+            output.add_node(node, cg_id=node, global_res_id=node, type=data['type'], 
+                                  x=np.asarray(data['x']), smiles=data['smiles'], body_id=-1)
+    for u, v, edge_data in cg_sys.edges(data=True):
+        output.add_edge(u, v, **edge_data)
+    components = nx.connected_components(output)
+    virtual_edges = [(u, v) for u, v, data in output.edges(data=True) if data.get("is_virtual", False)]
+    cg_graphs = []
+    for component in components:
+        output_subgraph = output.subgraph(component).copy()
+        sub_virtual_edges = [(u, v) for u, v, data in output_subgraph.edges(data=True) if data.get("is_virtual", False)]
+        output_subgraph.remove_edges_from(sub_virtual_edges)
+        cg_graphs.append(output_subgraph)
+    output.remove_edges_from(virtual_edges)
+    # delete v edge
+    return cg_graphs, output
+        
 
 def _final_all_rigid_id(cg_mol: nx.Graph) -> List[int]:
     """Returns unique rigid body IDs present in a molecular graph."""
@@ -330,18 +399,40 @@ def _extract_chem_complete_submol(orig_mol: Chem.Mol, seed_atom_indices: list) -
             rw_mol.RemoveAtom(idx)
     return rw_mol.GetMol()
 
+def _verify_rigid_mol(mol):
+    molh = Chem.AddHs(mol)
+    if molh.GetNumAtoms() != mol.GetNumAtoms():
+        raise ValueError(f"Rigid molecule {mol.GetProp('res_name')} has implicit hydrogens. Please provide a fully explicit molecule without implicit hydrogens.")
 
 def parse_body_configs(body_configs: Dict[str, Any], reactants: Dict) -> Dict[int, Dict[str, Any]]:
     """Converts rigid-name configurations to body_id configurations."""
     parsed_configs = {}
+    aa_pos = {}
+    aa_mol = {}
+    remaining_atom_idx = {}
     for _filler in body_configs:
         mapping = {int(_mapping['cg_id']): {'atom_idx': _mapping['atom_idx'], 'smarts': reactants[_mapping['type']]['smarts']} for _mapping in _filler['mappings']}
         for body_id in _filler.get(FILLER_IDX_CONF, []):
             parsed_configs[int(body_id)] = {
                 'file': _filler.get('file'),
                 'mapping': mapping,
-                'type': _filler['name']
+                'name': _filler['name']
             }
+        mapping_atom_idx = []
+        for mapping_node, data in mapping.items():
+            mapping_atom_idx.extend(data['atom_idx'])
+        mol = molecule_reader(_filler.get('file'))
+        _verify_rigid_mol(mol)
+        pos = np.asarray(mol.GetConformer(0).GetPositions(), dtype=float)
+        pos -= pos.mean(axis=0)
+        aa_pos[_filler['name']] = pos
+        remaining_atom_idx[_filler['name']] = [i for i in range(mol.GetNumAtoms()) if i not in mapping_atom_idx]
+        aa_mol[_filler['name']] = mol
+
+
+    parsed_configs['x'] = aa_pos
+    parsed_configs['remaining_atom_idx'] = remaining_atom_idx
+    parsed_configs['mol'] = aa_mol
     # print(parsed_configs)
     return parsed_configs
 
@@ -369,13 +460,7 @@ def _center_molecule_pbc(coords, box):
     return com, centered, unwrapped
 
 
-def _eigenvectors(centered_pos: np.ndarray) -> np.ndarray:
-    rg = np.dot(centered_pos.T, centered_pos) / len(centered_pos)
-    values, vectors = np.linalg.eigh(rg)
-    return vectors[:, np.argsort(values)[::-1]].T
-
-
-def _prepare_rigid_body(body_id: int, rigid_nodes: List[int], cg_graph: nx.Graph, body_config: Dict[str, Any],
+def _prepare_rigid_body_deplicated(body_id: int, rigid_nodes: List[int], cg_graph: nx.Graph, body_config: Dict[str, Any],
                         rigid_mols: Dict[str, Chem.Mol], rigid_config: Dict[str, np.ndarray], box_tensor: np.ndarray):
     rigid_name = body_config['type']
     if rigid_name not in rigid_mols:
@@ -413,7 +498,7 @@ def _prepare_rigid_body(body_id: int, rigid_nodes: List[int], cg_graph: nx.Graph
     return rigid_mol, aa_pos, cg_com, rotation.as_matrix(), local_to_global
 
 
-def _segment_and_purify_molecules(cg_sys: nx.Graph, box_tensor: np.ndarray, body_configs):
+def _segment_and_purify_molecules_deplicated(cg_sys: nx.Graph, box_tensor: np.ndarray, body_configs):
     """Segments the system, compresses rigid bodies, and assigns CG and residue IDs."""
     cg_mols, old_to_new, rigid_mols, rigid_config = [], {}, {}, {}
     next_node_id = 0
@@ -435,7 +520,7 @@ def _segment_and_purify_molecules(cg_sys: nx.Graph, box_tensor: np.ndarray, body
                 res_id = next_global_res_id
                 next_node_id += 1
                 next_global_res_id += 1
-                output.add_node(cg_id, cg_id=cg_id, global_res_id=res_id, type=data['type'],
+                output.add_node(cg_id, cg_id=cg_id, global_res_id=res_id, type=data['type'],original_id=old_node,
                                 x=np.asarray(data['x']), smiles=data['smiles'], body_id=-1)
                 old_to_new[old_node] = cg_id
                 continue
@@ -458,7 +543,7 @@ def _segment_and_purify_molecules(cg_sys: nx.Graph, box_tensor: np.ndarray, body
                 cg_id = next_node_id
                 next_node_id += 1
                 output.add_node(
-                    cg_id, cg_id=cg_id, global_res_id=res_id, body_id=body_id,
+                    cg_id, cg_id=cg_id, global_res_id=res_id, body_id=body_id,original_id=mapped_old_node,
                     rigid_name=body_config['type'], mapping_node=True, atom_idx=atom_idx,
                     smarts=site.get('smarts'), orient=orient,
                     x=np.asarray(source.nodes[mapped_old_node]['x']), type=source.nodes[mapped_old_node]['type']
@@ -478,6 +563,7 @@ def _segment_and_purify_molecules(cg_sys: nx.Graph, box_tensor: np.ndarray, body
                 )
                 for node in nonmapping_old_nodes:
                     old_to_new[node] = cg_id
+
                 body_new_nodes.append(cg_id)
         for old_u, old_v, edge_data in source.edges(data=True):
             if edge_data.get('is_virtual', False):
@@ -578,7 +664,7 @@ def _read_reaction_file(reaction_file: str):
     return reactions
 
 
-def _assign_reactions(cg_mols, old_to_new, reactions=None, reactions_config=None):
+def _assign_reactions(cg_mols, reactions=None, reactions_config=None):
     reaction_dict = {mol_idx: [] for mol_idx in range(len(cg_mols))}
     node_to_mol = {}
     for mol_idx, cg_mol in enumerate(cg_mols):
@@ -587,7 +673,7 @@ def _assign_reactions(cg_mols, old_to_new, reactions=None, reactions_config=None
     if reactions is not None:
         for reaction in reactions:
             name = str(reaction[0])
-            new_indices = [old_to_new[int(i)] for i in reaction[1:]]
+            new_indices = [int(i) for i in reaction[1:]]
             mol_idx = node_to_mol[new_indices[0]]
             reaction_dict[mol_idx].append((name, *new_indices))
 
@@ -644,11 +730,8 @@ def _parse_cg_topology(cg_configuration_file: str, reactants_config: Dict[str, A
         raw_data, box_tensor = _extract_raw_data_from_gsd(cg_configuration_file)
     else:
         raise ValueError(f"Unsupported structural layout extension '{ext}'.")
-    global_system_graph = _build_global_system_graph(raw_data, reactants_config)
-    cg_mols, combined_cg_mol, old_to_new, rigid_config = _segment_and_purify_molecules(
-        global_system_graph, box_tensor, rigid_configs
-    )
-    return cg_mols, box_tensor, combined_cg_mol, old_to_new, rigid_config
+    cg_graphs, cg_sys = _build_global_system_graph(raw_data, reactants_config, rigid_configs, box_tensor)
+    return cg_graphs, box_tensor, cg_sys, rigid_configs
 
 
 def assign_is_small(cg_mols, reactant_config, rigid_config):
@@ -665,11 +748,11 @@ def assign_is_small(cg_mols, reactant_config, rigid_config):
                 if body_id in counted_bodies:
                     continue
                 rigid_name = data.get('rigid_name')
-                if rigid_name not in rigid_config or rigid_config[rigid_name].get('mol') is None:
+                if rigid_config['mol'].get(rigid_name) is None:
                     raise ValueError(
                         f"CG molecule {mol_idx}, node {node}: rigid molecule '{rigid_name}' is unavailable."
                     )
-                estimated_n_atoms += rigid_config[rigid_name]['mol'].GetNumAtoms()
+                estimated_n_atoms += rigid_config['mol'][rigid_name].GetNumAtoms()
                 counted_bodies.add(body_id)
             else:
                 cg_type = data.get('type')
@@ -707,11 +790,11 @@ def parse_config(user_config: dict, work_dir=Path('./')) -> Config:
         for _filler in rigid_input_config:
             _filler['file'] = str(work_dir / _filler['file'])
 
-    cg_mols, box_tensor, cg_sys, old_to_new, rigid_config = _parse_cg_topology(
+    cg_mols, box_tensor, cg_sys, rigid_config = _parse_cg_topology(
         cg_topology_file, reactant_config, rigid_input_config
     )
     cg_mols = assign_is_small(cg_mols, reactant_config, rigid_config)
-    reaction_list = _assign_reactions(cg_mols, old_to_new, reactions, reaction_template)
+    reaction_list = _assign_reactions(cg_mols, reactions, reaction_template)
     return Config(
         reactant_config=reactant_config,
         reaction_template=reaction_template,

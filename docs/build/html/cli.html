@@ -107,18 +107,24 @@
 chemfast<span class="w"> </span>--help
 </pre></div>
 </div>
-<p>The <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> entry point is <code class="docutils literal notranslate"><span class="pre">chemfast</span> <span class="pre">=</span> <span class="pre">&quot;chemfast.cli:main&quot;</span></code>; the three
-subcommands use the existing tutorial protocols rather than a separate simulation
-implementation. Input paths and <code class="docutils literal notranslate"><span class="pre">--name</span></code> can be absolute or relative to the <strong>shell
-working directory</strong>; PDB filler paths declared inside JSON are resolved against
-the JSON’s directory. The tool never searches upward through arbitrary directories.</p>
-<section id="generate-cg-inputs-does-not-run-pygamd">
-<h2>1. Generate CG inputs (does not run PyGAMD)<a class="headerlink" href="#generate-cg-inputs-does-not-run-pygamd" title="Link to this heading">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> entry point is <code class="docutils literal notranslate"><span class="pre">chemfast</span> <span class="pre">=</span> <span class="pre">&quot;chemfast.cli:main&quot;</span></code>.
+<code class="docutils literal notranslate"><span class="pre">--name</span></code> sets the <strong>workspace</strong> and defaults to the current shell directory;
+<code class="docutils literal notranslate"><span class="pre">--json</span></code> selects the configuration independently and defaults to
+<code class="docutils literal notranslate"><span class="pre">&lt;workspace&gt;/config.json</span></code>. Command-line file paths are relative to the shell
+working directory, while paths <strong>inside JSON</strong> (including <code class="docutils literal notranslate"><span class="pre">fillers[*].file</span></code>)
+are relative to the JSON file’s directory. No upward directory search or
+fallback from a specified but missing file is performed.</p>
+<section id="prepare-cg-inputs-and-optionally-launch-pygamd">
+<h2>1. Prepare CG inputs (and optionally launch PyGAMD)<a class="headerlink" href="#prepare-cg-inputs-and-optionally-launch-pygamd" title="Link to this heading">¶</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>prepare_cg<span class="w"> </span>--json<span class="w"> </span>/data/input/config.json<span class="w"> </span>--name<span class="w"> </span>/data/work/SAMPLE
 <span class="c1"># If you need a nondefault initial XML filename:</span>
 chemfast<span class="w"> </span>prepare_cg<span class="w"> </span>--json<span class="w"> </span>/data/input/config.json<span class="w"> </span>--name<span class="w"> </span>/data/work/OTHER<span class="w"> </span>--xml<span class="w"> </span>custom_initial.xml
 </pre></div>
 </div>
+<p>Both <code class="docutils literal notranslate"><span class="pre">--name</span></code> and <code class="docutils literal notranslate"><span class="pre">--json</span></code> are optional: omitting <code class="docutils literal notranslate"><span class="pre">--name</span></code> uses the current
+directory as the workspace; omitting <code class="docutils literal notranslate"><span class="pre">--json</span></code> reads its <code class="docutils literal notranslate"><span class="pre">config.json</span></code>.
+Providing only <code class="docutils literal notranslate"><span class="pre">--json</span></code> does <strong>not</strong> change the workspace. To write into a
+different directory, specify <code class="docutils literal notranslate"><span class="pre">--name</span></code> explicitly.</p>
 <p><code class="docutils literal notranslate"><span class="pre">--xml</span></code> is an <strong>output filename</strong> inside <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/cg</span></code>, not an input XML path.
 The default is <code class="docutils literal notranslate"><span class="pre">initial.xml</span></code>, matching the existing tutorial. The command runs
 <code class="docutils literal notranslate"><span class="pre">build_pygamd_protocol(...,</span> <span class="pre">use_builtin=True,</span> <span class="pre">mass_density=0.5,</span> <span class="pre">random_seed=2026)</span></code> and <code class="docutils literal notranslate"><span class="pre">get_cgff_parameters(...,</span> <span class="pre">random_seed=2026)</span></code>, writing:</p>
@@ -144,20 +150,22 @@ specify each filler file <strong>inside config.json</strong>, e.g.:</p>
 <p>The shown filler is only an illustration of a <strong>file path</strong>, not a complete
 chemically valid ChemFAST filler configuration. There is no separate <code class="docutils literal notranslate"><span class="pre">--pdb</span></code>
 option. You may use <code class="docutils literal notranslate"><span class="pre">--mass-density</span></code> (g/cm³; default <code class="docutils literal notranslate"><span class="pre">0.5</span></code>) and <code class="docutils literal notranslate"><span class="pre">--seed</span></code>
-(default <code class="docutils literal notranslate"><span class="pre">2026</span></code>) to override the tutorial’s CG initialization defaults. The
-CLI’s <code class="docutils literal notranslate"><span class="pre">0.5</span> <span class="pre">g/cm³</span></code> tutorial-protocol default is distinct from the low-level
-<code class="docutils literal notranslate"><span class="pre">build_pygamd_protocol</span></code> API default of <code class="docutils literal notranslate"><span class="pre">0.9</span> <span class="pre">g/cm³</span></code>.</p>
-<p><strong>Run PyGAMD yourself</strong> using a Python interpreter/environment where PyGAMD is
-functional. For the default initial XML name:</p>
-<p>Switch to <code class="docutils literal notranslate"><span class="pre">/data/work/SAMPLE/cg/</span></code>, the directory just created by
-<code class="docutils literal notranslate"><span class="pre">--name</span> <span class="pre">/data/work/SAMPLE</span></code>, and run the generated script there:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>/path/to/pygamd-env/bin/python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
+(default <code class="docutils literal notranslate"><span class="pre">2026</span></code>) to override the tutorial’s CG initialization defaults.</p>
+<p>To run the generated CG protocol, use a Python interpreter with PyGAMD
+available. Run the script <strong>from the workspace’s <code class="docutils literal notranslate"><span class="pre">cg/</span></code> directory</strong>, as its
+inputs and outputs use relative paths:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>/data/work/SAMPLE/cg
+/path/to/pygamd-env/bin/python<span class="w"> </span>run_pygamd_polymerization.py<span class="w"> </span>initial.xml<span class="w"> </span>cg_parameters.json<span class="w"> </span>--gpu<span class="o">=</span><span class="m">0</span>
 </pre></div>
 </div>
-<p>If <code class="docutils literal notranslate"><span class="pre">--xml</span> <span class="pre">custom_initial.xml</span></code> was passed, use that name instead of <code class="docutils literal notranslate"><span class="pre">initial.xml</span></code>.
-The reactive protocol should produce <code class="docutils literal notranslate"><span class="pre">cg/reaction_final.xml</span></code> and
-<code class="docutils literal notranslate"><span class="pre">cg/reaction_path.txt</span></code>. They must come from the same PyGAMD run, with consistent
-particle indices; neither file is synthesized from the other by this CLI.</p>
+<p>For a custom initial XML filename, use it in place of <code class="docutils literal notranslate"><span class="pre">initial.xml</span></code>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For convenience, <code class="docutils literal notranslate"><span class="pre">chemfast</span> <span class="pre">run_cg_polymerization</span> <span class="pre">--name</span> <span class="pre">/data/work/SAMPLE</span> <span class="pre">--pygamd_bin</span> <span class="pre">/path/to/pygamd-env/bin/python</span> <span class="pre">--gpu_id</span> <span class="pre">0</span></code> launches the <strong>same generated script</strong> from the correct directory. <code class="docutils literal notranslate"><span class="pre">--pygamd_bin</span></code> defaults to
+the current Python interpreter. If <code class="docutils literal notranslate"><span class="pre">prepare_cg</span></code> used a custom <code class="docutils literal notranslate"><span class="pre">--xml</span></code> filename,
+pass that filename to this command as well. This helper is optional; existing
+CG XML and ReactionPath files can be reconstructed with installed PyGAMD.</p>
+</div>
 </section>
 <section id="reconstruct-aa-and-assign-force-fields">
 <h2>2. Reconstruct AA and assign force fields<a class="headerlink" href="#reconstruct-aa-and-assign-force-fields" title="Link to this heading">¶</a></h2>
@@ -166,37 +174,32 @@ directory; <code class="docutils literal notranslate"><span class="pre">--name</
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--name<span class="w"> </span>/data/work/SAMPLE
 </pre></div>
 </div>
-<p>The command resolves its input files in the following order:</p>
+<p>First, the CLI determines the workspace (<code class="docutils literal notranslate"><span class="pre">--name</span></code>, otherwise the current
+directory) and JSON (<code class="docutils literal notranslate"><span class="pre">--json</span></code>, otherwise <code class="docutils literal notranslate"><span class="pre">&lt;workspace&gt;/config.json</span></code>). It then
+selects exactly one input for each required reconstruction file:</p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Input</p></th>
-<th class="head"><p>Resolution order</p></th>
+<th class="head"><p>Strict priority</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>JSON</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">--json</span></code> → <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/config.json</span></code></p></td>
+<tr class="row-even"><td><p>CG XML</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--xml</span></code> → JSON <code class="docutils literal notranslate"><span class="pre">cg_topology_file</span></code> → <code class="docutils literal notranslate"><span class="pre">&lt;workspace&gt;/cg/reaction_final.xml</span></code></p></td>
 </tr>
-<tr class="row-odd"><td><p>CG XML</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">--xml</span></code> → <code class="docutils literal notranslate"><span class="pre">cg_topology_file</span></code> in JSON → <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/cg/reaction_final.xml</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p>ReactionPath</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code> → <code class="docutils literal notranslate"><span class="pre">reaction_path_file</span></code> in JSON → <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/cg/reaction_path.txt</span></code> → BFS inference</p></td>
+<tr class="row-odd"><td><p>ReactionPath</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code> → JSON <code class="docutils literal notranslate"><span class="pre">reaction_path_file</span></code> → <code class="docutils literal notranslate"><span class="pre">&lt;workspace&gt;/cg/reaction_path.txt</span></code></p></td>
 </tr>
 </tbody>
 </table>
-<p>Command-line paths are resolved relative to the shell working directory.
-Relative paths declared in the JSON configuration are resolved against the
-JSON file’s directory.</p>
-<p>Explicitly specified files must exist; otherwise, the command raises an
-error. If no ReactionPath is specified and the default file does not exist,
-ChemFAST infers a reconstruction path from the final CG connectivity using
-breadth-first search (BFS). When a default ReactionPath is available, ChemFAST
-uses it rather than invoking BFS.</p>
-<p>BFS inference requires compatible reaction rules and does not necessarily
-recover the original reaction sequence. A recorded ReactionPath is therefore
-recommended for systems in which reaction order affects the reconstructed
-atomistic topology.</p>
+<p>Defaults are used <strong>only when the corresponding JSON field is absent</strong>, not
+when a declared path is missing on disk. Command-line paths resolve relative
+to the shell working directory; JSON fields resolve relative to the JSON’s
+directory, even when <code class="docutils literal notranslate"><span class="pre">--name</span></code> selects a different workspace. If the selected
+file does not exist, the command fails with <code class="docutils literal notranslate"><span class="pre">FileNotFoundError</span></code>: it does not
+search alternate locations or silently infer a ReactionPath with BFS.</p>
+<p>For the supplied examples, JSON contains <code class="docutils literal notranslate"><span class="pre">&quot;cg_topology_file&quot;:</span> <span class="pre">&quot;cg/reaction_final.xml&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;reaction_path_file&quot;:</span> <span class="pre">&quot;cg/reaction_path.txt&quot;</span></code>,
+which resolve correctly when the example JSON is stored at the workspace root.</p>
 <p>For example, the following command uses the CG XML specified in
 <code class="docutils literal notranslate"><span class="pre">config.json</span></code>, or the workspace default if the JSON does not specify one:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--json<span class="w"> </span>config.json
@@ -217,13 +220,13 @@ atomistic topology.</p>
 <span class="w">  </span>--chunk-per-d<span class="w"> </span><span class="m">1</span>
 </pre></div>
 </div>
-<p>When <code class="docutils literal notranslate"><span class="pre">--name</span></code> is omitted but <code class="docutils literal notranslate"><span class="pre">--json</span></code> is supplied, the workspace defaults to
-the input JSON’s parent directory. <code class="docutils literal notranslate"><span class="pre">--chunk-per-d</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>, as in the
-standard tutorial; increase it for a large network when needed. The AA
+<p>When <code class="docutils literal notranslate"><span class="pre">--name</span></code> is omitted, the workspace is the <strong>current directory</strong>,
+independently of <code class="docutils literal notranslate"><span class="pre">--json</span></code>. <code class="docutils literal notranslate"><span class="pre">--chunk-per-d</span></code> defaults to <code class="docutils literal notranslate"><span class="pre">1</span></code>, as in the standard
+tutorial; increase it for a large network when needed. The AA
 workflow uses the existing <code class="docutils literal notranslate"><span class="pre">parse_config</span></code>, <code class="docutils literal notranslate"><span class="pre">topology_builder</span></code>,
 <code class="docutils literal notranslate"><span class="pre">embed_molecules</span></code>, <code class="docutils literal notranslate"><span class="pre">post_process_aa_mol</span></code>, and <code class="docutils literal notranslate"><span class="pre">run_adv_top_mode</span></code>, preserving
 the tutorial’s GMX -&gt; BOSS -&gt; ML force-field assignment order.</p>
-<p>All AA results are written under <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;/aa/</span></code>: <code class="docutils literal notranslate"><span class="pre">atomistic.sdf</span></code>, <code class="docutils literal notranslate"><span class="pre">system.gro</span></code>,
+<p>All AA results are written under <code class="docutils literal notranslate"><span class="pre">&lt;workspace&gt;/aa/</span></code>: <code class="docutils literal notranslate"><span class="pre">atomistic.sdf</span></code>, <code class="docutils literal notranslate"><span class="pre">system.gro</span></code>,
 <code class="docutils literal notranslate"><span class="pre">system.top</span></code>, <code class="docutils literal notranslate"><span class="pre">atomtypes.itp</span></code> and component <code class="docutils literal notranslate"><span class="pre">.itp</span></code> files. This step does <strong>not</strong>
 run GROMACS energy minimization or molecular dynamics.</p>
 </section>

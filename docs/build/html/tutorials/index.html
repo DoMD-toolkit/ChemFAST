@@ -194,7 +194,8 @@ provided:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--name<span class="w"> </span>CASE
 </pre></div>
 </div>
-<p>When only <code class="docutils literal notranslate"><span class="pre">--name</span></code> is supplied, ChemFAST reads the fixed workspace paths:</p>
+<p>For the supplied example JSON, these paths resolve relative to the JSON at
+the workspace root:</p>
 <div class="highlight-text notranslate"><div class="highlight"><pre><span></span>CASE/config.json
 CASE/cg/reaction_final.xml
 CASE/cg/reaction_path.txt
@@ -208,7 +209,9 @@ CASE/cg/reaction_path.txt
 └── *.itp
 </pre></div>
 </div>
-<p>The CG configuration provides the spatial organization of the system, while
+<p>The CG simulation generated files can be specified in the configuration JSON file with keys <code class="docutils literal notranslate"><span class="pre">cg_topology_file</span></code> and <code class="docutils literal notranslate"><span class="pre">reaction_path_file</span></code>. If the JSON omits the key <code class="docutils literal notranslate"><span class="pre">cg_topology_file</span></code> or <code class="docutils literal notranslate"><span class="pre">reaction_path_file</span></code>, the CLI uses
+the corresponding <code class="docutils literal notranslate"><span class="pre">&lt;workspace&gt;/cg/</span></code> default.</p>
+<p>The CG output provides the configurations of the system, while
 the ReactionPath and Reaction-DSL definitions determine how the molecular
 reactants are reconstructed into the atomistic topology.</p>
 <p>The resulting atomistic model can then be minimized and equilibrated with an

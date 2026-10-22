@@ -122,6 +122,12 @@ unit, integration, or reproducibility layer.</p>
 <tr class="row-odd"><td><p>Fast sanitization fails</p></td>
 <td><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests/unit/test_fast_sanitize_work.py</span> <span class="pre">-q</span></code>; compare the failing molecule with normal RDKit sanitization</p></td>
 </tr>
+<tr class="row-even"><td><p>Rigid filler hydrogens are implicit</p></td>
+<td><p>Provide an atomistic PDB/SDF with all hydrogens explicit; after reading, <code class="docutils literal notranslate"><span class="pre">Chem.AddHs(mol)</span></code> must not add atoms. Filler reactions may form bonds or remove explicitly mapped groups, but cannot generate new implicit filler H atoms; see <a class="reference internal" href="reaction-dsl.html#structured-components"><span class="std std-ref">Reaction-DSL warning</span></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Reconstruction input XML or ReactionPath not found</p></td>
+<td><p>Check <code class="docutils literal notranslate"><span class="pre">--xml</span></code> / <code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code> first, then JSON <code class="docutils literal notranslate"><span class="pre">cg_topology_file</span></code> / <code class="docutils literal notranslate"><span class="pre">reaction_path_file</span></code> resolved against the JSON directory, and only then workspace defaults for <em>absent</em> fields; no fallback is attempted for a declared missing path.</p></td>
+</tr>
 <tr class="row-even"><td><p>Structured/PDB reactant mapping fails</p></td>
 <td><p>Run <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">-m</span> <span class="pre">pytest</span> <span class="pre">tests/integration/test_filler_mapping_work.py</span> <span class="pre">-q</span></code>; check reference atom order, explicit hydrogens, fragment SMARTS, and zero-based mapped indices</p></td>
 </tr>

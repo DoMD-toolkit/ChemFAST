@@ -119,8 +119,8 @@ beads, respectively.</p>
 </figcaption>
 </figure>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;cg_topology_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reaction_final.xml&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;reaction_path_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reaction_path.txt&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;cg_topology_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cg/reaction_final.xml&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;reaction_path_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cg/reaction_path.txt&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;domd_react_dsl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v1&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
@@ -244,20 +244,12 @@ sequence, connectivity, and ReactionPath remain unchanged.</p>
 <code class="docutils literal notranslate"><span class="pre">config.json</span></code>, <code class="docutils literal notranslate"><span class="pre">cg/reaction_final.xml</span></code>, and <code class="docutils literal notranslate"><span class="pre">cg/reaction_path.txt</span></code> paths and
 writes <code class="docutils literal notranslate"><span class="pre">atomistic.sdf</span></code>, <code class="docutils literal notranslate"><span class="pre">system.gro</span></code>, <code class="docutils literal notranslate"><span class="pre">system.top</span></code>, and ITP files into
 <code class="docutils literal notranslate"><span class="pre">03_ps_b_peo/aa/</span></code>.</p>
-<p>Optional residue-rigid density packing is now a <strong>separate</strong> CLI operation:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>density_optimization<span class="w"> </span>--sdf_in<span class="w"> </span>03_ps_b_peo/aa/atomistic.sdf<span class="w"> </span>--density<span class="w"> </span><span class="m">1</span>.0
-</pre></div>
-</div>
-<p>It produces <code class="docutils literal notranslate"><span class="pre">03_ps_b_peo/aa/atomistic_density_optimized.sdf</span></code>, not a matching
-replacement GRO/TOP/ITP set. Do <strong>not</strong> combine that optimized SDF with the
-unmodified GROMACS files. The reconstruction itself uses the prescribed
-<code class="docutils literal notranslate"><span class="pre">S-S</span></code>, <code class="docutils literal notranslate"><span class="pre">S-O</span></code>, and <code class="docutils literal notranslate"><span class="pre">O-O</span></code> ReactionPath records, including the block junction.
-See <a class="reference internal" href="aa-relaxation.html"><span class="std std-doc">AA relaxation</span></a> for the optional density stage and the
+<p>See <a class="reference internal" href="aa-relaxation.html"><span class="std std-doc">AA relaxation</span></a> for the optional density stage and the
 separate GROMACS minimization/equilibration workflow.</p>
 <table class="docutils align-default">
 <thead>
 <tr class="row-odd"><th class="head"><p>Final CG configuration</p></th>
-<th class="head"><p>Energy-minimized AA reconstruction</p></th>
+<th class="head"><p>Energy-minimized AA model</p></th>
 </tr>
 </thead>
 <tbody>

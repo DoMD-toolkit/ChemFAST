@@ -295,7 +295,6 @@ class Reactor(object):
                 # Removing an atom implicitly removes all incident bonds.
                 if new_bi < 0 or new_bj < 0:
                     continue
-
                 aa_mol.AddBond(new_bi, new_bj, record["bond_type"])
                 new_bond = aa_mol.GetBondBetweenAtoms(new_bi, new_bj)
                 if new_bond is None:
@@ -368,9 +367,9 @@ class Reactor(object):
                 processed_body_ids.add(body_id)
                 body_nodes = rigid_body_nodes[body_id]
                 rigid_name = node_data["rigid_name"]
-                rigid_data = self.rigid_configs[rigid_name]
-                rigid_mol = rigid_data["mol"]
-                positions = rigid_data["pos"]
+                #rigid_data = self.rigid_configs[rigid_name]
+                rigid_mol = self.rigid_configs["mol"][rigid_name]
+                positions = self.rigid_configs["x"][rigid_name]
 
                 rigid_mol_local2stable = {}
 
@@ -417,7 +416,6 @@ class Reactor(object):
                             bond.GetStereo(),
                             stereo_atoms,
                         )
-
                 for rigid_node in body_nodes:
                     rigid_node_data = cg_mol.nodes[rigid_node]
                     rigid_atom_idx = rigid_node_data["atom_idx"]
@@ -445,7 +443,9 @@ class Reactor(object):
             for bond in reactant_molecule.GetBonds():
                 bi = atom_idx[bond.GetBeginAtomIdx()]
                 bj = atom_idx[bond.GetEndAtomIdx()]
-
+                #print(bond.GetBondType(),bond.GetBeginAtomIdx(), bond.GetEndAtomIdx())
+                #if 312 in (bi,bj):
+                #    raise
                 stereo_atoms = ()
                 if bond.GetStereo() in (
                         Chem.BondStereo.STEREOZ,
@@ -576,6 +576,10 @@ class Reactor(object):
                     reactants_tuple,
                     rxn_tpls,
                 )
+                #print(reactants_order, reactants_tuple)
+                #if 800 in reactants_order:
+                #    print(reaction_map[1], '----------------------'*100, reaction_map[2])
+                #    raise
 
                 if not reaction_map:
                     raise ValueError(
@@ -710,6 +714,14 @@ class Reactor(object):
             mol_meta.nodes[node]["stable_atom_idx"] = dict(mol_meta.nodes[node]["atom_idx"])
             mol_meta.nodes[node]["atom_idx"] = dict(LocalToGlobal[node])
 
+        #if 800 in list(cg_mol.nodes):
+        #    print(aa_mol.GetAtomWithIdx(312).GetSymbol())
+        #    atom = aa_mol.GetAtomWithIdx(312)
+        #    neis = atom.GetNeighbors()
+        #    for nei in neis:
+        #        print(nei.GetIdx(),nei.GetSymbol(),aa_mol.GetBondBetweenAtoms(atom.GetIdx(),nei.GetIdx()).GetBondType())
+        #    raise
+
         if len(cg_mol.nodes) == 1:
             aa_mol_h, mol_graph = post_process(aa_mol.GetMol())
         else:
@@ -724,6 +736,8 @@ class Reactor(object):
         mol_graph.graph["LocalToGlobal"] = LocalToGlobal
         mol_graph.graph["GlobalToLocal"] = GlobalToLocal
         # For Test
+        #print(cg_graph.nodes)
+        #raise
         return aa_mol_h, mol_graph
 
     def process_deprecated(self, cg_mol: nx.Graph, reactions: list) -> tuple[Chem.Mol, nx.Graph]:
@@ -760,9 +774,9 @@ class Reactor(object):
                 processed_body_ids.add(body_id)
                 body_nodes = rigid_body_nodes[body_id]
                 rigid_name = node_data["rigid_name"]
-                rigid_data = self.rigid_configs[rigid_name]
-                rigid_mol = rigid_data["mol"]
-                positions = rigid_data["pos"]
+                #rigid_data = self.rigid_configs[rigid_name]
+                rigid_mol = rigid_data["mol"][rigid_name]
+                positions = rigid_data["x"][rigid_name]
                 rigid_mol_local2global = {i: i + global_count for i in range(rigid_mol.GetNumAtoms())}
                 for atom_id in range(rigid_mol.GetNumAtoms()):
                     aa_mol.AddAtom(rigid_mol.GetAtomWithIdx(atom_id))
@@ -879,7 +893,7 @@ class Reactor(object):
                             raise ValueError(f"Invalid SMARTS for rigid CG node {reactants_order[i]}: {meta['smarts']}")
                         _molecules.append(rigid_fragment)
                     elif len(meta["atom_idx"]) == 1:
-                        rigid_mol = self.rigid_configs[meta["rigid_name"]]["mol"]
+                        rigid_mol = self.rigid_configs["mol"][meta["rigid_name"]]
                         rigid_fragment = Chem.RWMol()
                         rigid_fragment.AddAtom(Chem.Atom(rigid_mol.GetAtomWithIdx(meta["atom_idx"][0])))
                         _molecules.append(rigid_fragment.GetMol())
@@ -988,11 +1002,20 @@ class Reactor(object):
         for bi in tqdm.tqdm(rm_all, total=len(rm_all), desc="removing atom", disable=True):
             aa_mol.RemoveAtom(bi)
         aa_mol.CommitBatchEdit()
+        raise
         assert self.check(aa_mol_, aa_mol)  # for debug
         fast_sanitize_p = self.fast_sanitize_p
         if aa_mol.GetNumAtoms() > FAST_SANITZE_THRESHOLD:
             fast_sanitize_p = True
         aa_mol_h, mol_graph = post_process(aa_mol.GetMol(), fast_sanitize_p)
+        #print(cg_graph.nodes)
+        #raise
+        #if 800 in list(cg_graph.nodes):
+        #    print(aa_mol_h.GetAtomWithIdx(312).GetSymbol())
+        #    neis = (aa_mol_h.GetNeighbors(312))
+        #    for nei in neis:
+        #        print(nei.GetIdx(),nei.GetSymbol())
+        #    raise
         return aa_mol_h, mol_graph
 
     @staticmethod

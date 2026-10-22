@@ -7,19 +7,26 @@ python -m pip install -e .
 chemfast --help
 ```
 
-The `pyproject.toml` entry point is `chemfast = "chemfast.cli:main"`; the three
-subcommands use the existing tutorial protocols rather than a separate simulation
-implementation. Input paths and `--name` can be absolute or relative to the **shell
-working directory**; PDB filler paths declared inside JSON are resolved against
-the JSON's directory. The tool never searches upward through arbitrary directories.
+The `pyproject.toml` entry point is `chemfast = "chemfast.cli:main"`.
+`--name` sets the **workspace** and defaults to the current shell directory;
+`--json` selects the configuration independently and defaults to
+`<workspace>/config.json`. Command-line file paths are relative to the shell
+working directory, while paths **inside JSON** (including `fillers[*].file`)
+are relative to the JSON file's directory. No upward directory search or
+fallback from a specified but missing file is performed.
 
-## 1. Generate CG inputs (does not run PyGAMD)
+## 1. Prepare CG inputs (and optionally launch PyGAMD)
 
 ```bash
 chemfast prepare_cg --json /data/input/config.json --name /data/work/SAMPLE
 # If you need a nondefault initial XML filename:
 chemfast prepare_cg --json /data/input/config.json --name /data/work/OTHER --xml custom_initial.xml
 ```
+
+Both `--name` and `--json` are optional: omitting `--name` uses the current
+directory as the workspace; omitting `--json` reads its `config.json`.
+Providing only `--json` does **not** change the workspace. To write into a
+different directory, specify `--name` explicitly.
 
 `--xml` is an **output filename** inside `<name>/cg`, not an input XML path.
 The default is `initial.xml`, matching the existing tutorial. The command runs
@@ -51,24 +58,25 @@ specify each filler file **inside config.json**, e.g.:
 The shown filler is only an illustration of a **file path**, not a complete
 chemically valid ChemFAST filler configuration. There is no separate `--pdb`
 option. You may use `--mass-density` (g/cm³; default `0.5`) and `--seed`
-(default `2026`) to override the tutorial's CG initialization defaults. The
-CLI's `0.5 g/cm³` tutorial-protocol default is distinct from the low-level
-`build_pygamd_protocol` API default of `0.9 g/cm³`.
+(default `2026`) to override the tutorial's CG initialization defaults.
 
-**Run PyGAMD yourself** using a Python interpreter/environment where PyGAMD is
-functional. For the default initial XML name:
-
-Switch to `/data/work/SAMPLE/cg/`, the directory just created by
-`--name /data/work/SAMPLE`, and run the generated script there:
+To run the generated CG protocol, use a Python interpreter with PyGAMD
+available. Run the script **from the workspace's `cg/` directory**, as its
+inputs and outputs use relative paths:
 
 ```bash
+cd /data/work/SAMPLE/cg
 /path/to/pygamd-env/bin/python run_pygamd_polymerization.py initial.xml cg_parameters.json --gpu=0
 ```
 
-If `--xml custom_initial.xml` was passed, use that name instead of `initial.xml`.
-The reactive protocol should produce `cg/reaction_final.xml` and
-`cg/reaction_path.txt`. They must come from the same PyGAMD run, with consistent
-particle indices; neither file is synthesized from the other by this CLI.
+For a custom initial XML filename, use it in place of `initial.xml`.
+
+```{note}
+For convenience, `chemfast run_cg_polymerization --name /data/work/SAMPLE --pygamd_bin /path/to/pygamd-env/bin/python --gpu_id 0` launches the **same generated script** from the correct directory. `--pygamd_bin` defaults to
+the current Python interpreter. If `prepare_cg` used a custom `--xml` filename,
+pass that filename to this command as well. This helper is optional; existing
+CG XML and ReactionPath files can be reconstructed with installed PyGAMD.
+```
 
 ## 2. Reconstruct AA and assign force fields
 
@@ -79,28 +87,25 @@ directory; `--name` is the same workspace used during CG preparation:
 chemfast reconstruct_aa --name /data/work/SAMPLE
 ```
 
-The command resolves its input files in the following order:
+First, the CLI determines the workspace (`--name`, otherwise the current
+directory) and JSON (`--json`, otherwise `<workspace>/config.json`). It then
+selects exactly one input for each required reconstruction file:
 
-| Input | Resolution order |
+| Input | Strict priority |
 |---|---|
-| JSON | `--json` → `<name>/config.json` |
-| CG XML | `--xml` → `cg_topology_file` in JSON → `<name>/cg/reaction_final.xml` |
-| ReactionPath | `--reactionpath` → `reaction_path_file` in JSON → `<name>/cg/reaction_path.txt` → BFS inference |
+| CG XML | `--xml` → JSON `cg_topology_file` → `<workspace>/cg/reaction_final.xml` |
+| ReactionPath | `--reactionpath` → JSON `reaction_path_file` → `<workspace>/cg/reaction_path.txt` |
 
-Command-line paths are resolved relative to the shell working directory.
-Relative paths declared in the JSON configuration are resolved against the
-JSON file's directory.
+Defaults are used **only when the corresponding JSON field is absent**, not
+when a declared path is missing on disk. Command-line paths resolve relative
+to the shell working directory; JSON fields resolve relative to the JSON's
+directory, even when `--name` selects a different workspace. If the selected
+file does not exist, the command fails with `FileNotFoundError`: it does not
+search alternate locations or silently infer a ReactionPath with BFS.
 
-Explicitly specified files must exist; otherwise, the command raises an
-error. If no ReactionPath is specified and the default file does not exist,
-ChemFAST infers a reconstruction path from the final CG connectivity using
-breadth-first search (BFS). When a default ReactionPath is available, ChemFAST
-uses it rather than invoking BFS.
-
-BFS inference requires compatible reaction rules and does not necessarily
-recover the original reaction sequence. A recorded ReactionPath is therefore
-recommended for systems in which reaction order affects the reconstructed
-atomistic topology.
+For the supplied examples, JSON contains `"cg_topology_file":
+"cg/reaction_final.xml"` and `"reaction_path_file": "cg/reaction_path.txt"`,
+which resolve correctly when the example JSON is stored at the workspace root.
 
 For example, the following command uses the CG XML specified in
 `config.json`, or the workspace default if the JSON does not specify one:
@@ -128,14 +133,14 @@ chemfast reconstruct_aa \
   --chunk-per-d 1
 ```
 
-When `--name` is omitted but `--json` is supplied, the workspace defaults to
-the input JSON's parent directory. `--chunk-per-d` defaults to `1`, as in the
-standard tutorial; increase it for a large network when needed. The AA
+When `--name` is omitted, the workspace is the **current directory**,
+independently of `--json`. `--chunk-per-d` defaults to `1`, as in the standard
+tutorial; increase it for a large network when needed. The AA
 workflow uses the existing `parse_config`, `topology_builder`,
 `embed_molecules`, `post_process_aa_mol`, and `run_adv_top_mode`, preserving
 the tutorial's GMX -> BOSS -> ML force-field assignment order.
 
-All AA results are written under `<name>/aa/`: `atomistic.sdf`, `system.gro`,
+All AA results are written under `<workspace>/aa/`: `atomistic.sdf`, `system.gro`,
 `system.top`, `atomtypes.itp` and component `.itp` files. This step does **not**
 run GROMACS energy minimization or molecular dynamics.
 

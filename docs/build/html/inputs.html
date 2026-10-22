@@ -166,10 +166,10 @@ with the following ChemFAST options:</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">cg_topology_file</span></code></p></td>
-<td><p>Path to the final PyGAMD XML configuration for FG</p></td>
+<td><p>Optional path to the final PyGAMD XML for FG; relative to the JSON file</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">reaction_path_file</span></code></p></td>
-<td><p>Path to the matching tuple-per-line ReactionPath text file for FG</p></td>
+<td><p>Optional path to the matching tuple-per-line ReactionPath for FG; relative to the JSON file</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">box_tensor</span></code></p></td>
 <td><p>Optional initial CG box lengths <code class="docutils literal notranslate"><span class="pre">[Lx,</span> <span class="pre">Ly,</span> <span class="pre">Lz]</span></code> in nm for an orthorhombic box</p></td>
@@ -194,11 +194,17 @@ function:</p>
 <p>Import this function from <code class="docutils literal notranslate"><span class="pre">chemfast.cg.pipeline</span></code>. An explicit box takes precedence
 over density. <strong>During FG, the box is read from the final XML; <code class="docutils literal notranslate"><span class="pre">box_tensor</span></code> in the
 JSON is ignored.</strong></p>
-<p>The two FG files need not exist during CG preparation. After simulation, pass
-their actual paths in a copy of the configuration dictionary; the JSON need not
-be rewritten. For file-based <code class="docutils literal notranslate"><span class="pre">build_pygamd_protocol</span></code>, relative reference paths
-resolve against the JSON directory. Direct FG <code class="docutils literal notranslate"><span class="pre">parse_config</span></code> calls resolve them
-against <code class="docutils literal notranslate"><span class="pre">work_dir</span></code>; pass the JSON parent directory or use absolute paths.</p>
+<p>The two FG files need not exist during CG preparation. For a JSON stored at
+the workspace root, the standard declarations are <code class="docutils literal notranslate"><span class="pre">&quot;cg_topology_file&quot;:</span> <span class="pre">&quot;cg/reaction_final.xml&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;reaction_path_file&quot;:</span> <span class="pre">&quot;cg/reaction_path.txt&quot;</span></code>.
+During <code class="docutils literal notranslate"><span class="pre">reconstruct_aa</span></code>, CLI flags (<code class="docutils literal notranslate"><span class="pre">--xml</span></code>, <code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code>) override these
+fields; when a field is absent, the CLI uses its corresponding
+<code class="docutils literal notranslate"><span class="pre">&lt;workspace&gt;/cg/</span></code> default. A declared path that does not exist raises an
+error; there is <strong>no fallback or automatic BFS inference</strong>. The workspace
+(<code class="docutils literal notranslate"><span class="pre">--name</span></code>, otherwise the current directory) and JSON (<code class="docutils literal notranslate"><span class="pre">--json</span></code>, otherwise
+<code class="docutils literal notranslate"><span class="pre">&lt;workspace&gt;/config.json</span></code>) are resolved independently. For file-based
+<code class="docutils literal notranslate"><span class="pre">build_pygamd_protocol</span></code>, relative reference paths resolve against the JSON
+directory. Direct FG <code class="docutils literal notranslate"><span class="pre">parse_config</span></code> calls resolve them against <code class="docutils literal notranslate"><span class="pre">work_dir</span></code>;
+pass the JSON parent directory or use absolute paths.</p>
 <section id="reactants">
 <h3>Reactants<a class="headerlink" href="#reactants" title="Link to this heading">¶</a></h3>
 <p>See <a class="reference internal" href="reaction-dsl.html#reactants"><span class="std std-ref">Reactants</span></a> for SMILES/SMARTS, counts and capacity.</p>

@@ -77,8 +77,8 @@ The CLI reads `06_spe/config.json` and the two fixed CG outputs from
 `06_spe/cg/`, then writes the reconstructed SDF and GROMACS files to
 `06_spe/aa/`. No CG result filenames need to be passed again.
 
-| Final CG configuration | Energy-minimized AA reconstruction |
-|---|---|
+| Final CG configuration | Energy-minimized AA model                                                                 |
+|---|-------------------------------------------------------------------------------------------|
 | ![Final CG SPE configuration used for reconstruction.](../_static/tutorials/06_spe/cg_final.png) | ![Atomistic SPE system after energy minimization.](../_static/tutorials/06_spe/aa_em.png) |
 
 ChemFAST restores the full crosslinker geometries, replays the recorded network

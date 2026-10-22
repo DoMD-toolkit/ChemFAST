@@ -186,8 +186,8 @@ All downloadable tutorial configurations use this same spelling.
 The following complete configuration defines a dianhydride and a diamine, their
 reaction rules, and filenames for subsequent reconstruction:</p>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;cg_topology_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reaction_final.xml&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;reaction_path_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reaction_path.txt&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;cg_topology_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cg/reaction_final.xml&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;reaction_path_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cg/reaction_path.txt&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
 <span class="w">      </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;A&quot;</span><span class="p">,</span>
@@ -530,6 +530,20 @@ The array is deliberately not sorted. Its length and order must match the SMARTS
 atoms, and the selected reference fragment must match the pattern. These indices
 are not PDB serial numbers, atom-map labels or global CG particle IDs. Preserve
 the reference atom order and hydrogen representation after preparing mappings.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Explicit hydrogens in rigid fillers
+Rigid filler coordinates are reconstructed by <strong>rotation and translation</strong> of
+an existing reference structure. ChemFAST does not generate coordinates for
+new hydrogen atoms on a filler during reconstruction. The reference PDB/SDF
+file must include <strong>all hydrogen atoms explicitly</strong>.</p>
+<p>Reactions involving fillers currently support bond formation between existing
+atoms and removal of explicitly represented atoms or groups. They must <strong>not
+produce implicit hydrogens on the filler</strong>. In particular, map any hydrogens
+or leaving groups to be removed correctly, and verify the resulting atomistic
+valences and bond orders. A reaction requiring newly generated filler hydrogen
+atoms is not supported by the current rigid-body reconstruction.</p>
+</div>
 <p>For reconstruction, supply <code class="docutils literal notranslate"><span class="pre">filler_idx</span></code> from the actual final XML <code class="docutils literal notranslate"><span class="pre">body</span></code> values.
 For example, <code class="docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">9]</span></code> would associate two rigid bodies with this reference only if
 those are their recorded IDs. <code class="docutils literal notranslate"><span class="pre">N:</span> <span class="pre">2</span></code> alone does not identify them. Reference-path

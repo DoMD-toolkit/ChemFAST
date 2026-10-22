@@ -137,8 +137,8 @@ definitions. The same file is used for CG preparation and AA reconstruction.</p>
 </tbody>
 </table>
 <div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-<span class="w">  </span><span class="nt">&quot;cg_topology_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reaction_final.xml&quot;</span><span class="p">,</span>
-<span class="w">  </span><span class="nt">&quot;reaction_path_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;reaction_path.txt&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;cg_topology_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cg/reaction_final.xml&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;reaction_path_file&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;cg/reaction_path.txt&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;domd_react_dsl&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v1&quot;</span><span class="p">,</span>
 <span class="w">  </span><span class="nt">&quot;reactants&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <span class="w">    </span><span class="p">{</span>
@@ -218,9 +218,11 @@ use a relative <code class="docutils literal notranslate"><span class="pre">--na
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>chemfast<span class="w"> </span>reconstruct_aa<span class="w"> </span>--name<span class="w"> </span>MY_SYSTEM
 </pre></div>
 </div>
-<p>Without explicit <code class="docutils literal notranslate"><span class="pre">--xml</span></code>, <code class="docutils literal notranslate"><span class="pre">--json</span></code>, or <code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code>, the CLI reads only
-<code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/config.json</span></code>, <code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/cg/reaction_final.xml</span></code>, and
-<code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/cg/reaction_path.txt</span></code>. No manual edits to the JSON are required.</p>
+<p>Without explicit <code class="docutils literal notranslate"><span class="pre">--xml</span></code>, <code class="docutils literal notranslate"><span class="pre">--json</span></code>, or <code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code>, the CLI reads
+<code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/config.json</span></code>. The bundled JSON explicitly references
+<code class="docutils literal notranslate"><span class="pre">cg/reaction_final.xml</span></code> and <code class="docutils literal notranslate"><span class="pre">cg/reaction_path.txt</span></code> relative to its own location,
+so no manual edits are required. If those fields are omitted, the same files
+are selected from the workspace <code class="docutils literal notranslate"><span class="pre">cg/</span></code> defaults.</p>
 <p>The CLI writes <code class="docutils literal notranslate"><span class="pre">MY_SYSTEM/aa/atomistic.sdf</span></code> (including residue/box
 metadata), plus matching GROMACS <code class="docutils literal notranslate"><span class="pre">system.gro</span></code>, <code class="docutils literal notranslate"><span class="pre">system.top</span></code>, and ITP files.
 For external CG results, use explicit <code class="docutils literal notranslate"><span class="pre">--xml</span></code>, <code class="docutils literal notranslate"><span class="pre">--reactionpath</span></code>, and <code class="docutils literal notranslate"><span class="pre">--json</span></code>

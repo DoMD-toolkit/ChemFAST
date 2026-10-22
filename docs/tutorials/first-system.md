@@ -98,8 +98,8 @@ chemfast reconstruct_aa --name 01_linear_pi_new
 `01_linear_pi_new/cg/`, then writes AA results into `01_linear_pi_new/aa/`.
 The corresponding outputs for Option A are in `01_linear_pi/aa/`.
 
-| Final CG configuration | Energy-minimized AA reconstruction |
-|---|---|
+| Final CG configuration | Energy-minimized AA model                                                                            |
+|---|------------------------------------------------------------------------------------------------------|
 | ![Final CG configuration used for reconstruction.](../_static/tutorials/01_linear_pi/cg_final.png) | ![Atomistic polyimide model after energy minimization.](../_static/tutorials/01_linear_pi/aa_em.png) |
 
 ChemFAST replays the recorded reactions to build atomistic connectivity, then

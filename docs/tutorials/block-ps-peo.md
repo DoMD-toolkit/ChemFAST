@@ -88,21 +88,11 @@ chemfast reconstruct_aa --name 03_ps_b_peo
 writes `atomistic.sdf`, `system.gro`, `system.top`, and ITP files into
 `03_ps_b_peo/aa/`.
 
-Optional residue-rigid density packing is now a **separate** CLI operation:
-
-```bash
-chemfast density_optimization --sdf_in 03_ps_b_peo/aa/atomistic.sdf --density 1.0
-```
-
-It produces `03_ps_b_peo/aa/atomistic_density_optimized.sdf`, not a matching
-replacement GRO/TOP/ITP set. Do **not** combine that optimized SDF with the
-unmodified GROMACS files. The reconstruction itself uses the prescribed
-`S-S`, `S-O`, and `O-O` ReactionPath records, including the block junction.
 See [AA relaxation](aa-relaxation.md) for the optional density stage and the
 separate GROMACS minimization/equilibration workflow.
 
-| Final CG configuration | Energy-minimized AA reconstruction |
-|---|---|
+| Final CG configuration | Energy-minimized AA model                                                                    |
+|---|----------------------------------------------------------------------------------------------|
 | ![Final CG PS-b-PEO configuration used for reconstruction.](../_static/tutorials/03_ps_b_peo/cg_final.png) | ![Atomistic PS-b-PEO after energy minimization.](../_static/tutorials/03_ps_b_peo/aa_em.png) |
 
 The AA panel shows an energy-minimized configuration, rather than the
