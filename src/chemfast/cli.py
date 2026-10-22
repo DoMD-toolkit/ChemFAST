@@ -138,7 +138,8 @@ def prepare_cg(args: argparse.Namespace) -> None:
     print(f"[ChemFAST] outputs: {cg_dir / cg_xml}, {cg_dir / 'run_pygamd_polymerization.py'}, "
           f"{cg_dir / 'cg_parameters.json'}", flush=True)
     next_xml = f" --xml {cg_xml}" if cg_xml != "initial.xml" else ""
-    print(f"[ChemFAST] NEXT: chemfast run_cg_polymerization --name {root}{next_xml}", flush=True)
+    print(f"[ChemFAST] NEXT: switch to {root}{next_xml}/cg and run cg polymerization with PyGAMD", flush=True)
+    print(f"[ChemFAST] (CLI): chemfast run_cg_polymerization --name {root}{next_xml}", flush=True)
 
 
 def run_cg_polymerization(args: argparse.Namespace) -> None:
