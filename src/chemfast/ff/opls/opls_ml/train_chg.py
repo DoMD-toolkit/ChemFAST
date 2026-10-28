@@ -527,7 +527,7 @@ class ChargeProjectionGINE(nn.Module):
         h = self.jk(states)
         num_graphs = batch_ptr.numel() - 1
         h, context = self.molecular_context(
-            h,
+            h.float(),
             batch_index,
             formal_charge,
             num_graphs,
